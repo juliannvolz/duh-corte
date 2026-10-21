@@ -1,9 +1,9 @@
 import Link from "next/link";
-import { Check, Sparkles } from "lucide-react";
+import { ArrowUpRight, Check, Sparkles, Store } from "lucide-react";
 import { Section, SectionHeading } from "@/components/ui/Section";
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/Reveal";
 import { getPlans } from "@/lib/content";
-import { formatBRL } from "@/lib/site";
+import { business, formatBRL } from "@/lib/site";
 
 export async function Plans() {
   const plans = await getPlans();
@@ -70,16 +70,29 @@ export async function Plans() {
                 </ul>
               </div>
 
-              <Link
-                href={`/agendar?plano=${plan.id}`}
-                className={`mt-10 inline-flex items-center justify-center gap-2 rounded-full px-6 py-3.5 text-sm font-semibold transition-all duration-300 ${
-                  plan.highlight
-                    ? "bg-gold text-ink hover:scale-[1.02]"
-                    : "border border-line-strong text-bone hover:border-gold hover:text-gold"
-                }`}
-              >
-                Quero este plano
-              </Link>
+              <div className="mt-10 flex flex-col gap-3">
+                <Link
+                  href={`/agendar?plano=${plan.id}`}
+                  className={`inline-flex items-center justify-center gap-2 rounded-full px-6 py-3.5 text-sm font-semibold transition-all duration-300 ${
+                    plan.highlight
+                      ? "bg-gold text-ink hover:scale-[1.02]"
+                      : "border border-line-strong text-bone hover:border-gold hover:text-gold"
+                  }`}
+                >
+                  Quero este plano
+                  <ArrowUpRight className="size-4 transition-transform duration-300 group-hover:translate-x-0.5" />
+                </Link>
+                <a
+                  href={`https://wa.me/${business.whatsapp}?text=${encodeURIComponent(
+                    `Olá! Quero assinar o plano ${plan.name} (${formatBRL(plan.priceCents)}/${plan.period}). Quero saber como ativar na loja.`,
+                  )}`}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="inline-flex items-center justify-center gap-2 rounded-full border border-line px-6 py-3 text-xs text-bone-dim transition-colors hover:border-gold hover:text-gold"
+                >
+                  <Store className="size-3.5" /> Ativar na loja (Vila Nova)
+                </a>
+              </div>
             </RevealItem>
           ))}
         </RevealGroup>

@@ -1,6 +1,6 @@
 {
   "base": "http://localhost:3000",
-  "startedAt": "2026-10-21T21:27:08.323Z",
+  "startedAt": "2026-10-21T23:01:55.597Z",
   "viewports": {
     "mobile/": {
       "status": 200,
@@ -35,7 +35,9 @@
     "mobile-diagnostics": {
       "consoleErrors": [],
       "pageErrors": [],
-      "failedRequests": [],
+      "failedRequests": [
+        "GET https://www.google.com/maps?q=R.%20Walter%20Marquardt%2C%20878%2C%20Vila%20Nova%2C%20Jaragu%C3%A1%20do%20Sul%20-%20SC&output=embed :: net::ERR_ABORTED"
+      ],
       "httpErrors": [],
       "warnings": []
     },
@@ -131,5 +133,5 @@
   "admin": {
     "loggedIn": true
   },
-  "finishedAt": "2026-10-21T21:29:16.184Z"
+  "finishedAt": "2026-10-21T23:03:56.652Z"
 }

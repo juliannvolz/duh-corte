@@ -6,6 +6,7 @@ import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { Menu, X } from "lucide-react";
 import { business, navLinks } from "@/lib/site";
 import { ScrollProgress } from "@/components/motion/ScrollProgress";
+import { AccountButton } from "@/components/account/AccountButton";
 
 export function SiteHeader() {
   const [scrolled, setScrolled] = useState(false);
@@ -72,6 +73,9 @@ export function SiteHeader() {
           >
             {business.phone}
           </a>
+
+          <AccountButton />
+
           <Link
             href="/agendar"
             className="group relative hidden overflow-hidden rounded-full bg-gold px-6 py-3 text-sm font-semibold text-ink transition-transform duration-300 hover:scale-[1.03] sm:inline-flex"

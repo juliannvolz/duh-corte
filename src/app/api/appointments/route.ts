@@ -19,6 +19,7 @@ const schema = z.object({
     notes: z.string().max(500).optional(),
   }),
   referralCode: z.string().max(16).optional(),
+  planId: z.string().max(40).optional(),
 });
 
 /** POST /api/appointments — cria a reserva (idempotente por chave). */
@@ -60,6 +61,7 @@ export async function POST(request: Request) {
         notes: data.customer.notes,
       },
       referralCode: data.referralCode,
+      planId: data.planId,
     });
   } catch (error) {
     const mensagem = error instanceof Error ? error.message : "erro desconhecido";

@@ -203,6 +203,8 @@ model Appointment {
   idempotencyKey String? @unique
   /// Codigo de indicacao usado na reserva (programa de fidelidade).
   referralCode  String?
+  /// Plano do Clube do Assinante escolhido na reserva (ativado na loja).
+  planId        String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   customer      Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)

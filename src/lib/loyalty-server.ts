@@ -52,7 +52,9 @@ export async function awardPointsForAppointment(appointmentId: string) {
   });
   if (jaCreditado) return { points: 0, rewards: 0 };
 
-  const pontos = Math.floor(appointment.priceCents / 100) * LOYALTY.pointsPerReal;
+  // assinante do Clube (VIP) ganha pontos em dobro
+  const base = Math.floor(appointment.priceCents / 100) * LOYALTY.pointsPerReal;
+  const pontos = appointment.planId ? base * 2 : base;
 
   await prisma.pointEntry.create({
     data: {

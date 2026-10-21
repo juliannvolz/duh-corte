@@ -96,6 +96,9 @@ export function BookingWizard({
   initialServiceId,
   initialProfessionalId,
   referralCode,
+  planId,
+  clientName,
+  clientEmail,
 }: {
   services: ServiceView[];
   professionals: ProfessionalSeed[];
@@ -105,6 +108,11 @@ export function BookingWizard({
   initialProfessionalId?: string;
   /** Codigo de indicacao (programa de fidelidade), vindo da URL. */
   referralCode?: string;
+  /** Plano do Clube escolhido (ativado na loja fisica). */
+  planId?: string;
+  /** Preenchimento automatico quando o cliente esta logado. */
+  clientName?: string;
+  clientEmail?: string;
 }) {
   const reduced = useReducedMotion();
   const [step, setStep] = useState(0);
@@ -117,7 +125,12 @@ export function BookingWizard({
   const [slots, setSlots] = useState<SlotResponse | null>(null);
   const [loadingSlots, setLoadingSlots] = useState(false);
   const [slot, setSlot] = useState<{ startsAt: string; label: string } | null>(null);
-  const [form, setForm] = useState({ name: "", phone: "", email: "", notes: "" });
+  const [form, setForm] = useState({
+    name: clientName ?? "",
+    phone: "",
+    email: clientEmail ?? "",
+    notes: "",
+  });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [created, setCreated] = useState<{
@@ -181,6 +194,7 @@ export function BookingWizard({
           startsAt: slot.startsAt,
           idempotencyKey,
           referralCode,
+          planId,
           customer: {
             name: form.name.trim(),
             phone: form.phone.trim(),

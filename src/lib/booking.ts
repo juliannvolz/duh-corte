@@ -192,6 +192,8 @@ export type CreateAppointmentInput = {
   idempotencyKey?: string;
   /** Codigo de indicacao (programa de fidelidade), opcional. */
   referralCode?: string;
+  /** Plano do Clube do Assinante escolhido (opcional). */
+  planId?: string;
 };
 
 export type CreateAppointmentResult =
@@ -294,6 +296,7 @@ export async function createAppointment(
           source: "site",
           idempotencyKey: input.idempotencyKey ?? null,
           referralCode: isValidReferralCode(input.referralCode) ? input.referralCode!.toUpperCase() : null,
+          planId: input.planId ?? null,
         },
       });
     });

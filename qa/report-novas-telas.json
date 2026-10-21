@@ -1,0 +1,21 @@
+{
+  "entrar": {
+    "temBotaoEntrar": true,
+    "temSenhaAdmin": true
+  },
+  "minhaConta": {
+    "redirecionaParaEntrar": true
+  },
+  "planos": {
+    "temBotao": true,
+    "temAtivarLoja": true,
+    "contextoNaAgenda": true,
+    "url": "http://localhost:3000/agendar?plano=corte"
+  },
+  "admin": {
+    "temCardIntegracoes": true,
+    "temCardFidelidade": true
+  },
+  "erros": [],
+  "httpErros": []
+}

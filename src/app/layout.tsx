@@ -3,6 +3,7 @@ import { Anton, Instrument_Serif, Inter } from "next/font/google";
 import "./globals.css";
 import { business } from "@/lib/site";
 import { SiteHeader } from "@/components/layout/SiteHeader";
+import { AuthProvider } from "@/components/account/AuthProvider";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { WhatsAppFab } from "@/components/layout/WhatsAppFab";
 import { SmoothScroll } from "@/components/motion/SmoothScroll";
@@ -111,6 +112,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${inter.variable} ${anton.variable} ${instrumentSerif.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col bg-ink text-bone">
+        <AuthProvider>
         <link rel="preload" as="image" href="/brand/wordmark-bone.png" fetchPriority="high" />
         <script
           type="application/ld+json"
@@ -130,6 +132,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         </main>
         <SiteFooter />
         <WhatsAppFab />
+        </AuthProvider>
       </body>
     </html>
   );

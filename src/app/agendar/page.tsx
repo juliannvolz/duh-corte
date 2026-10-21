@@ -2,6 +2,10 @@ import type { Metadata } from "next";
 import { BookingWizard } from "@/components/booking/BookingWizard";
 import { getCategories, getProfessionals, getServices } from "@/lib/content";
 import { getWeekWindows } from "@/lib/booking";
+import { getPlans } from "@/lib/content";
+import { auth } from "@/lib/auth-social";
+import { Store, Sparkles } from "lucide-react";
+import { business } from "@/lib/site";
 
 export const instant = false;
 
@@ -15,16 +19,20 @@ export const metadata: Metadata = {
 export default async function AgendarPage({
   searchParams,
 }: {
-  searchParams: Promise<{ servico?: string; profissional?: string; ref?: string }>;
+  searchParams: Promise<{ servico?: string; profissional?: string; ref?: string; plano?: string }>;
 }) {
-  const [{ servico, profissional, ref }, services, professionals, categories, windows] =
+  const [{ servico, profissional, ref, plano }, services, professionals, categories, windows, plans, session] =
     await Promise.all([
       searchParams,
       getServices(),
       getProfessionals(),
       getCategories(),
       getWeekWindows(),
+      getPlans(),
+      auth(),
     ]);
+
+  const planoEscolhido = plano ? plans.find((p) => p.id === plano) : undefined;
 
   return (
     <div className="relative overflow-hidden pb-24 pt-28 md:pt-36">
@@ -44,6 +52,29 @@ export default async function AgendarPage({
           fica reservada no seu nome.
         </p>
 
+        {planoEscolhido ? (
+          <div className="mt-8 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-gold/40 bg-gold/[0.07] px-5 py-4">
+            <p className="flex items-center gap-3 text-sm text-bone">
+              <Sparkles className="size-4 shrink-0 text-gold" />
+              <span>
+                <span className="text-gold">{planoEscolhido.name}</span> selecionado — sua vaga
+                fica prioritaria e os pontos valem <span className="text-gold">em dobro</span>. A
+                assinatura é ativada na loja (Vila Nova), depois do primeiro corte.
+              </span>
+            </p>
+            <a
+              href={`https://wa.me/${business.whatsapp}?text=${encodeURIComponent(
+                `Olá! Quero ativar o plano ${planoEscolhido.name} na loja.`,
+              )}`}
+              target="_blank"
+              rel="noreferrer noopener"
+              className="inline-flex items-center gap-2 rounded-full bg-gold px-4 py-2 text-xs font-semibold text-ink"
+            >
+              <Store className="size-3.5" /> Ativar na loja
+            </a>
+          </div>
+        ) : null}
+
         <div className="mt-14">
           <BookingWizard
             services={services}
@@ -53,6 +84,9 @@ export default async function AgendarPage({
             initialServiceId={servico}
             initialProfessionalId={profissional}
             referralCode={ref}
+            planId={planoEscolhido?.id}
+            clientName={session?.user?.name ?? undefined}
+            clientEmail={session?.user?.email ?? undefined}
           />
         </div>
       </div>
