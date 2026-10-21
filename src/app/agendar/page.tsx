@@ -15,15 +15,16 @@ export const metadata: Metadata = {
 export default async function AgendarPage({
   searchParams,
 }: {
-  searchParams: Promise<{ serviço?: string; profissional?: string }>;
+  searchParams: Promise<{ servico?: string; profissional?: string; ref?: string }>;
 }) {
-  const [{ serviço, profissional }, services, professionals, categories, windows] = await Promise.all([
-    searchParams,
-    getServices(),
-    getProfessionals(),
-    getCategories(),
-    getWeekWindows(),
-  ]);
+  const [{ servico, profissional, ref }, services, professionals, categories, windows] =
+    await Promise.all([
+      searchParams,
+      getServices(),
+      getProfessionals(),
+      getCategories(),
+      getWeekWindows(),
+    ]);
 
   return (
     <div className="relative overflow-hidden pb-24 pt-28 md:pt-36">
@@ -49,8 +50,9 @@ export default async function AgendarPage({
             professionals={professionals}
             categories={categories}
             windows={windows}
-            initialServiceId={serviço}
+            initialServiceId={servico}
             initialProfessionalId={profissional}
+            referralCode={ref}
           />
         </div>
       </div>

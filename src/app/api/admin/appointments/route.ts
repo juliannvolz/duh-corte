@@ -3,6 +3,7 @@ import { z } from "zod";
 import { requireAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { dayStart, toISODate } from "@/lib/time";
+import { awardPointsForAppointment } from "@/lib/loyalty-server";
 
 const statusSchema = z.object({
   status: z.enum(["pending", "confirmed", "done", "cancelled", "no_show"]),
@@ -68,5 +69,12 @@ export async function PATCH(request: Request) {
     data: { status: parsed.data.status },
   });
 
-  return NextResponse.json({ id: updated.id, status: updated.status });
+  // programa de fidelidade: quando o atendimento e marcado como "atendido",
+  // os pontos do cliente entram na conta (1 ponto por real).
+  let loyalty: { points: number; rewards: number } | null = null;
+  if (parsed.data.status === "done") {
+    loyalty = await awardPointsForAppointment(updated.id);
+  }
+
+  return NextResponse.json({ id: updated.id, status: updated.status, loyalty });
 }

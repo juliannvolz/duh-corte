@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-21T19:32:00.897Z",
+  "generatedAt": "2026-10-21T21:02:28.835Z",
   "widths": [
     480,
     960,
@@ -151,6 +151,31 @@
         }
       ],
       "fallback": "clube-assinante-1440.jpg"
+    },
+    {
+      "id": "dono",
+      "alt": "Dudu, dono e mestre barbeiro da Duh Corte Barbearia",
+      "credit": "Duh Corte Barbearia (foto do dono)",
+      "source": "oficial/dono.jpg",
+      "original": {
+        "width": 1066,
+        "height": 1600,
+        "format": "jpeg"
+      },
+      "placeholder": "data:image/jpeg;base64,/9j/2wBDABQODxIPDRQSEBIXFRQYHjIhHhwcHj0sLiQySUBMS0dARkVQWnNiUFVtVkVGZIhlbXd7gYKBTmCNl4x9lnN+gXz/2wBDARUXFx4aHjshITt8U0ZTfHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHz/wAARCAAeABgDASIAAhEBAxEB/8QAGAAAAwEBAAAAAAAAAAAAAAAAAAUGBAf/xAAkEAABBAICAQQDAAAAAAAAAAABAAIDEQQFEiGRBhNBYVFxsf/EABUBAQEAAAAAAAAAAAAAAAAAAAEA/8QAFxEBAAMAAAAAAAAAAAAAAAAAAAERQf/aAAwDAQACEQMRAD8AkwtsGG6bGfK1x5N7rqq/axMHJ4bdWaVfrdLGxskc7jJE9lEA0b/KJvDFamQhMNvqzrJGFsnuRSXxJFEEfBQlEgNEH7V/guMjQ4knoWFz4HsJzjeoMmEBrI4yR8m1A127xk6fJBvniz134/hCFj3mU+HCZiyAGbIqaV7RQP0B48ISn//Z",
+      "variants": [
+        {
+          "w": 480,
+          "file": "dono-480.webp",
+          "bytes": 11084
+        },
+        {
+          "w": 960,
+          "file": "dono-960.webp",
+          "bytes": 28150
+        }
+      ],
+      "fallback": "dono-1440.jpg"
     }
   ]
 }

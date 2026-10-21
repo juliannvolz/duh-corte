@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { AlertTriangle, CheckCircle2, Clock3, LogOut, Phone, RefreshCcw } from "lucide-react";
 import { formatBRL } from "@/lib/site";
 import { IntegrationsCard, type IntegrationsInfo } from "@/components/admin/IntegrationsCard";
+import { LoyaltyCard } from "@/components/admin/LoyaltyCard";
 
 type Appointment = {
   id: string;
@@ -270,6 +271,10 @@ export function AdminDashboard({
 
           <div className="mt-6">
             <IntegrationsCard info={integrations} />
+          </div>
+
+          <div className="mt-6">
+            <LoyaltyCard />
           </div>
         </aside>
       </div>

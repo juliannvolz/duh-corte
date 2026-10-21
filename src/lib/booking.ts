@@ -12,6 +12,8 @@ import {
 import { dayStart, toISODate, weekdayOf } from "@/lib/time";
 import { getGoogleBusy, createGoogleEvent } from "@/lib/google-calendar";
 import { business } from "@/lib/site";
+import { ensureReferralCode } from "@/lib/loyalty-server";
+import { isValidReferralCode } from "@/lib/loyalty";
 
 export type AvailabilityQuery = {
   dateISO: string;
@@ -188,6 +190,8 @@ export type CreateAppointmentInput = {
   startsAt: string;
   customer: { name: string; phone: string; email?: string; notes?: string };
   idempotencyKey?: string;
+  /** Codigo de indicacao (programa de fidelidade), opcional. */
+  referralCode?: string;
 };
 
 export type CreateAppointmentResult =
@@ -289,14 +293,47 @@ export async function createAppointment(
           status: "pending",
           source: "site",
           idempotencyKey: input.idempotencyKey ?? null,
+          referralCode: isValidReferralCode(input.referralCode) ? input.referralCode!.toUpperCase() : null,
         },
       });
     });
 
+    // programa de fidelidade: codigo do cliente + vinculo de indicacao
+    const referralCode = await ensureReferralCode({
+      id: appointment.customerId,
+      phone: input.customer.phone,
+    });
+
+    if (isValidReferralCode(input.referralCode)) {
+      const codigo = input.referralCode!.trim().toUpperCase();
+      const indicador = await prisma.customer.findUnique({
+        where: { referralCode: codigo },
+        select: { id: true },
+      });
+      if (indicador && indicador.id !== appointment.customerId) {
+        await prisma.referral
+          .create({
+            data: {
+              referrerId: indicador.id,
+              refereeId: appointment.customerId,
+            },
+          })
+          .catch(() => undefined); // ja existia vinculo
+      }
+    }
+
     // agenda do Google (quando configurada): a reserva vira um evento la
     await createGoogleEvent({
       summary: `${service.name} — ${input.customer.name}`,
-      description: `Reserva no site da ${business.name}. Código ${appointment.id.slice(0, 8).toUpperCase()}. Telefone: ${input.customer.phone}.`,
+      description: [
+        `Cliente: ${input.customer.name}`,
+        `WhatsApp: ${input.customer.phone}`,
+        `Serviço: ${service.name} (${service.durationMin} min)`,
+        `Profissional: ${professional.name}`,
+        `Valor: R$ ${(priceCents / 100).toFixed(2).replace(".", ",")}`,
+        `Código da reserva: ${appointment.id.slice(0, 8).toUpperCase()}`,
+        `Agendado pelo site da ${business.name}.`,
+      ].join("\n"),
       location: `${business.address.street}, ${business.address.neighborhood} — ${business.address.city}/${business.address.state}`,
       startsAt: appointment.startsAt.toISOString(),
       endsAt: appointment.endsAt.toISOString(),

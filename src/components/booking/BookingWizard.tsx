@@ -5,13 +5,15 @@ import {
   ArrowLeft,
   ArrowRight,
   CalendarDays,
-  CalendarPlus,
   Check,
   CheckCircle2,
   Clock3,
   Loader2,
   MessageCircle,
   Scissors,
+  Share2,
+  Sparkles,
+  Ticket,
   User,
   Wallet,
 } from "lucide-react";
@@ -22,6 +24,18 @@ import type { ProfessionalSeed, ServiceCategory } from "@/lib/site";
 import type { ServiceView } from "@/lib/content";
 
 const STEPS = ["Serviço", "Profissional", "Horário", "Seus dados"];
+
+/** Resumo de fidelidade devolvido pela API de reservas. */
+type LoyaltyInfo = {
+  points: number;
+  referralCode: string | null;
+  progress: {
+    tier: { id: string; points: number; label: string; kind: string; valueCents: number } | null;
+    faltamPontos: number;
+    progresso: number;
+  };
+  rewards: Array<{ id: string; label: string; status: string }>;
+};
 
 export type SlotWindow = { weekday: number; openMin: number; closeMin: number } | null;
 
@@ -81,6 +95,7 @@ export function BookingWizard({
   windows,
   initialServiceId,
   initialProfessionalId,
+  referralCode,
 }: {
   services: ServiceView[];
   professionals: ProfessionalSeed[];
@@ -88,6 +103,8 @@ export function BookingWizard({
   windows: SlotWindow[];
   initialServiceId?: string;
   initialProfessionalId?: string;
+  /** Codigo de indicacao (programa de fidelidade), vindo da URL. */
+  referralCode?: string;
 }) {
   const reduced = useReducedMotion();
   const [step, setStep] = useState(0);
@@ -107,7 +124,7 @@ export function BookingWizard({
     id: string;
     startsAt: string;
     priceCents: number;
-    calendarToken: string;
+    loyalty: LoyaltyInfo | null;
   } | null>(null);
   const [idempotencyKey] = useState(() => `reserva-${crypto.randomUUID()}`);
 
@@ -163,6 +180,7 @@ export function BookingWizard({
           professionalId,
           startsAt: slot.startsAt,
           idempotencyKey,
+          referralCode,
           customer: {
             name: form.name.trim(),
             phone: form.phone.trim(),
@@ -177,7 +195,7 @@ export function BookingWizard({
         id: json.id,
         startsAt: json.startsAt,
         priceCents: json.priceCents,
-        calendarToken: json.calendarToken ?? "",
+        loyalty: (json.loyalty as LoyaltyInfo | null) ?? null,
       });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erro ao reservar");
@@ -718,7 +736,7 @@ function SuccessCard({
   professionalName,
   label,
 }: {
-  created: { id: string; startsAt: string; priceCents: number; calendarToken: string };
+  created: { id: string; startsAt: string; priceCents: number; loyalty: LoyaltyInfo | null };
   serviceName: string;
   professionalName: string;
   label: string;
@@ -744,18 +762,76 @@ function SuccessCard({
         <span className="mx-auto grid size-14 place-items-center rounded-full bg-gold text-ink">
           <CheckCircle2 className="size-7" />
         </span>
-        <h2 className="display mt-6 text-3xl md:text-4xl">Reserva feita.</h2>
+        <h2 className="display mt-6 text-3xl md:text-4xl">Reserva confirmada.</h2>
         <p className="mt-3 text-sm text-bone-dim">
           {serviceName} com {professionalName}
           <br />
-          <span className="text-bone">
-            {dateLabel} · código {created.id.slice(0, 8).toUpperCase()}
-          </span>
+          <span className="text-bone">{dateLabel}</span>
         </p>
+
+        <div className="mx-auto mt-6 max-w-md rounded-2xl border border-gold/40 bg-ink/60 p-5 text-left">
+          <p className="flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-gold">
+            <Ticket className="size-4" /> Código da reserva
+          </p>
+          <p className="display mt-2 text-2xl text-bone">{created.id.slice(0, 8).toUpperCase()}</p>
+          <p className="mt-2 text-xs leading-relaxed text-bone-dim">
+            Guarde este código: é por ele que a barbearia encontra o seu horário no sistema.
+            Para remarcar ou cancelar, é só mandar o código no WhatsApp.
+          </p>
+        </div>
 
         <p className="mt-4 text-sm text-bone-dim">
           Valor: <span className="text-gold">{formatBRL(created.priceCents)}</span>
         </p>
+
+        {created.loyalty ? (
+          <div className="mx-auto mt-6 max-w-md rounded-2xl border border-line bg-ink/60 p-5 text-left">
+            <p className="flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-gold">
+              <Sparkles className="size-4" /> Seus pontos
+            </p>
+            <p className="mt-2 text-sm text-bone">
+              Você tem <span className="text-gold">{created.loyalty.points} pontos</span> no
+              programa da casa.
+            </p>
+            {created.loyalty.progress.tier ? (
+              <>
+                <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-line">
+                  <div
+                    className="h-full rounded-full bg-gold"
+                    style={{ width: `${Math.round(created.loyalty.progress.progresso * 100)}%` }}
+                  />
+                </div>
+                <p className="mt-2 text-xs leading-relaxed text-bone-dim">
+                  Faltam {created.loyalty.progress.faltamPontos} pontos para{" "}
+                  <span className="text-bone">{created.loyalty.progress.tier.label}</span>.
+                </p>
+              </>
+            ) : (
+              <p className="mt-2 text-xs text-bone-dim">Você está no topo do programa. 👑</p>
+            )}
+
+            {created.loyalty.referralCode ? (
+              <div className="mt-4 border-t border-line pt-4">
+                <p className="text-xs leading-relaxed text-bone-dim">
+                  Indique um amigo e ganhem{" "}
+                  <span className="text-gold">30 pontos</span> para cada um assim que ele fizer o
+                  primeiro corte. Seu código:
+                </p>
+                <p className="display mt-1 text-lg text-bone">{created.loyalty.referralCode}</p>
+                <a
+                  href={`https://wa.me/?text=${encodeURIComponent(
+                    `Corte na Duh Corte Barbearia? Use meu código ${created.loyalty.referralCode} e ganhe 30 pontos no seu primeiro corte: ${typeof window === "undefined" ? "" : window.location.origin}/agendar?ref=${created.loyalty.referralCode}`,
+                  )}`}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="mt-3 inline-flex items-center gap-2 rounded-full border border-line-strong px-4 py-2 text-xs font-medium text-bone transition-colors hover:border-gold hover:text-gold"
+                >
+                  <Share2 className="size-3.5" /> Indicar pelo WhatsApp
+                </a>
+              </div>
+            ) : null}
+          </div>
+        ) : null}
 
         <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
           <a
@@ -788,21 +864,7 @@ function SuccessCard({
           </p>
         </div>
 
-        <div className="mt-4 rounded-2xl border border-line bg-ink/70 p-5 text-left">
-          <p className="flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-bone-dim">
-            <CalendarPlus className="size-4 text-gold" /> Google Agenda
-          </p>
-          <p className="mt-3 text-sm text-bone-dim">
-            Salve o horário na sua agenda do Google (ou Apple/Outlook) e o lembrete aparece
-            sozinho.
-          </p>
-          <a
-            href={"/api/calendar/ics?appointment=" + created.id + "&token=" + created.calendarToken}
-            className="mt-3 inline-flex items-center gap-2 rounded-full border border-line-strong px-5 py-2.5 text-sm font-medium text-bone transition-colors hover:border-gold hover:text-gold"
-          >
-            <CalendarPlus className="size-4" /> Adicionar à minha agenda
-          </a>
-        </div>
+
       </motion.div>
     </div>
   );

@@ -1,6 +1,6 @@
 {
   "base": "http://localhost:3000",
-  "startedAt": "2026-10-21T19:41:13.418Z",
+  "startedAt": "2026-10-21T21:27:08.323Z",
   "viewports": {
     "mobile/": {
       "status": 200,
@@ -117,10 +117,11 @@
   "flow": {
     "servicePressed": true,
     "choseSlot": true,
-    "slotCount": 34,
+    "slotCount": 38,
     "success": true,
     "pagamentoPresencial": true,
-    "googleAgenda": true,
+    "codigoReserva": true,
+    "fidelidade": true,
     "consoleErrors": [],
     "pageErrors": [],
     "failedRequests": [],
@@ -130,5 +131,5 @@
   "admin": {
     "loggedIn": true
   },
-  "finishedAt": "2026-10-21T19:43:08.271Z"
+  "finishedAt": "2026-10-21T21:29:16.184Z"
 }

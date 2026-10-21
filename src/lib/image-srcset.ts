@@ -62,5 +62,15 @@ export const IMAGE_SRCSET: Record<string, ImageSize> = {
       1440
     ],
     "jpgWidth": 1440
+  },
+  "dono": {
+    "width": 1066,
+    "height": 1600,
+    "avif": [],
+    "webp": [
+      480,
+      960
+    ],
+    "jpgWidth": 1440
   }
 };

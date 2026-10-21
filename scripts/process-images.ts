@@ -22,7 +22,14 @@ const OUT = path.join(ROOT, "public", "gallery");
 const WIDTHS = [480, 960, 1440, 1920];
 
 /** Mapa origem -> nome no site. */
-const PIPELINE: Array<{ from: string; to: string; alt: string; credit: string }> = [
+const PIPELINE: Array<{
+  from: string;
+  to: string;
+  alt: string;
+  credit: string;
+  /** Enquadramento opcional (proporcao do card no site). */
+  crop?: { ratio: [number, number]; position?: "top" | "center" | "bottom" | "left" };
+}> = [
   {
     from: "oficial/oficial-03.png",
     to: "degrade-medio",
@@ -65,6 +72,8 @@ const PIPELINE: Array<{ from: string; to: string; alt: string; credit: string }>
     to: "dono",
     alt: "Dudu, dono e mestre barbeiro da Duh Corte Barbearia",
     credit: "Duh Corte Barbearia (foto do dono)",
+    // card vertical 4/5, cortando pela base (mantem rosto e torso)
+    crop: { ratio: [4, 5], position: "top" },
   },
 ];
 
@@ -100,13 +109,47 @@ async function processOne(item: (typeof PIPELINE)[number]) {
   const meta = await input.metadata();
   const original = { width: meta.width ?? 0, height: meta.height ?? 0, format: meta.format };
 
+  /**
+   * Enquadramento: o site usa proporcoes fixas (ex.: 4/5 no bloco do dono).
+   * Recortamos a partir da foto original — `position: "top"` mantem o rosto
+   * e o torso (nunca cortamos a cabeca).
+   */
+  let base = input;
+  let cropped = false;
+  if (item.crop && original.width && original.height) {
+    const [rw, rh] = item.crop.ratio;
+    const target = rw / rh;
+    const current = original.width / original.height;
+    let left = 0;
+    let top = 0;
+    let width = original.width;
+    let height = original.height;
+
+    if (current > target) {
+      // imagem mais larga: corta dos lados
+      width = Math.round(original.height * target);
+      height = original.height;
+      left = item.crop.position === "left" ? 0 : Math.round((original.width - width) / 2);
+    } else {
+      // imagem mais alta: corta a parte de baixo (mantem o topo)
+      width = original.width;
+      height = Math.round(original.width / target);
+      top = item.crop.position === "bottom" ? original.height - height : 0;
+      if (top + height > original.height) top = original.height - height;
+    }
+
+    base = input.clone().extract({ left, top, width, height });
+    cropped = true;
+  }
+  void cropped;
+
   const variants: Array<{ w: number; file: string; bytes: number }> = [];
 
   for (const width of WIDTHS) {
     if (original.width && width > original.width * 1.35) continue; // nao inventa resolucao
     for (const format of ["avif", "webp"] as const) {
       const file = `${item.to}-${width}.${format}`;
-      const out = await input
+      const out = await base
         .clone()
         .resize({ width, withoutEnlargement: true })
         .toFormat(format, { quality: format === "avif" ? 52 : 78, effort: 6 })
@@ -118,7 +161,7 @@ async function processOne(item: (typeof PIPELINE)[number]) {
 
   // fallback jpg (compatibilidade) na maior largura + nome canonico <id>.jpg
   const jpgName = `${item.to}-1440.jpg`;
-  const jpg = await input
+  const jpg = await base
     .clone()
     .resize({ width: 1440, withoutEnlargement: true })
     .jpeg({ quality: 82, mozjpeg: true })
@@ -129,7 +172,7 @@ async function processOne(item: (typeof PIPELINE)[number]) {
   // sharpen leve para origens pequenas (evita aparencia "borrada" ao ampliar)
   const small = (original.width ?? 0) < 900;
   if (small) {
-    const sharpened = await input
+    const sharpened = await base
       .clone()
       .sharpen({ sigma: 1.1, m1: 0.6, m2: 0.9 })
       .jpeg({ quality: 88, mozjpeg: true })
@@ -138,7 +181,7 @@ async function processOne(item: (typeof PIPELINE)[number]) {
   }
 
   // placeholder blur
-  const tiny = await input.clone().resize({ width: 24 }).jpeg({ quality: 40 }).toBuffer();
+  const tiny = await base.clone().resize({ width: 24 }).jpeg({ quality: 40 }).toBuffer();
   const blurData = `data:image/jpeg;base64,${tiny.toString("base64")}`;
 
   console.log(`[ok] ${item.to}: ${variants.length} variantes + jpg`);

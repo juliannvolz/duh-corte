@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { createAppointment } from "@/lib/booking";
-import { signCalendarToken } from "@/lib/calendar-token";
+import { getLoyaltyByAppointment } from "@/lib/loyalty-server";
 
 const schema = z.object({
   serviceId: z.string().min(1),
@@ -18,6 +18,7 @@ const schema = z.object({
     email: z.string().email().optional().or(z.literal("")),
     notes: z.string().max(500).optional(),
   }),
+  referralCode: z.string().max(16).optional(),
 });
 
 /** POST /api/appointments — cria a reserva (idempotente por chave). */
@@ -56,6 +57,7 @@ export async function POST(request: Request) {
       email: data.customer.email || undefined,
       notes: data.customer.notes,
     },
+    referralCode: data.referralCode,
   });
 
   if (!result.ok) {
@@ -70,8 +72,8 @@ export async function POST(request: Request) {
       startsAt: result.startsAt,
       priceCents: result.priceCents,
       status: "pending",
-      // link do .ics (Google Agenda) com assinatura do proprio agendamento
-      calendarToken: signCalendarToken(result.appointmentId),
+      // programa de fidelidade: pontos do cliente e codigo de indicacao
+      loyalty: await getLoyaltyByAppointment(result.appointmentId),
     },
     { status: result.replayed ? 200 : 201 },
   );

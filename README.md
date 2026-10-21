@@ -40,9 +40,10 @@ Todos os preços são **placeholders de referência** (`priceConfirmed: false`) 
 
 ## Gates medidos (evidência)
 
-- **Build/typecheck/lint:** `tsc --noEmit` limpo; `next build` ok; ESLint **0 erros** (13 avisos, todos em scripts de pipeline); 50 testes verdes.
-- **Testes:** 50 vitests (scheduling + Pix CRC16) — `npx vitest run`.
-- **QA E2E (`scripts/qa.mjs`, Brave headless):** fluxo de reserva completo (serviço → profissional → horário → dados → reserva criada), **pagamento presencial** visível, **link de agenda (.ics) respondendo `text/calendar`**, admin login OK; 0 erros de console, 0 page errors, 0 request/HTTP failures. Screenshots em `qa/screens/` (390/768/1440).
+- **Build/typecheck/lint:** `tsc --noEmit` limpo; `next build` ok; ESLint **0 erros** (13 avisos, todos em scripts de pipeline); 59 testes verdes.
+- **Testes:** 59 vitests (scheduling + Pix CRC16 + fidelidade) — `npx vitest run`.
+- **QA E2E (`scripts/qa.mjs`, Brave headless):** fluxo de reserva completo (serviço → profissional → horário → dados → reserva confirmada), **pagamento presencial** visível, **código da reserva** visível, **pontos de fidelidade** visíveis, admin login OK; 0 erros de console, 0 page errors, 0 request/HTTP failures. Screenshots em `qa/screens/` (390/768/1440).
+- **QA da fidelidade (`scripts/qa-loyalty.mjs`):** reserva → status "atendido" → 50 pontos creditados (R$ 50) → recompensa "R$ 10 de desconto" liberada → cliente com código `DUC-XXXX` e próxima faixa calculada.
 - **Lighthouse (mobile 390×844, Brave):** performance **87** / accessibility **96** / best-practices **100**; FCP 1,0 s, Speed Index 2,2 s, TBT 120 ms, CLS **0**.
   - LCP simulado 3,9 s (gate < 2,5 s **não atingido**; budget registrado como justificativa): simulação 4× CPU + slow 4G com o perfil de animações próprias; os subpartes reais do LCP somam ~0,7 s. Ações feitas: entradas do hero em CSS puro (sem hidratação), imagem LCP com `fetchpriority`, PNG do header pré-carregado, partículas carregadas via `dynamic` (fora do bundle inicial). Realizar diligência em URL real antes de hotspot de campanha.
 - **Acessibilidade:** landmark/skip-link/aria-pressed no wizard; `prefers-reduced-motion` respeitado (motion, keyframes e canvas).
@@ -54,9 +55,15 @@ Todos os preços são **placeholders de referência** (`priceConfirmed: false`) 
 - **Acentuação** — bug real identificado e corrigido: a Instrument Serif itálica **não tem glifo de acento maiúsculo** (o "É" saía como "E"); o span itálico agora preserva a caixa original (`text-transform: none`). Auditoria de texto: `node scripts/audit-text.mjs` e `node scripts/audit-accents.mjs`.
 - **Agendamento estilo app** — grade separada em *Manhã* e *Tarde*, duração do serviço à vista e intervalo real de 15 min entre cortes (o primeiro horário livre após um atendimento também é oferecido: corte 09:00–09:40 → próximo 09:55).
 - **Pagamento 100% presencial** — QR Pix online removido (rota `/api/payments/pix` deletada); o site informa que o pagamento é feito na barbearia.
-- **Seção do dono** — bloco "O nome do dono é a garantia" com foto real (pipeline pronto: `assets/raw/oficial/dono.jpg` → `public/gallery/dono.*`; sem o arquivo, usa fallback).
+- **Seção do dono** — bloco "O nome do dono é a garantia" com foto real (pipeline: `assets/raw/oficial/dono.jpg` → recorte 4/5 → AVIF/WebP/JPEG).
 - **Proporção das imagens** — corrigido `aspect-4/3` / `aspect-4/5` (classe inválida no Tailwind v4) que estourava galeria e seção da casa.
 - **Mais motion** — partículas douradas em canvas (hero, casa, dono), parallax nas fotos, barra de progresso de leitura e entradas de texto em CSS puro.
+
+## Novidades (rodada 3)
+
+- **Google Agenda agora é só do dono** — o botão de agenda e a rota `.ics` saíram do fluxo do cliente; a integração ficou 100% interna (o dono conecta a própria agenda e cada reserva aparece lá com horário, nome, telefone, serviço, valor e código). Tutorial sem jargão em `entregaveis/TUTORIAL-DONO.md`.
+- **Programa de fidelidade** — 1 ponto por R$ 1; faixas 50 (R$ 10), 100 (R$ 25), 200 (1 corte grátis) e 500 (2 cortes grátis); código de indicação por cliente (`DUC-XXXX`, capturado via `?ref=`); bônus de 30 pontos para quem indica e para o indicado; extrato de pontos (`PointEntry`), recompensas (`Reward`), indicações (`Referral`); card *Fidelidade* no painel e seção pública no site. Regras puras em `src/lib/loyalty.ts` (9 testes) e aplicação em `src/lib/loyalty-server.ts`.
+- **Código da reserva explicado** — tela de confirmação com o código em destaque e o motivo de uso; o evento na agenda do Google já carrega o código.
 
 
 ## Regeneração de assets/pipeline

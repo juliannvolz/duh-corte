@@ -1,41 +1,51 @@
-# Duh Corte Barbearia — o que foi feito (texto para o cliente)
+# Duh Corte Barbearia — o que foi feito (texto pronto para o cliente)
 
-**Assunto: Site da Duh Corte no ar, com agenda online e painel de administração**
+**Assunto: Site da Duh Corte no ar, com agenda online, painel e programa de fidelidade**
 
-Dudu, ficou pronto o site da barbearia. Abaixo, o resumo do que já está funcionando — e o que só depende de você mandar.
+Dudu, ficou pronto o site da barbearia. Resumo do que já está funcionando — e o que só depende de você.
 
 ## O que já está no ar
 
 **1. Site com a sua cara**
-Visual premium (o padrão de referência que você pediu), com as fotos reais da casa, o logo, o telefone, o Instagram e o endereço com mapa — tudo clicável para o WhatsApp, o Instagram e o Google Maps.
+Visual premium, com as fotos reais da casa, **a sua foto na seção "O nome do dono é a garantia"**, o logo, o telefone, o Instagram e o endereço com mapa — tudo clicável.
 
 **2. Agenda online de verdade**
-O cliente escolhe o serviço, o profissional, o dia e o horário. O sistema só mostra horários **realmente livres** — nada de cliente chegar e esperar. O formato é o mesmo do app Cashbarber: horários separados em manhã e tarde, com 15 minutos de intervalo entre um corte e o outro (limpeza da cadeira), e a duração de cada serviço à vista.
+O cliente escolhe serviço, profissional, dia e horário. O sistema só mostra horários **realmente livres**, com **15 minutos de intervalo** entre um corte e o outro, no mesmo formato do app Cashbarber (horários separados em manhã e tarde, com a duração do serviço à vista).
 
-**3. Confirmação e Google Agenda**
-Ao finalizar, o cliente recebe o código da reserva e pode salvar o horário na própria agenda (Google Agenda, Apple ou Outlook), com lembrete 2 horas antes. Se você quiser, também dá para ligar a sua agenda do Google no site: os horários que já estão ocupados aí somem das vagas disponíveis e cada reserva nova aparece automaticamente na sua agenda.
+**3. Sua agenda do Google conectada em tempo real**
+Você conecta a **sua própria** agenda do Google e, a partir daí, **cada reserva feita no site cai sozinha na sua agenda** — com horário, nome do cliente, telefone e o código da reserva. E os horários que você já tem ocupados **somem** das vagas do site. Isso é uma configuração interna sua: **o cliente não vê nada disso**, além da confirmação da reserva.
 
-**4. Pagamento só na barbearia**
-Como você pediu, o site não cobra nada online. O cliente reserva, recebe a confirmação no WhatsApp e paga no balcão (Pix, cartão ou dinheiro). Isso elimina qualquer confusão quando alguém cancela.
+**4. Confirmação por WhatsApp**
+Ao finalizar, o cliente recebe um **código de reserva** e o botão de falar com você no WhatsApp. O código serve para a sua equipe achar o horário dele (e é o que vai junto no evento da sua agenda).
 
-**5. Painel para você**
-Um painel simples onde você vê a agenda do dia, confirma, cancela ou marca "não compareceu" de cada cliente, acompanha quantos atendimentos são e o quanto está previsto para o dia. É só entrar em `/admin` com a sua senha.
+**5. Pagamento só na barbearia**
+Como você pediu, o site **não cobra nada online**. O cliente reserva, você confirma no WhatsApp e o pagamento é feito no balcão (Pix, cartão ou dinheiro). Sem risco de confusão em caso de cancelamento.
 
-**6. Movimento e partículas**
-O site tem poeira dourada ao fundo, fotos com parallax, barra de progresso de leitura e entradas de texto animadas — o tipo de coisa que segura a atenção e passa impressão de loja premium.
+**6. Painel para você**
+Um painel simples onde você vê a agenda do dia, confirma/cancela/marca "atendido" de cada horário, acompanha o movimento do dia e vê as pendências de conteúdo. Entrada: `/admin`, com a sua senha.
+
+**7. Programa de fidelidade (pontuação)**
+Cada R$ 1 gasto = 1 ponto. O cliente acumula pontos e recebe: **50 pontos = R$ 10 de desconto · 100 = R$ 25 · 200 = 1 corte grátis · 500 = 2 cortes grátis**. Além disso, cada cliente ganha um **código de indicação**: quem usa o código ganha 30 pontos e quem indicou ganha outros 30. O site calcula tudo sozinho — os pontos entram quando você marca o atendimento como "Atendido", e no painel você vê quem está acumulando e marca a recompensa como usada.
+
+**8. Movimento e partículas**
+Poeira dourada ao fundo, fotos com parallax, barra de progresso de leitura e entradas de texto animadas.
 
 ## O que depende de você (5 itens rápidos)
 
-1. **Tabela oficial de preços** — os valores no site hoje são referência de mercado e estão marcados como "tabela em validação". Me mande preço e duração de cada serviço (e os valores do Clube do Assinante) que eu atualizo em minutos.
-2. **Sua foto** — a seção nova "O nome do dono é a garantia" está pronta e esperando a foto profissional sua. É só me mandar o arquivo.
-3. **Chave Pix e CNPJ** — para o pagamento presencial no balcão e a emissão de recibo.
-4. **Sábado** — o site está como "sábado e domingo fechados" (é o que está no Google Maps). Se vocês abrem, me avise que eu mudo em um instante.
-5. **Senha do painel** — a senha de demonstração precisa ser trocada antes de publicar.
+1. **Tabela oficial de preços** — os valores no site são referência e estão marcados como "tabela em validação". Me mande preço e duração de cada serviço (e do Clube) que atualizo em minutos.
+2. **Chave Pix e CNPJ** — para o pagamento no balcão e a emissão de recibo.
+3. **Sábado** — o site está como "sábado e domingo fechados" (é o que está no Google Maps). Se abrirem, me avise.
+4. **Senha do painel** — a senha de demonstração precisa ser trocada.
+5. **Fotos e nomes dos outros profissionais** — hoje só você está confirmado.
+
+## Como conectar a sua agenda do Google
+
+Escrevi um tutorial passo a passo, sem jargão, em **`entregaveis/TUTORIAL-DONO.md`** (são 5 passos e uns 10 minutos). Se preferir, eu ligo para você e a gente faz junto.
 
 ## Como fica a manutenção
 
-- Mudança de preço, horário, foto ou texto: me manda, eu atualizo e republico.
-- Você não precisa mexer em nada: a agenda, os horários, o painel e o Google Agenda ficam sob seu controle pelo painel e pelo celular.
-- O site fica no seu domínio, com backup e suporte.
+Mudança de preço, horário, foto, texto ou profissional: você me manda, eu atualizo e republico. Você não precisa mexer em nada: agenda, horários, pontos e recompensas ficam no painel, pelo celular.
 
-Estamos prontos para publicar assim que você enviar a tabela de preços e a foto — até lá, a demonstração está rodando em `localhost:3000` e os arquivos do pacote estão na pasta `entregaveis/`.
+O site já está rodando localmente (`http://localhost:3000`) — mostrarei no celular pelo QR. Quando você aprovar a tabela de preços e a foto dos profissionais, é só publicar no domínio e trocar a senha do painel.
+
+Estamos prontos. Se preferir, passo no sábado para te mostrar ao vivo.

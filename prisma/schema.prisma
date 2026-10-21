@@ -131,10 +131,62 @@ model Customer {
   phone     String
   email     String?
   notes     String?
+  /// Programa de fidelidade: saldo de pontos (1 ponto = R$ 1 gasto).
+  points    Int      @default(0)
+  /// Codigo de indicacao do cliente (ex.: DUC-7F3A).
+  referralCode String? @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   appointments Appointment[]
   subscriptions Subscription[]
+  pointEntries PointEntry[]
+  rewards     Reward[]
+  referralsSent Referral[] @relation("ReferralReferrer")
+  referralsReceived Referral[] @relation("ReferralReferee")
+}
+
+/// Extrato de pontos (toda entrada/saida fica registrada).
+model PointEntry {
+  id           String   @id @default(cuid())
+  customerId   String
+  delta        Int
+  reason       String
+  appointmentId String?
+  createdAt    DateTime @default(now())
+  customer     Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@index([customerId, createdAt])
+}
+
+/// Recompensa liberada pelo programa de fidelidade.
+model Reward {
+  id         String   @id @default(cuid())
+  customerId String
+  label      String
+  /// "desconto" (valor em reais) ou "corte" (corte gratis)
+  kind       String
+  valueCents Int
+  pointsCost Int
+  status     String   @default("available")
+  createdAt  DateTime @default(now())
+  usedAt     DateTime?
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@index([customerId, status])
+}
+
+/// Indicacao: quem indicou e quem foi indicado.
+model Referral {
+  id           String   @id @default(cuid())
+  referrerId   String
+  refereeId    String
+  bonusPoints  Int      @default(30)
+  rewardedAt   DateTime?
+  createdAt    DateTime @default(now())
+  referrer     Customer @relation("ReferralReferrer", fields: [referrerId], references: [id], onDelete: Cascade)
+  referee      Customer @relation("ReferralReferee", fields: [refereeId], references: [id], onDelete: Cascade)
+
+  @@unique([refereeId])
 }
 
 model Appointment {
@@ -149,6 +201,8 @@ model Appointment {
   notes         String?
   source        String   @default("site")
   idempotencyKey String? @unique
+  /// Codigo de indicacao usado na reserva (programa de fidelidade).
+  referralCode  String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   customer      Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
