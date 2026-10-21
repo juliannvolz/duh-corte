@@ -59,6 +59,14 @@ Todos os preços são **placeholders de referência** (`priceConfirmed: false`) 
 - **Proporção das imagens** — corrigido `aspect-4/3` / `aspect-4/5` (classe inválida no Tailwind v4) que estourava galeria e seção da casa.
 - **Mais motion** — partículas douradas em canvas (hero, casa, dono), parallax nas fotos, barra de progresso de leitura e entradas de texto em CSS puro.
 
+## Novidades (rodada 4)
+
+- **Login social sem banco de usuários** — Google, Apple e Facebook (Auth.js v5, sessão JWT). O provedor só aparece se as credenciais estiverem no ambiente (nada quebra antes disso). Área do cliente em `/minha-conta`: horários, pontos, recompensas e código de indicação. **O admin entra pelo mesmo botão** (e-mail em `ADMIN_EMAILS`) e a senha continua como segunda porta. Guia: [`docs/LOGIN-SOCIAL.md`](docs/LOGIN-SOCIAL.md).
+- **Botão de planos corrigido** — "Quero este plano" leva para `/agendar?plano=<id>` com o contexto do Clube (vaga prioritária + **pontos em dobro**); "Ativar na loja" abre o WhatsApp com a mensagem pronta (assinatura ativada presencialmente na Vila Nova).
+- **Publicação na Vercel** — `https://duh-corte.vercel.app` (projeto `duh-corte`, escopo pessoal). Banco **Neon Postgres** provisionado pelo marketplace (`neon-aero-ferry`), schema aplicado e populado. O build da Vercel troca o schema para Postgres (`vercel.json` → `npm run db:postgres && prisma generate && next build`).
+- **Revisão geral front/back** — checagem de erros de console/HTTP em todas as rotas (0), QA E2E rodando contra **produção**, degrade elegante quando o banco está indisponível (503 com mensagem em vez de tela quebrada), login do admin verificado de verdade (o QA buscava o texto "agenda do dia", que também existe na tela de login — agora confere o botão *Sair*), sessão do header sem provider global (site continua estático), `vercel.json` com região `gru1` (São Paulo) para latência menor.
+- **Entregáveis em PDF no estilo do site** — `entregaveis/*.pdf` (Tutorial do Dono, Texto do Cliente, Proposta Comercial) gerados por `npm run pdf:gerar` (Markdown → HTML com a paleta do site → PDF pelo Brave). Os `.md` continuam no lugar e os PDFs também ficam servidos em `/documentos/*.pdf`.
+
 ## Novidades (rodada 3)
 
 - **Google Agenda agora é só do dono** — o botão de agenda e a rota `.ics` saíram do fluxo do cliente; a integração ficou 100% interna (o dono conecta a própria agenda e cada reserva aparece lá com horário, nome, telefone, serviço, valor e código). Tutorial sem jargão em `entregaveis/TUTORIAL-DONO.md`.

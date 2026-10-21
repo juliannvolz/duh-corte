@@ -18,7 +18,12 @@
     "postinstall": "prisma generate",
     "pdf:gerar": "tsx scripts/gerar-pdf.mts",
     "db:postgres": "tsx scripts/prepare-db.mts postgres",
-    "db:sqlite": "tsx scripts/prepare-db.mts sqlite"
+    "db:sqlite": "tsx scripts/prepare-db.mts sqlite",
+    "db:local": "tsx scripts/prepare-db.mts sqlite && prisma generate",
+    "db:producao": "node scripts/aplicar-schema.mjs producao",
+    "db:limpar": "tsx scripts/limpar-teste.mts",
+    "qa:novas": "node scripts/qa-novas-telas.mjs",
+    "qa:fidelidade": "node scripts/qa-loyalty.mjs"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",

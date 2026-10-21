@@ -218,9 +218,11 @@ async function run() {
     await adminPage.getByPlaceholder("••••••••").fill(process.env.ADMIN_PASSWORD ?? "duhcorte");
     await adminPage.getByRole("button", { name: /entrar/i }).click();
     await adminPage.waitForTimeout(2500);
-    const logged = await adminPage.getByText(/agenda do dia/i).count();
+    // "Sair" so aparece quando o painel carregou (a tela de login fala
+    // "agenda do dia" no texto de apoio e gerava falso positivo)
+    const logado = await adminPage.getByRole("button", { name: /sair/i }).count();
     await adminPage.screenshot({ path: path.join(OUT, "screens", "admin-dashboard.png"), fullPage: true });
-    report.admin = { loggedIn: logged > 0 };
+    report.admin = { loggedIn: logado > 0 };
   } catch (error) {
     report.admin = { error: error.message };
   }

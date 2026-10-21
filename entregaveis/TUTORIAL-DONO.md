@@ -117,13 +117,33 @@ Depois é só **republicar** o site. Volte ao painel: o card **Integrações** p
 
 ---
 
-## 5. O que você ainda precisa me mandar (5 itens)
+## 4b. Login do cliente (Google, Apple, Facebook)
+
+O site tem uma área do cliente em **/entrar**. O cliente entra com o botão do **Google, Apple ou Facebook** — **sem criar senha no site** (quem guarda a identidade é o próprio Google/Apple/Facebook). Depois de entrar, ele vê:
+
+- os horários que já reservou (com o código e o status);
+- quantos pontos tem e quanto falta para a próxima recompensa;
+- o código de indicação para compartilhar no WhatsApp.
+
+**Para você (barbearia):** o mesmo botão serve para o admin. Basta o seu e-mail estar na lista de administradores — aí, entrando por ele, aparece o botão "Ir para o painel da barbearia". A senha continua valendo como segunda porta, caso o e-mail fique indisponível.
+
+> O botão do Google já pode ser liberado em ~15 minutos (eu te guio por tela). Apple exige conta de desenvolvedor paga (US$ 99/ano) — se não quiser, o Google + Facebook dão conta. Passo a passo: `docs/LOGIN-SOCIAL.md`.
+
+## 4c. Clube do Assinante (planos)
+
+Cada plano tem dois caminhos no site:
+
+- **"Quero este plano"** → leva o cliente direto para a agenda já com o plano marcado (vaga prioritária e **pontos em dobro**);
+- **"Ativar na loja"** → abre o WhatsApp com a mensagem pronta. A assinatura é ativada presencialmente na loja da Vila Nova, depois do primeiro corte.
+
+## 5. O que você ainda precisa me mandar (6 itens)
 
 1. **Tabela oficial de preços** (preço + duração de cada serviço e dos planos do Clube). Hoje o site mostra valores de referência com o aviso "tabela em validação".
 2. **Chave Pix e CNPJ** da barbearia (para o Pix no balcão e a emissão de recibo).
 3. **Sábado:** o site está como "sábado e domingo fechados" (é o que está no Google Maps). Se vocês abrem, me avise.
 4. **Senha do painel** (a demo é `duhcorte`).
-5. **Fotos e nomes dos outros professionals** (hoje só o Dudu está confirmado).
+5. **Fotos e nomes dos outros profissionais** (hoje só o Dudu está confirmado).
+6. **Os apps do login social** (opcional) — para liberar o botão "Entrar com Google/Apple/Facebook". Sem isso, o cliente continua entrando pelo WhatsApp e o painel pela senha.
 
 ---
 

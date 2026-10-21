@@ -1,6 +1,6 @@
 {
   "base": "http://localhost:3000",
-  "startedAt": "2026-10-21T23:01:55.597Z",
+  "startedAt": "2026-10-21T23:28:09.850Z",
   "viewports": {
     "mobile/": {
       "status": 200,
@@ -133,5 +133,5 @@
   "admin": {
     "loggedIn": true
   },
-  "finishedAt": "2026-10-21T23:03:56.652Z"
+  "finishedAt": "2026-10-21T23:30:17.559Z"
 }
