@@ -50,3 +50,8 @@ prisma/dev.db
 
 .vercel
 .env*
+
+entregaveis/.tmp-*.html
+.vscode/
+.vercel/
+
