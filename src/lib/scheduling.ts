@@ -149,8 +149,10 @@ export function generateSlots(input: GenerateSlotsInput): Slot[] {
 
     // candidato extra: o primeiro horario livre logo apos um atendimento
     // (permite o intervalo real de 15 min entre um corte e o seguinte, como
-    // no app da Cashbarber, sem obrigar o horario a cair no grid)
-    const candidatos = new Set<number>([span.startMin]);
+    // no app da Cashbarber). So entra quando cai em horario redondo de 5
+    // minutos — senao o cliente veria "17:41" no meio de uma grade "17:45".
+    const candidatos = new Set<number>();
+    if (span.startMin % 5 === 0) candidatos.add(span.startMin);
 
     while (start + durationMin <= span.endMin) {
       if (start >= earliest && start + durationMin <= latest) {
