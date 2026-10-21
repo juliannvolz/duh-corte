@@ -40,13 +40,24 @@ Todos os preços são **placeholders de referência** (`priceConfirmed: false`) 
 
 ## Gates medidos (evidência)
 
-- **Build/typecheck/lint:** `tsc --noEmit` limpo; `next build` ok; ESLint 0 erros (9 avisos documentados em scripts de pipeline, sem impacto de runtime); markdown n/a.
-- **Testes:** 48 vitests (scheduling + Pix CRC16) verdes — `npx vitest run`.
-- **QA E2E (`scripts/qa.mjs`, Brave headless):** fluxo de reserva completo (serviço → profissional → horário → dados → reserva criada + QR fallback + admin login OK); 0 erros de console, 0 page errors, 0 request/HTTP failures. Screenshots em `qa/screens/` (390/768/1440).
-- **Lighthouse (mobile 390×844, Brave):** performance **87** / accessibility **96** / best-practices **100**; FCP 1.0 s, Speed Index 2.0 s, TBT 140 ms, CLS **0**.
-  - LCP simulado 3,6–3,8 s (gate < 2,5 s **não atingido**; budget registrado como justificativa): simulação 4× CPU + slow 4G com o perfil de animações próprias; os 4 subpartes reais do LCP somam ~0,7 s (TTFB 0,16 + load 0,08 + render delay 0,44). Ações feitas: entradas do hero agora são CSS puro (sem hidratação), imagem LCP com `fetchpriority`, PNG do header pré-carregado. Realizar diligência em URL real antes de hotspot de campanha.
-- **Acessibilidade:** landmark/skip-link/aria-pressed no wizard; `prefers-reduced-motion` respeitado (motion e keyframes).
-- **Imagens:** 34 variantes AVIF/WebP/JPEG geradas de 10 originais (512–1024 px), placeholders base64 só no manifesto do servidor; a página carrega `image-srcset.ts` (sem base64).
+- **Build/typecheck/lint:** `tsc --noEmit` limpo; `next build` ok; ESLint **0 erros** (13 avisos, todos em scripts de pipeline); 50 testes verdes.
+- **Testes:** 50 vitests (scheduling + Pix CRC16) — `npx vitest run`.
+- **QA E2E (`scripts/qa.mjs`, Brave headless):** fluxo de reserva completo (serviço → profissional → horário → dados → reserva criada), **pagamento presencial** visível, **link de agenda (.ics) respondendo `text/calendar`**, admin login OK; 0 erros de console, 0 page errors, 0 request/HTTP failures. Screenshots em `qa/screens/` (390/768/1440).
+- **Lighthouse (mobile 390×844, Brave):** performance **87** / accessibility **96** / best-practices **100**; FCP 1,0 s, Speed Index 2,2 s, TBT 120 ms, CLS **0**.
+  - LCP simulado 3,9 s (gate < 2,5 s **não atingido**; budget registrado como justificativa): simulação 4× CPU + slow 4G com o perfil de animações próprias; os subpartes reais do LCP somam ~0,7 s. Ações feitas: entradas do hero em CSS puro (sem hidratação), imagem LCP com `fetchpriority`, PNG do header pré-carregado, partículas carregadas via `dynamic` (fora do bundle inicial). Realizar diligência em URL real antes de hotspot de campanha.
+- **Acessibilidade:** landmark/skip-link/aria-pressed no wizard; `prefers-reduced-motion` respeitado (motion, keyframes e canvas).
+- **Imagens:** 34 variantes AVIF/WebP/JPEG geradas de 10 originais (512–1024 px); placeholders base64 só no manifesto do servidor; a página carrega `image-srcset.ts` (sem base64).
+
+## Novidades (rodada 2)
+
+- **Google Agenda** — `.ics` para o cliente salvar o horário (Google/Apple/Outlook) + modo opcional de leitura/escrita na agenda do barbeiro (horários ocupados bloqueiam o site; cada reserva vira evento). Guia completo em [`docs/INTEGRACAO-GOOGLE-AGENDA.md`](docs/INTEGRACAO-GOOGLE-AGENDA.md). Card *Integrações* no painel mostra o status.
+- **Acentuação** — bug real identificado e corrigido: a Instrument Serif itálica **não tem glifo de acento maiúsculo** (o "É" saía como "E"); o span itálico agora preserva a caixa original (`text-transform: none`). Auditoria de texto: `node scripts/audit-text.mjs` e `node scripts/audit-accents.mjs`.
+- **Agendamento estilo app** — grade separada em *Manhã* e *Tarde*, duração do serviço à vista e intervalo real de 15 min entre cortes (o primeiro horário livre após um atendimento também é oferecido: corte 09:00–09:40 → próximo 09:55).
+- **Pagamento 100% presencial** — QR Pix online removido (rota `/api/payments/pix` deletada); o site informa que o pagamento é feito na barbearia.
+- **Seção do dono** — bloco "O nome do dono é a garantia" com foto real (pipeline pronto: `assets/raw/oficial/dono.jpg` → `public/gallery/dono.*`; sem o arquivo, usa fallback).
+- **Proporção das imagens** — corrigido `aspect-4/3` / `aspect-4/5` (classe inválida no Tailwind v4) que estourava galeria e seção da casa.
+- **Mais motion** — partículas douradas em canvas (hero, casa, dono), parallax nas fotos, barra de progresso de leitura e entradas de texto em CSS puro.
+
 
 ## Regeneração de assets/pipeline
 
@@ -66,7 +77,8 @@ node scripts/shots.mjs # capturas por seção em 1440
 
 ## Estrutura
 
-- `src/app/api/*` — services, slots, appointments (idempotente por `idempotencyKey`), payments/pix (BR Code EMV + CRC16-CCITT, `configured:false` até `PIX_KEY`), admin/login|logout|appointments.
-- `src/lib/scheduling.ts` / `booking.ts` — disponibilidade pura (fuso America/Sao_Paulo).
-- `src/components/booking/BookingWizard.tsx` — wizard 4 passos; sucesso continua na página (código + WhatsApp + Pix).
+- `src/app/api/*` — services, slots, appointments (idempotente por `idempotencyKey`), calendar/ics (arquivo de agenda assinado por HMAC), admin/login|logout|appointments. A rota de Pix online foi removida: o pagamento é presencial.
+- `src/lib/scheduling.ts` / `booking.ts` — disponibilidade pura (fuso America/Sao_Paulo) + integração opcional com a agenda do Google.
+- `src/lib/google-calendar.ts` — freebusy (leitura) e criação de eventos (escrita) via conta de serviço, sem dependências externas.
+- `src/components/booking/BookingWizard.tsx` — wizard 4 passos; sucesso continua na página (código + WhatsApp + download da agenda).
 - `src/app/api/admin` — sessão por cookie; senha demo em `ADMIN_PASSWORD` (default `duhcorte`).

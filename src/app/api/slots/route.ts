@@ -23,7 +23,7 @@ export async function GET(request: Request) {
 
   if (!parsed.success) {
     return NextResponse.json(
-      { error: "Parametros invalidos. Informe date, service e (opcional) professional." },
+      { error: "Parâmetros inválidos. Informe date, service e (opcional) professional." },
       { status: 400 },
     );
   }

@@ -19,7 +19,7 @@ export function Location() {
             eyebrow="Onde estamos"
             title="Vila Nova,"
             accent="Jaraguá do Sul."
-            description="Faca esquina com a barber pole, estacione na frente e suba. A agenda começa as 9h."
+            description="Fica na esquina, com a barber pole na porta. Estacione na frente e suba — a agenda abre às 9h."
           />
 
           <Reveal delay={0.1}>

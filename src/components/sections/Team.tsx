@@ -12,7 +12,7 @@ export async function Team() {
           eyebrow="Quem senta na cadeira"
           title="Cada corte"
           accent="com autor."
-          description="Quem faz, faz com criterio. Escolha o profissional no momento da reserva — agenda e preço podem variar entre eles."
+          description="Quem faz, faz com critério. Escolha o profissional no momento da reserva — agenda e preço podem variar entre eles."
         />
 
         <RevealGroup className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">

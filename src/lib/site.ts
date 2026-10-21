@@ -63,7 +63,7 @@ export const weekdayShort: Record<Weekday, string> = {
   6: "Sáb",
 };
 
-// Fonte: Google Maps (perfil da loja). Instagram informa "segunda a sexta das 9:00 as 19:00";
+// Fonte: Google Maps (perfil da loja). Instagram informa "segunda a sexta das 9:00 às 19:00";
 // a divergencia de sexta (18:00 no Google) esta registrada em `pending`.
 export const openingHours: Record<Weekday, { open: number; close: number } | null> = {
   0: null,
@@ -320,7 +320,7 @@ export const testimonials: TestimonialSeed[] = [
     author: "wsluthieria",
     initials: "WL",
     rating: 5,
-    text: "Otimo ambiente, atendimento exemplar e um profissional extremamente qualificado. Duh Corte distoa para muito além dos padroes de locais e serviços encontrados na cidade.",
+    text: "Ótimo ambiente, atendimento exemplar e um profissional extremamente qualificado. Duh Corte distoa para muito além dos padrões de locais e serviços encontrados na cidade.",
     source: "Google",
     sourceUrl: "https://maps.google.com/?cid=12222460781727324303",
   },
@@ -329,7 +329,7 @@ export const testimonials: TestimonialSeed[] = [
     author: "Suh Camargo",
     initials: "SC",
     rating: 5,
-    text: "Otimo atendimento, lugar super agradável, profissionais mto caprichosos.",
+    text: "Ótimo atendimento, lugar super agradável, profissionais muito caprichosos.",
     source: "Google",
     sourceUrl: "https://maps.google.com/?cid=12222460781727324303",
   },
@@ -400,15 +400,19 @@ export const gallery: GalleryItemSeed[] = [
 export const faqs = [
   {
     q: "Preciso agendar com antecedência?",
-    a: "Sim. A agenda abre com 60 dias de antecedencia e o atendimento e sempre com hora marcada, para garantir que a cadeira esteja reservada para você.",
+    a: "Sim. A agenda abre com 60 dias de antecedência e o atendimento é sempre com hora marcada, para garantir que a cadeira esteja reservada para você.",
   },
   {
     q: "Como funciona a assinatura do Clube do Assinante?",
     a: "Você escolhe o plano, a vaga na agenda fica reservada e o corte acontece sem fila. A assinatura é mensal e o pagamento pode ser feito por Pix ou cartão.",
   },
   {
-    q: "Quais formas de pagamento voces aceitam?",
-    a: "Pix (com QR Code enviado na hora), cartao de debito, cartao de credito e dinheiro, sempre na barbearia.",
+    q: "Quais formas de pagamento vocês aceitam?",
+    a: "O pagamento é feito na barbearia, no momento do atendimento: Pix, cartão de débito, cartão de crédito ou dinheiro. Não há cobrança online.",
+  },
+  {
+    q: "Posso salvar o horário na minha agenda?",
+    a: "Sim. Ao concluir a reserva você pode baixar o horário para o Google Agenda, Apple Calendar ou Outlook — o lembrete aparece com 2 horas de antecedência.",
   },
   {
     q: "Posso cancelar ou remarcar?",
@@ -419,7 +423,7 @@ export const faqs = [
     a: "Sim. A agenda infantil tem hora reservada, com mais tolerância de tempo e abordagem para a criança.",
   },
   {
-    q: "Voces vendem produtos?",
+    q: "Vocês vendem produtos?",
     a: "Sim. A casa tem linha própria de produtos para cabelo e barba, disponíveis na loja e também no atendimento.",
   },
 ];
@@ -427,7 +431,7 @@ export const faqs = [
 export const pending: PendingItem[] = [
   {
     id: "precos",
-    label: "Tabela oficial de preços e duracoes",
+    label: "Tabela oficial de preços e durações",
     detail: "Valores atuais são referência de mercado local (Jaraguá do Sul).",
     source: "interno",
   },
@@ -451,14 +455,14 @@ export const pending: PendingItem[] = [
   },
   {
     id: "pix",
-    label: "Chave Pix cadastrada e CNPJ",
-    detail: "Necessário para emitir QR Code válido.",
+    label: "Chave Pix da casa e CNPJ",
+    detail: "Necessário para o pagamento presencial via Pix e para a emissão fiscal.",
     source: "interno",
   },
   {
     id: "fotos",
-    label: "Acervo fotografico de alta resolucao",
-    detail: "Hoje temos 3 fotos de trabalho, 1 da nova unidade, 1 de cliente e o logo.",
+    label: "Acervo fotográfico de alta resolução",
+    detail: "Trabalho da casa, nova unidade, clientes e o dono no comando.",
     source: "instagram",
   },
   {

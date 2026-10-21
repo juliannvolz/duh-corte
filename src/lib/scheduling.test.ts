@@ -119,6 +119,28 @@ describe("generateSlots", () => {
     expect(labels({ offTime: [{ startMin: 0, endMin: 24 * 60 }] })).toEqual([]);
   });
 
+  it("oferece o primeiro horario livre logo apos o atendimento (gap de 15 min)", () => {
+    // corte de 40 min das 09:00 as 09:40 + 15 min de cleanup (buffer do
+    // chamador) -> a agenda reabre as 09:55
+    const slots = labels({
+      durationMin: 40,
+      busy: [{ startMin: 9 * 60, endMin: 9 * 60 + 55 }],
+    });
+    expect(slots).toContain("09:55");
+    expect(slots).not.toContain("09:00");
+    expect(slots).not.toContain("09:15");
+  });
+
+  it("mantem o intervalo de 15 min entre dois cortes seguidos", () => {
+    const slots = generateSlots({
+      ...base,
+      durationMin: 40,
+      busy: [{ startMin: 9 * 60, endMin: 9 * 60 + 55 }],
+    }).map((s) => s.startMin);
+    const proximo = slots.find((min) => min > 9 * 60);
+    expect(proximo).toBe(9 * 60 + 55); // 09:55
+  });
+
   it("bloqueio parcial divide os horarios disponiveis", () => {
     const slots = labels({
       durationMin: 30,

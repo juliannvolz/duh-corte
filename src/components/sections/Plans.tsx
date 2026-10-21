@@ -22,7 +22,7 @@ export async function Plans() {
           eyebrow="Clube do assinante"
           title="Seu corte em dia,"
           accent="sem fila."
-          description="Assinatura mensal com agenda prioritaria, preço fixo e desconto nos produtos da casa. Escolha o plano e reserve a sua vaga."
+          description="Assinatura mensal com agenda prioritária, preço fixo e desconto nos produtos da casa. Escolha o plano e reserve a sua vaga."
         />
 
         {pending ? (

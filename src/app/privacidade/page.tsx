@@ -19,7 +19,7 @@ const sections = [
   },
   {
     title: "Com quem compartilhamos",
-    body: "Não vendemos e não cedemos seus dados. O contato acontece por WhatsApp e, quando você escolhe pagar por Pix, apenas o valor e o identificador do agendamento trafegam no QR Code.",
+    body: "Não vendemos e não cedemos seus dados. O contato acontece por WhatsApp e, se você salvar o horário na sua agenda (Google Agenda, Apple ou Outlook), o arquivo .ics leva apenas os dados do agendamento.",
   },
   {
     title: "Por quanto tempo guardamos",

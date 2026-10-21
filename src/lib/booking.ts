@@ -10,6 +10,8 @@ import {
   type Interval,
 } from "@/lib/scheduling";
 import { dayStart, toISODate, weekdayOf } from "@/lib/time";
+import { getGoogleBusy, createGoogleEvent } from "@/lib/google-calendar";
+import { business } from "@/lib/site";
 
 export type AvailabilityQuery = {
   dateISO: string;
@@ -129,11 +131,19 @@ export async function getAvailability(query: AvailabilityQuery): Promise<Availab
     .map((t) => appointmentToLocalInterval(t.startsAt, t.endsAt, dateISO, 0))
     .filter((i): i is Interval => i !== null);
 
+  // agenda do Google (quando integrada): horarios ja ocupados na agenda do
+  // barbeiro tambem sao bloqueados aqui — a fonte de verdade continua sendo
+  // a agenda interna, o Google entra como bloqueio externo.
+  const googleBusy = (await getGoogleBusy(dateISO)).map<Interval>((slot) => ({
+    startMin: slot.startMin,
+    endMin: slot.endMin,
+  }));
+
   const slots = generateSlots({
     dateISO,
     durationMin: service.durationMin,
     window,
-    busy,
+    busy: [...busy, ...googleBusy],
     offTime,
     now,
     ...rules,
@@ -281,6 +291,15 @@ export async function createAppointment(
           idempotencyKey: input.idempotencyKey ?? null,
         },
       });
+    });
+
+    // agenda do Google (quando configurada): a reserva vira um evento la
+    await createGoogleEvent({
+      summary: `${service.name} — ${input.customer.name}`,
+      description: `Reserva no site da ${business.name}. Código ${appointment.id.slice(0, 8).toUpperCase()}. Telefone: ${input.customer.phone}.`,
+      location: `${business.address.street}, ${business.address.neighborhood} — ${business.address.city}/${business.address.state}`,
+      startsAt: appointment.startsAt.toISOString(),
+      endsAt: appointment.endsAt.toISOString(),
     });
 
     return {

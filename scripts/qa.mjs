@@ -42,7 +42,7 @@ function attachDiagnostics(page, bucket) {
   });
   page.on("response", (response) => {
     const status = response.status();
-    if (status >= 400 && !response.url().includes("/api/payments/pix")) {
+    if (status >= 400 && !response.url().includes("/favicon.ico")) {
       bucket.httpErrors.push(`${status} ${response.url()}`);
     }
   });
@@ -155,6 +155,8 @@ async function run() {
     const slotCount = await slotButtons.count();
     const slotButton = slotButtons.first();
     let success = false;
+    let pagamentoPresencial = false;
+    let icsOk = false;
 
     if (slotCount > 0) {
       await slotButton.click();
@@ -168,6 +170,23 @@ async function run() {
       await page.getByRole("button", { name: /confirmar reserva/i }).click();
       await page.getByText(/reserva feita/i).waitFor({ state: "visible", timeout: 20000 });
       success = true;
+
+      // pagamento presencial (sem cobranca online) e link de agenda
+      pagamentoPresencial = await page
+        .getByText(/pagamento .* na barbearia/i)
+        .first()
+        .isVisible()
+        .catch(() => false);
+      const linkAgenda = await page
+        .getByRole("link", { name: /adicionar .* agenda/i })
+        .first()
+        .getAttribute("href")
+        .catch(() => null);
+      if (linkAgenda) {
+        const url = linkAgenda.startsWith("http") ? linkAgenda : `${BASE}${linkAgenda}`;
+        const res = await page.request.get(url);
+        icsOk = res.ok() && (res.headers()["content-type"] ?? "").includes("text/calendar");
+      }
       await page.waitForTimeout(1500);
       await page.screenshot({ path: path.join(OUT, "screens", "flow-4-sucesso.png"), fullPage: true });
     }
@@ -177,6 +196,8 @@ async function run() {
       choseSlot: slotCount > 0,
       slotCount,
       success,
+      pagamentoPresencial,
+      googleAgenda: icsOk,
       ...flowBucket,
     };
   } catch (error) {

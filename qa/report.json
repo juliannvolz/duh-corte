@@ -1,6 +1,6 @@
 {
   "base": "http://localhost:3000",
-  "startedAt": "2026-10-21T18:38:42.607Z",
+  "startedAt": "2026-10-21T19:35:10.878Z",
   "viewports": {
     "mobile/": {
       "status": 200,
@@ -119,6 +119,8 @@
     "choseSlot": true,
     "slotCount": 38,
     "success": true,
+    "pagamentoPresencial": true,
+    "googleAgenda": true,
     "consoleErrors": [],
     "pageErrors": [],
     "failedRequests": [],
@@ -128,5 +130,5 @@
   "admin": {
     "loggedIn": true
   },
-  "finishedAt": "2026-10-21T18:40:48.584Z"
+  "finishedAt": "2026-10-21T19:37:05.701Z"
 }

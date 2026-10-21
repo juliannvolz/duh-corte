@@ -30,11 +30,11 @@ const dados = {
     nome: business.name,
     cidade: `${business.address.city}/${business.address.state}`,
     bairro: business.address.neighborhood,
-    endereco: business.address.line,
+    endereco: business.address.street,
     telefone: business.phoneE164,
     whatsapp: business.whatsapp,
     instagram: business.instagram,
-    googleMaps: business.mapsUrl,
+    googleMaps: business.address.mapsUrl,
     nota: business.rating.value,
     avaliacoes: business.rating.count,
   },
@@ -76,7 +76,7 @@ await writeFile(
 await writeFile(
   path.join(OUT, "equipe.json"),
   JSON.stringify(
-    professionals.map((p) => ({ nome: p.name, funcao: p.role, slug: p.slug })),
+    professionals.map((p) => ({ nome: p.name, funcao: p.role })),
     null,
     2,
   ),

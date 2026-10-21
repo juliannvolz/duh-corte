@@ -8,6 +8,9 @@
  * Regras (todas testadas em scheduling.test.ts):
  *  1. O slot so existe se [inicio, inicio + duração] couber na janela do dia.
  *  2. Slots andam de `slotStepMin` em `slotStepMin` a partir da abertura.
+ *  2b. Apos um atendimento, o primeiro horario livre tambem e oferecido
+ *      (ex.: corte 09:00-09:40 + 15 min de cleanup -> proximo cliente 09:55),
+ *      igual ao app da Cashbarber: intervalos de 15 min entre um corte e outro.
  *  3. Antecedencia minima: `inicio >= agora + minLeadMin`.
  *  4. Horizonte máximo: `inicio <= agora + maxAdvanceDays`.
  *  5. Um compromisso existente ocupa [inicio, fim + buffer].
@@ -144,15 +147,27 @@ export function generateSlots(input: GenerateSlotsInput): Slot[] {
     const steps = Math.ceil(offset / slotStepMin);
     let start = window.openMin + steps * slotStepMin;
 
+    // candidato extra: o primeiro horario livre logo apos um atendimento
+    // (permite o intervalo real de 15 min entre um corte e o seguinte, como
+    // no app da Cashbarber, sem obrigar o horario a cair no grid)
+    const candidatos = new Set<number>([span.startMin]);
+
     while (start + durationMin <= span.endMin) {
       if (start >= earliest && start + durationMin <= latest) {
-        slots.push({
-          startsAt: atMinutes(dateISO, start).toISOString(),
-          startMin: start,
-          label: formatHHMM(start),
-        });
+        candidatos.add(start);
       }
       start += slotStepMin;
+    }
+
+    for (const candidate of [...candidatos].sort((a, b) => a - b)) {
+      if (candidate < earliest) continue;
+      if (candidate + durationMin > span.endMin) continue;
+      if (candidate + durationMin > latest) continue;
+      slots.push({
+        startsAt: atMinutes(dateISO, candidate).toISOString(),
+        startMin: candidate,
+        label: formatHHMM(candidate),
+      });
     }
   }
 

@@ -32,7 +32,7 @@ export async function Gallery() {
             >
               <figure className="group relative h-full overflow-hidden rounded-3xl border border-line bg-ink">
                 <div
-                  className={`relative overflow-hidden ${index === 0 ? "aspect-4/3 lg:aspect-auto lg:h-full" : "aspect-4/5"}`}
+                  className={`relative overflow-hidden ${index === 0 ? "aspect-[4/3] lg:aspect-auto lg:h-full" : "aspect-[4/5]"}`}
                 >
                   <SmartImage
                     name={nameFromSrc(item.src)}

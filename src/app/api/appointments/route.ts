@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { createAppointment } from "@/lib/booking";
+import { signCalendarToken } from "@/lib/calendar-token";
 
 const schema = z.object({
   serviceId: z.string().min(1),
@@ -69,6 +70,8 @@ export async function POST(request: Request) {
       startsAt: result.startsAt,
       priceCents: result.priceCents,
       status: "pending",
+      // link do .ics (Google Agenda) com assinatura do proprio agendamento
+      calendarToken: signCalendarToken(result.appointmentId),
     },
     { status: result.replayed ? 200 : 201 },
   );

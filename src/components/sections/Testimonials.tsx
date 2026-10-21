@@ -12,7 +12,7 @@ export async function Testimonials() {
       <div className="shell">
         <div className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
           <SectionHeading
-            eyebrow="Quem ja sentou"
+            eyebrow="Quem já sentou"
             title="5,0 no Google"
             accent="com 123 avaliações."
             description="Avaliações reais de clientes da barbearia, coletadas do perfil do Google."

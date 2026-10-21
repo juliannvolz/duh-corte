@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { ArrowUpRight, Clock, Star } from "lucide-react";
 import { Marquee } from "@/components/motion/Marquee";
+import { Particles } from "@/components/motion/ParticlesLazy";
+import { Parallax } from "@/components/motion/Parallax";
 import { business } from "@/lib/site";
 import { SmartImage } from "@/components/ui/SmartImage";
 
@@ -30,6 +32,8 @@ export function Hero() {
         style={{ background: "radial-gradient(circle, rgba(255,255,255,0.16), transparent 65%)" }}
       />
 
+      <Particles density={0.00011} className="z-0 opacity-70" />
+
       <div className="shell relative grid items-center gap-14 lg:grid-cols-12">
         <div className="lg:col-span-7">
           <p
@@ -55,7 +59,11 @@ export function Hero() {
             <br />
             <span className="rise-mask">
               <span className="rise-word" style={{ animationDelay: "0.22s" }}>
-                postura no{" "}
+                postura no
+              </span>
+            </span>{" "}
+            <span className="rise-mask">
+              <span className="rise-word" style={{ animationDelay: "0.3s" }}>
                 <span className="accent gold-text normal-case">rolar.</span>
               </span>
             </span>
@@ -98,13 +106,15 @@ export function Hero() {
           >
               <div className="absolute -inset-3 -translate-x-3 translate-y-3 border border-gold/40" aria-hidden />
               <div className="relative aspect-[4/5] overflow-hidden bg-ink-3">
-                <SmartImage
-                  name="degrade-medio"
-                  alt="Corte degradê médio executado na Duh Corte Barbearia"
-                  priority
-                  className="h-full w-full scale-105 object-cover motion-safe:animate-[kenburns_18s_ease-in-out_infinite_alternate]"
-                  style={{ animationName: "kenburns" }}
-                />
+                <Parallax amount={26} className="h-full w-full">
+                  <SmartImage
+                    name="degrade-medio"
+                    alt="Corte degradê médio executado na Duh Corte Barbearia"
+                    priority
+                    className="h-full w-full scale-105 object-cover motion-safe:animate-[kenburns_18s_ease-in-out_infinite_alternate]"
+                    style={{ animationName: "kenburns" }}
+                  />
+                </Parallax>
               </div>
               <figcaption className="mt-4 flex items-center justify-between text-xs uppercase tracking-[0.22em] text-bone-dim">
                 <span>Degradê médio</span>

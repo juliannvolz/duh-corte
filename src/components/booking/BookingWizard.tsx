@@ -5,15 +5,15 @@ import {
   ArrowLeft,
   ArrowRight,
   CalendarDays,
+  CalendarPlus,
   Check,
   CheckCircle2,
   Clock3,
-  Copy,
   Loader2,
   MessageCircle,
-  QrCode,
   Scissors,
   User,
+  Wallet,
 } from "lucide-react";
 import React, { useCallback, useEffect, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
@@ -103,9 +103,12 @@ export function BookingWizard({
   const [form, setForm] = useState({ name: "", phone: "", email: "", notes: "" });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [created, setCreated] = useState<{ id: string; startsAt: string; priceCents: number } | null>(
-    null,
-  );
+  const [created, setCreated] = useState<{
+    id: string;
+    startsAt: string;
+    priceCents: number;
+    calendarToken: string;
+  } | null>(null);
   const [idempotencyKey] = useState(() => `reserva-${crypto.randomUUID()}`);
 
   const service = services.find((s) => s.id === serviceId) ?? null;
@@ -169,8 +172,13 @@ export function BookingWizard({
         }),
       });
       const json = await res.json();
-      if (!res.ok) throw new Error(json.error ?? "NÃ£o foi possÃ­vel concluir a reserva");
-      setCreated({ id: json.id, startsAt: json.startsAt, priceCents: json.priceCents });
+      if (!res.ok) throw new Error(json.error ?? "Não foi possível concluir a reserva");
+      setCreated({
+        id: json.id,
+        startsAt: json.startsAt,
+        priceCents: json.priceCents,
+        calendarToken: json.calendarToken ?? "",
+      });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erro ao reservar");
     } finally {
@@ -264,6 +272,7 @@ export function BookingWizard({
                   loading={loadingSlots}
                   selected={slot?.startsAt ?? null}
                   onSelect={(s) => setSlot(s)}
+                  durationMin={service?.durationMin ?? 0}
                 />
               ) : null}
 
@@ -316,14 +325,14 @@ export function BookingWizard({
           <p className="eyebrow text-bone-dim">Resumo</p>
 
           <dl className="mt-5 space-y-4 text-sm">
-            <SummaryRow icon={<Scissors className="size-4" />} label="ServiÃ§o">
+            <SummaryRow icon={<Scissors className="size-4" />} label="Serviço">
               {service ? (
                 <span>
                   {service.name}
                   <span className="block text-xs text-bone-dim">{service.durationMin} min</span>
                 </span>
               ) : (
-                <span className="text-bone-dim">Escolha um serviÃ§o</span>
+                <span className="text-bone-dim">Escolha um serviço</span>
               )}
             </SummaryRow>
 
@@ -341,31 +350,31 @@ export function BookingWizard({
                   {labelFor(dateISO).weekday}, {labelFor(dateISO).day} de {labelFor(dateISO).month}
                 </span>
               ) : (
-                <span className="text-bone-dim">Escolha o horÃ¡rio</span>
+                <span className="text-bone-dim">Escolha o horário</span>
               )}
             </SummaryRow>
 
-            <SummaryRow icon={<Clock3 className="size-4" />} label="HorÃ¡rio">
-              {slot ? <span>{slot.label}</span> : <span className="text-bone-dim">â€”</span>}
+            <SummaryRow icon={<Clock3 className="size-4" />} label="Horário">
+              {slot ? <span>{slot.label}</span> : <span className="text-bone-dim">—</span>}
             </SummaryRow>
           </dl>
 
           <div className="mt-6 flex items-end justify-between border-t border-line pt-5">
             <span className="text-sm text-bone-dim">Total</span>
             <span className="display text-2xl text-gold">
-              {service ? formatBRL(service.priceCents) : "â€”"}
+              {service ? formatBRL(service.priceCents) : "—"}
             </span>
           </div>
 
           {service && !service.priceConfirmed ? (
             <p className="mt-3 text-xs leading-relaxed text-gold/80">
-              Valor de referÃªncia â€” confirmado no atendimento.
+              Valor de referência — confirmado no atendimento.
             </p>
           ) : null}
 
           <p className="mt-5 rounded-2xl border border-line bg-ink/60 p-4 text-xs leading-relaxed text-bone-dim">
-            Pagamento na barbearia: Pix, cartÃ£o de dÃ©bito/crÃ©dito ou dinheiro. O QR Code Pix aparece
-            ao final da reserva.
+            Pagamento presencial na barbearia: Pix, cartão de débito/crédito ou dinheiro. Sem
+            cobrança online — se precisar remarcar, é só chamar no WhatsApp.
           </p>
         </div>
       </aside>
@@ -409,7 +418,7 @@ function StepService({
   return (
     <div>
       <h2 className="display text-2xl">O que vamos fazer hoje?</h2>
-      <p className="mt-2 text-sm text-bone-dim">PreÃ§os por serviÃ§o, com a duraÃ§Ã£o real do atendimento.</p>
+      <p className="mt-2 text-sm text-bone-dim">Preços por serviço, com a duração real do atendimento.</p>
 
       <div className="mt-6 space-y-6">
         {categories.map((category) => {
@@ -466,7 +475,7 @@ function StepProfessional({
     <div>
       <h2 className="display text-2xl">Com quem?</h2>
       <p className="mt-2 text-sm text-bone-dim">
-        Cada profissional tem a prÃ³pria agenda. Escolha quem vai cuidar do seu visual.
+        Cada profissional tem a própria agenda. Escolha quem vai cuidar do seu visual.
       </p>
 
       <ul className="mt-6 grid gap-3 sm:grid-cols-2">
@@ -512,6 +521,7 @@ function StepSlot({
   loading,
   selected,
   onSelect,
+  durationMin,
 }: {
   days: string[];
   windows: SlotWindow[];
@@ -521,11 +531,12 @@ function StepSlot({
   loading: boolean;
   selected: string | null;
   onSelect: (slot: { startsAt: string; label: string }) => void;
+  durationMin: number;
 }) {
   return (
     <div>
-      <h2 className="display text-2xl">Quando fica bom pra vocÃª?</h2>
-      <p className="mt-2 text-sm text-bone-dim">Agenda aberta para os prÃ³ximos 14 dias.</p>
+      <h2 className="display text-2xl">Quando fica bom pra você?</h2>
+      <p className="mt-2 text-sm text-bone-dim">Agenda aberta para os próximos 14 dias.</p>
 
       <div className="no-scrollbar mt-6 flex gap-2 overflow-x-auto pb-2">
         {days.map((day) => {
@@ -560,36 +571,60 @@ function StepSlot({
       <div className="mt-6">
         {loading ? (
           <div className="flex items-center gap-2 text-sm text-bone-dim">
-            <Loader2 className="size-4 animate-spin" /> Buscando horÃ¡rios...
+            <Loader2 className="size-4 animate-spin" /> Buscando horários...
           </div>
         ) : slots?.closed ? (
           <p className="rounded-2xl border border-line bg-ink/50 p-5 text-sm text-bone-dim">
-            Fechado neste dia. Escolha outra data â€” atendemos de segunda a sexta.
+            Fechado neste dia. Escolha outra data — atendemos de segunda a sexta.
           </p>
         ) : slots && slots.slots.length > 0 ? (
-          <div className="grid grid-cols-3 gap-2 sm:grid-cols-5">
-            {slots.slots.map((s) => {
-              const active = selected === s.startsAt;
+          <div className="space-y-7">
+            {[
+              { titulo: "Manhã", ate: 12 * 60 },
+              { titulo: "Tarde", ate: 24 * 60 },
+            ].map((grupo) => {
+              const lista = slots.slots.filter((s) => {
+                const minuto = Number(s.label.slice(0, 2)) * 60 + Number(s.label.slice(3, 5));
+                return grupo.titulo === "Manhã" ? minuto < grupo.ate : minuto >= 12 * 60;
+              });
+              if (lista.length === 0) return null;
               return (
-                <button
-                  key={s.startsAt}
-                  type="button"
-                  onClick={() => onSelect(s)}
-                  aria-pressed={active}
-                  className={`rounded-xl border py-2.5 text-sm font-medium transition-colors ${
-                    active
-                      ? "border-gold bg-gold text-ink"
-                      : "border-line bg-ink/40 hover:border-line-strong"
-                  }`}
-                >
-                  {s.label}
-                </button>
+                <div key={grupo.titulo}>
+                  <p className="eyebrow flex items-center gap-3 text-bone-dim">
+                    {grupo.titulo}
+                    <span className="h-px flex-1 bg-line" aria-hidden />
+                  </p>
+                  <div className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-5">
+                    {lista.map((s) => {
+                      const active = selected === s.startsAt;
+                      return (
+                        <button
+                          key={s.startsAt}
+                          type="button"
+                          onClick={() => onSelect(s)}
+                          aria-pressed={active}
+                          className={`rounded-xl border py-2.5 text-sm font-medium transition-colors ${
+                            active
+                              ? "border-gold bg-gold text-ink"
+                              : "border-line bg-ink/40 hover:border-line-strong"
+                          }`}
+                        >
+                          {s.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
               );
             })}
+            <p className="text-xs leading-relaxed text-bone-dim">
+              Cada atendimento tem {durationMin} min e os horarios ficam com 15 min de intervalo
+              entre um corte e o seguinte. Se preferir outro horario, chame no WhatsApp.
+            </p>
           </div>
         ) : slots ? (
           <p className="rounded-2xl border border-line bg-ink/50 p-5 text-sm text-bone-dim">
-            Sem horÃ¡rios livres neste dia. Tente outra data ou chame no WhatsApp.
+            Sem horários livres neste dia. Tente outra data ou chame no WhatsApp.
           </p>
         ) : null}
       </div>
@@ -610,7 +645,7 @@ function StepDetails({
 }) {
   return (
     <div>
-      <h2 className="display text-2xl">SÃ³ falta vocÃª.</h2>
+      <h2 className="display text-2xl">Só falta você.</h2>
       <p className="mt-2 text-sm text-bone-dim">
         Usamos o WhatsApp para confirmar. Sem spam, sem cadastro.
       </p>
@@ -651,25 +686,25 @@ function StepDetails({
             onChange={(e) => setForm({ ...form, email: e.target.value })}
             autoComplete="email"
             className="rounded-xl border border-line bg-ink px-4 py-3 text-bone placeholder:text-bone-dim/50 focus:border-gold focus:outline-none"
-            placeholder="vocÃª@email.com"
+            placeholder="você@email.com"
           />
         </label>
 
         <label className="flex flex-col gap-1.5 text-sm sm:col-span-2">
-          <span className="text-bone-dim">ObservaÃ§Ã£o (opcional)</span>
+          <span className="text-bone-dim">Observação (opcional)</span>
           <textarea
             value={form.notes}
             onChange={(e) => setForm({ ...form, notes: e.target.value })}
             rows={3}
             className="resize-none rounded-xl border border-line bg-ink px-4 py-3 text-bone placeholder:text-bone-dim/50 focus:border-gold focus:outline-none"
-            placeholder="ReferÃªncia de corte, alergia, primeira vez..."
+            placeholder="Referência de corte, alergia, primeira vez..."
           />
         </label>
       </div>
 
       <p className="mt-5 text-xs leading-relaxed text-bone-dim">
-        Ao confirmar, vocÃª concorda com o contato pelo WhatsApp e com a polÃ­tica de cancelamento de{" "}
-        {business.name} (cancelamento sem custo atÃ© 1 hora antes).
+        Ao confirmar, você concorda com o contato pelo WhatsApp e com a política de cancelamento de{" "}
+        {business.name} (cancelamento sem custo até 1 hora antes).
       </p>
 
       {error ? <p className="mt-4 text-sm text-red-400">{error}</p> : null}
@@ -683,53 +718,20 @@ function SuccessCard({
   professionalName,
   label,
 }: {
-  created: { id: string; startsAt: string; priceCents: number };
+  created: { id: string; startsAt: string; priceCents: number; calendarToken: string };
   serviceName: string;
   professionalName: string;
   label: string;
 }) {
-  const [pix, setPix] = useState<{ payload: string; amountCents: number } | null>(null);
-  const [pixMessage, setPixMessage] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
 
   const date = new Date(created.startsAt);
   const local = new Date(date.getTime() - 3 * 60 * 60 * 1000);
-  const dateLabel = `${String(local.getUTCDate()).padStart(2, "0")}/${String(local.getUTCMonth() + 1).padStart(2, "0")} Ã s ${label}`;
+  const dateLabel = `${String(local.getUTCDate()).padStart(2, "0")}/${String(local.getUTCMonth() + 1).padStart(2, "0")} às ${label}`;
 
   const whatsappText = encodeURIComponent(
-    `OlÃ¡! Acabei de reservar na Duh Corte: ${serviceName} com ${professionalName} em ${dateLabel}. Meu cÃ³digo Ã© ${created.id.slice(0, 8)}.`,
+    `Olá! Acabei de reservar na Duh Corte: ${serviceName} com ${professionalName} em ${dateLabel}. Meu código é ${created.id.slice(0, 8)}.`,
   );
 
-  useEffect(() => {
-    let cancelled = false;
-    fetch("/api/payments/pix", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ appointmentId: created.id }),
-    })
-      .then(async (res) => {
-        const json = await res.json();
-        if (cancelled) return;
-        if (res.ok && json.pixConfigured && json.payload) {
-          setPix({ payload: json.payload, amountCents: json.amountCents });
-        } else {
-          setPixMessage(json.fallback ?? json.error ?? "Pix indisponÃ­vel no momento.");
-        }
-      })
-      .catch(() => {
-        if (!cancelled) setPixMessage("Pix indisponÃ­vel no momento. Pague na barbearia.");
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [created.id]);
-
-  async function copy() {
-    if (!pix) return;
-    await navigator.clipboard.writeText(pix.payload);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  }
 
   return (
     <div className="mx-auto max-w-2xl">
@@ -747,7 +749,7 @@ function SuccessCard({
           {serviceName} com {professionalName}
           <br />
           <span className="text-bone">
-            {dateLabel} Â· cÃ³digo {created.id.slice(0, 8).toUpperCase()}
+            {dateLabel} · código {created.id.slice(0, 8).toUpperCase()}
           </span>
         </p>
 
@@ -768,42 +770,38 @@ function SuccessCard({
             href="/"
             className="inline-flex items-center justify-center rounded-full border border-line-strong px-6 py-3 text-sm text-bone transition-colors hover:border-gold hover:text-gold"
           >
-            Voltar ao inÃ­cio
+            Voltar ao início
           </Link>
         </div>
 
         <div className="mt-8 rounded-2xl border border-line bg-ink/70 p-5 text-left">
           <p className="flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-bone-dim">
-            <QrCode className="size-4 text-gold" /> Pagamento
+            <Wallet className="size-4 text-gold" /> Pagamento
           </p>
+          <p className="mt-3 text-sm text-bone">
+            O pagamento é feito <span className="text-gold">na barbearia</span>, no momento do
+            atendimento: Pix, cartão de débito, cartão de crédito ou dinheiro.
+          </p>
+          <p className="mt-2 text-xs leading-relaxed text-bone-dim">
+            Nada é cobrado online. Se precisar remarcar, é só falar no WhatsApp — o horário fica
+            reservado até 1 hora antes.
+          </p>
+        </div>
 
-          {pix ? (
-            <>
-              <p className="mt-3 text-sm text-bone">
-                Pix de <span className="text-gold">{formatBRL(pix.amountCents)}</span> â€” copie o
-                cÃ³digo e pague no app do seu banco.
-              </p>
-              <div className="mt-3 flex items-center gap-2">
-                <code className="flex-1 truncate rounded-lg border border-line bg-ink px-3 py-2 text-xs text-bone-dim">
-                  {pix.payload}
-                </code>
-                <button
-                  type="button"
-                  onClick={copy}
-                  className="inline-flex items-center gap-1.5 rounded-lg bg-gold px-3 py-2 text-xs font-semibold text-ink"
-                >
-                  {copied ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
-                  {copied ? "Copiado" : "Copiar"}
-                </button>
-              </div>
-            </>
-          ) : (
-            <p className="mt-3 text-sm text-bone-dim">
-              {pixMessage ?? "Gerando o QR Code..."}
-              <br />
-              TambÃ©m aceitamos cartÃ£o de dÃ©bito, crÃ©dito e dinheiro na barbearia.
-            </p>
-          )}
+        <div className="mt-4 rounded-2xl border border-line bg-ink/70 p-5 text-left">
+          <p className="flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-bone-dim">
+            <CalendarPlus className="size-4 text-gold" /> Google Agenda
+          </p>
+          <p className="mt-3 text-sm text-bone-dim">
+            Salve o horário na sua agenda do Google (ou Apple/Outlook) e o lembrete aparece
+            sozinho.
+          </p>
+          <a
+            href={"/api/calendar/ics?appointment=" + created.id + "&token=" + created.calendarToken}
+            className="mt-3 inline-flex items-center gap-2 rounded-full border border-line-strong px-5 py-2.5 text-sm font-medium text-bone transition-colors hover:border-gold hover:text-gold"
+          >
+            <CalendarPlus className="size-4" /> Adicionar à minha agenda
+          </a>
         </div>
       </motion.div>
     </div>

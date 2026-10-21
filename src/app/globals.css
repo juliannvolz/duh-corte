@@ -68,6 +68,9 @@
   display: inline-block;
   overflow: hidden;
   vertical-align: bottom;
+  /* folga extra no topo da mascara: o agudo do serif italico nao e cortado */
+  padding-top: 0.16em;
+  margin-top: -0.16em;
 }
 
 .rise-word {
@@ -172,6 +175,14 @@ html.lenis body {
     font-family: var(--font-accent);
     font-style: italic;
     font-weight: 400;
+    /* A Instrument Serif italica nao tem o glifo de acento MAIUSCULO (o "É"
+       saia como "E"). Como o titulo do bloco e maiusculo, o span mantem a
+       caixa original (text-transform: none) e o acento sempre aparece. */
+    text-transform: none;
+    display: inline-block;
+    line-height: 1.04;
+    padding-top: 0.08em;
+    padding-bottom: 0.02em;
   }
 
   .eyebrow {

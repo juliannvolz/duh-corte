@@ -59,6 +59,13 @@ const PIPELINE: Array<{ from: string; to: string; alt: string; credit: string }>
     alt: "Peca de divulgacao do Clube do Assinante da Duh Corte",
     credit: "Instagram @duhcortebarbearia",
   },
+  {
+    // foto do dono (fundador) — salve o arquivo em assets/raw/oficial/dono.jpg
+    from: "oficial/dono.jpg",
+    to: "dono",
+    alt: "Dudu, dono e mestre barbeiro da Duh Corte Barbearia",
+    credit: "Duh Corte Barbearia (foto do dono)",
+  },
 ];
 
 async function exists(p: string) {
@@ -70,12 +77,24 @@ async function exists(p: string) {
   }
 }
 
+/** Aceita jpg/jpeg/png/webp para o mesmo item do pipeline. */
+async function resolveSource(from: string): Promise<string | null> {
+  if (await exists(path.join(RAW, from))) return from;
+  const base = from.replace(/\.[a-z]+$/i, "");
+  for (const ext of [".jpg", ".jpeg", ".png", ".webp"]) {
+    const candidate = `${base}${ext}`;
+    if (await exists(path.join(RAW, candidate))) return candidate;
+  }
+  return null;
+}
+
 async function processOne(item: (typeof PIPELINE)[number]) {
-  const src = path.join(RAW, item.from);
-  if (!(await exists(src))) {
+  const resolved = await resolveSource(item.from);
+  if (!resolved) {
     console.log(`[skip] ${item.from} nao encontrado`);
     return null;
   }
+  const src = path.join(RAW, resolved);
 
   const input = sharp(src, { failOn: "none" }).rotate();
   const meta = await input.metadata();

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AlertTriangle, CheckCircle2, Clock3, LogOut, Phone, RefreshCcw } from "lucide-react";
 import { formatBRL } from "@/lib/site";
+import { IntegrationsCard, type IntegrationsInfo } from "@/components/admin/IntegrationsCard";
 
 type Appointment = {
   id: string;
@@ -45,7 +46,11 @@ function timeOf(iso: string) {
   return `${String(local.getUTCHours()).padStart(2, "0")}:${String(local.getUTCMinutes()).padStart(2, "0")}`;
 }
 
-export function AdminDashboard() {
+export function AdminDashboard({
+  integrations,
+}: {
+  integrations: IntegrationsInfo;
+}) {
   const [date, setDate] = useState(todayISO());
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [pending, setPending] = useState<PendingItem[]>([]);
@@ -261,6 +266,10 @@ export function AdminDashboard() {
                 <CheckCircle2 className="size-4" /> Nenhuma pendência registrada.
               </p>
             ) : null}
+          </div>
+
+          <div className="mt-6">
+            <IntegrationsCard info={integrations} />
           </div>
         </aside>
       </div>

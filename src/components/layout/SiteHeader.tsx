@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { Menu, X } from "lucide-react";
 import { business, navLinks } from "@/lib/site";
+import { ScrollProgress } from "@/components/motion/ScrollProgress";
 
 export function SiteHeader() {
   const [scrolled, setScrolled] = useState(false);
@@ -26,7 +27,9 @@ export function SiteHeader() {
   }, [open]);
 
   return (
-    <header
+    <>
+      <ScrollProgress />
+      <header
       className={`fixed inset-x-0 top-0 z-50 transition-[background-color,border-color,backdrop-filter] duration-500 ${
         scrolled || open
           ? "border-b border-line bg-ink/90"
@@ -133,6 +136,7 @@ export function SiteHeader() {
         )}
       </AnimatePresence>
     </header>
+    </>
   );
 }
 

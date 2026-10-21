@@ -2,11 +2,13 @@ import { Section, SectionHeading } from "@/components/ui/Section";
 import { Reveal } from "@/components/motion/Reveal";
 import { business } from "@/lib/site";
 import { SmartImage } from "@/components/ui/SmartImage";
+import { Particles } from "@/components/motion/ParticlesLazy";
+import { Parallax } from "@/components/motion/Parallax";
 
 const pillars = [
   {
     title: "Hora marcada, sempre",
-    text: "Nada de fila e nada de 'deixa eu ver'. Sua cadeira e sua — no horário que você escolheu.",
+    text: "Nada de fila e nada de 'deixa eu ver'. Sua cadeira é sua — no horário que você escolheu.",
   },
   {
     title: "Cuidado no detalhe",
@@ -21,16 +23,20 @@ const pillars = [
 export function Story() {
   return (
     <Section id="sobre" className="py-24 md:py-36">
-      <div className="shell grid gap-14 lg:grid-cols-12">
+      <Particles density={0.00005} className="z-0 opacity-60" />
+
+      <div className="shell relative grid gap-14 lg:grid-cols-12">
         <Reveal direction="right" className="lg:col-span-6">
           <figure className="relative">
             <div className="absolute -bottom-4 -left-4 size-32 border-b border-l border-gold/40" aria-hidden />
-            <div className="relative aspect-4/3 overflow-hidden rounded-3xl border border-line bg-ink-2">
-              <SmartImage
-                name="nova-unidade"
-                alt="A chave da nova unidade da Duh Corte Barbearia"
-                className="h-full w-full object-cover"
-              />
+            <div className="relative aspect-[4/3] overflow-hidden rounded-3xl border border-line bg-ink-2">
+              <Parallax amount={34} className="h-full w-full">
+                <SmartImage
+                  name="nova-unidade"
+                  alt="A chave da nova unidade da Duh Corte Barbearia"
+                  className="h-full w-full object-cover"
+                />
+              </Parallax>
             </div>
             <figcaption className="mt-4 text-xs uppercase tracking-[0.22em] text-bone-dim">
               Toda grande transformação começa com uma chave
