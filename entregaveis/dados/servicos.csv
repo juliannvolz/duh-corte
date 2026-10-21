@@ -1,0 +1,11 @@
+categoria;servico;minutos;preco_brl;preco_confirmado
+Cabelo;Corte Social;40;R$ 45,00;nao (referencia)
+Cabelo;Corte Degradê;45;R$ 50,00;nao (referencia)
+Cabelo;Corte Navalhado;50;R$ 55,00;nao (referencia)
+Barba;Barba Completa;30;R$ 40,00;nao (referencia)
+Barba;Sobrancelha na Navalha;15;R$ 20,00;nao (referencia)
+Combos;Corte + Barba;70;R$ 80,00;nao (referencia)
+Combos;Corte + Barba + Sobrancelha;90;R$ 95,00;nao (referencia)
+Infantil;Corte Infantil;30;R$ 35,00;nao (referencia)
+Extras;Finalização;15;R$ 20,00;nao (referencia)
+Extras;Hidratação Capilar;20;R$ 30,00;nao (referencia)

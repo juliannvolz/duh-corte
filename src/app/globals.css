@@ -1,0 +1,237 @@
+@import "tailwindcss";
+
+/* ============================================================
+   Duh Corte — sistema de design
+   Referencia: Awwwards CRISP Barbershop (HM 11/08/2026) + Podium (SOTD 27/06/2026)
+   Paleta extraida do material proprio do cliente (preto + dourado, #RUMOAOHEXA)
+   ============================================================ */
+
+@theme {
+  --color-ink: #0a0a0a;
+  --color-ink-2: #121212;
+  --color-ink-3: #1b1b1b;
+  --color-bone: #f4f1ea;
+  --color-bone-dim: #a29c93;
+  --color-gold: #c8952b;
+  --color-gold-bright: #e0b44a;
+  --color-line: color-mix(in oklab, var(--color-bone) 14%, transparent);
+  --color-line-strong: color-mix(in oklab, var(--color-bone) 28%, transparent);
+
+  --font-display: var(--font-anton), "Arial Narrow", sans-serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-accent: var(--font-instrument-serif), Georgia, serif;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-quart: cubic-bezier(0.76, 0, 0.24, 1);
+
+  --spacing-section: clamp(4.5rem, 10vw, 9rem);
+}
+
+@keyframes kenburns {
+  from {
+    transform: scale(1.02) translate3d(0, 0, 0);
+  }
+  to {
+    transform: scale(1.12) translate3d(-1.5%, -1.5%, 0);
+  }
+}
+
+/**
+ * Entrada acima da dobra — CSS puro, sem esperar hidratação.
+ * O LCP do site passava por um atraso de render porque as animações de
+ * entrada do hero dependiam de JS (motion). Com keyframes nativos, o texto
+ * aparece junto com a primeira pintura e a animação fica igual.
+ */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(110%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.rise-mask {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+}
+
+.rise-word {
+  display: inline-block;
+  animation: rise 0.85s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.fade-up {
+  animation: fade-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rise-word,
+  .fade-up {
+    animation: none;
+  }
+}
+
+/* Lenis */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+@layer base {
+  * {
+    border-color: var(--color-line);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-ink);
+    color: var(--color-bone);
+    font-family: var(--font-sans);
+    overflow-x: clip;
+  }
+
+  ::selection {
+    background-color: var(--color-gold);
+    color: var(--color-ink);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-gold-bright);
+    outline-offset: 3px;
+  }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  .shell {
+    width: 100%;
+    max-width: 90rem;
+    margin-inline: auto;
+    padding-inline: clamp(1.25rem, 4vw, 3.5rem);
+  }
+
+  .display {
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    line-height: 0.86;
+    letter-spacing: -0.01em;
+  }
+
+  .accent {
+    font-family: var(--font-accent);
+    font-style: italic;
+    font-weight: 400;
+  }
+
+  .eyebrow {
+    font-size: 0.6875rem;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  .hairline {
+    height: 1px;
+    background: linear-gradient(90deg, var(--color-line-strong), transparent);
+  }
+
+  .gold-text {
+    background: linear-gradient(100deg, var(--color-gold-bright), var(--color-gold) 55%, var(--color-gold-bright));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .grain::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.16;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+  }
+
+  .card-hover {
+    transition:
+      border-color 0.4s var(--ease-out-expo),
+      background-color 0.4s var(--ease-out-expo),
+      transform 0.4s var(--ease-out-expo);
+  }
+
+  .card-hover:hover {
+    border-color: var(--color-line-strong);
+    background-color: var(--color-ink-2);
+    transform: translateY(-2px);
+  }
+}
+
+@layer utilities {
+  .mask-fade-y {
+    mask-image: linear-gradient(to bottom, transparent, black 12%, black 88%, transparent);
+  }
+
+  .mask-fade-x {
+    mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}

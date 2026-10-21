@@ -1,0 +1,57 @@
+{
+  "text": "Degradê médio\n\nCorte moderno com degradê médio bem conectado e linha frontal bem marcada. Excelente definição e simetria,\nPróximo",
+  "downloaded": [],
+  "payloads": [
+    {
+      "url": "https://api.cashbarber.com.br/api/duhcortebarbearia/web/get-data",
+      "status": 200,
+      "json": {
+        "tenantId": 4514,
+        "logoUrl": "https://cdn.cashbarber.com.br/1768177336-500733.png",
+        "iconeUrl": "https://cdn.cashbarber.com.br/1768177337-23078.png",
+        "backgroundColor": "#fff",
+        "primaryColor": "#000000",
+        "publicToken": null,
+        "img_1Url": "https://cdn.cashbarber.com.br/1768177337-260182.png",
+        "img_2Url": "https://cdn.cashbarber.com.br/1768177338-237875.png",
+        "img_3Url": "https://cdn.cashbarber.com.br/1768177339-114583.png",
+        "acesso_clube": 1,
+        "clube_da_barba": "Clube do assinante",
+        "emp_intro_titulo_1": "Degradê médio",
+        "emp_intro_subtitulo_1": "Corte moderno com degradê médio bem conectado e linha frontal bem marcada. Excelente definição e simetria,",
+        "emp_intro_titulo_2": "Degradê alto",
+        "emp_intro_subtitulo_2": "Degradê alto extremamente limpo, com transição suave e acabamento refinado. O corte transmite modernidade e atitude, destacando o formato do rosto e trazendo um visual marcante e profissional.",
+        "emp_intro_titulo_3": "Aquele moica de respeito",
+        "emp_intro_subtitulo_3": "Corte elegante e bem equilibrado, com degradê baixo suave que valoriza o contorno da cabeça. O topo mantém comprimento e textura natural, garantindo um visual moderno, versátil e fácil de manter no dia a dia.",
+        "emp_nome_fantasia": "Duh Corte Barbearia",
+        "emp_url": "DuhCorteBarbearia",
+        "emp_fuso": "GMT-3",
+        "emp_tolerancia_cancelamento": 60,
+        "emp_gateway": "DOM",
+        "emp_dom_pagamentos_public_token": "pk_ee81c356-34a3-431f-91bb-1bbec797ee94",
+        "emp_em_transicao_gateway": false,
+        "emp_duracao_penalidade": 720,
+        "possui_planos": true
+      }
+    },
+    {
+      "url": "https://api.cashbarber.com.br/api/auth/me",
+      "status": 401,
+      "json": {
+        "message": "Token de autenticação não fornecido",
+        "timestamp": "2026-10-21T16:51:34.861Z",
+        "path": "/auth/me"
+      }
+    },
+    {
+      "url": "https://api.cashbarber.com.br/api/auth/refresh",
+      "status": 401,
+      "json": {
+        "message": "Token de Sessão não fornecido",
+        "action": "require_login",
+        "timestamp": "2026-10-21T16:51:36.329Z",
+        "path": "/auth/refresh"
+      }
+    }
+  ]
+}

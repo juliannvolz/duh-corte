@@ -1,0 +1,91 @@
+{
+  "negocio": {
+    "nome": "Duh Corte Barbearia",
+    "cidade": "Jaraguá do Sul/SC",
+    "bairro": "Vila Nova",
+    "telefone": "+5547999815500",
+    "whatsapp": "5547999815500",
+    "instagram": "https://instagram.com/duhcortebarbearia",
+    "nota": 5,
+    "avaliacoes": 123
+  },
+  "horarios": [
+    {
+      "dia": "Domingo",
+      "status": "fechado"
+    },
+    {
+      "dia": "Segunda",
+      "abre": 9,
+      "fecha": 19
+    },
+    {
+      "dia": "Terça",
+      "abre": 9,
+      "fecha": 19
+    },
+    {
+      "dia": "Quarta",
+      "abre": 9,
+      "fecha": 19
+    },
+    {
+      "dia": "Quinta",
+      "abre": 9,
+      "fecha": 19
+    },
+    {
+      "dia": "Sexta",
+      "abre": 9,
+      "fecha": 19
+    },
+    {
+      "dia": "Sábado",
+      "status": "fechado"
+    }
+  ],
+  "pendencias": [
+    {
+      "id": "precos",
+      "label": "Tabela oficial de preços e duracoes",
+      "detail": "Valores atuais são referência de mercado local (Jaraguá do Sul).",
+      "source": "interno"
+    },
+    {
+      "id": "horario-sexta",
+      "label": "Horário de sexta",
+      "detail": "Google Maps indica 9:00-18:00; a bio do Instagram informa 9:00-19:00.",
+      "source": "maps"
+    },
+    {
+      "id": "equipe",
+      "label": "Equipe completa e fotos dos profissionais",
+      "detail": "Apenas 'Dudu' (fundador) está confirmado hoje.",
+      "source": "instagram"
+    },
+    {
+      "id": "planos",
+      "label": "Valores do Clube do Assinante",
+      "detail": "A plataforma Cashbarber confirma que o clube existe (acesso_clube), sem expor os valores.",
+      "source": "cashbarber"
+    },
+    {
+      "id": "pix",
+      "label": "Chave Pix cadastrada e CNPJ",
+      "detail": "Necessário para emitir QR Code válido.",
+      "source": "interno"
+    },
+    {
+      "id": "fotos",
+      "label": "Acervo fotografico de alta resolucao",
+      "detail": "Hoje temos 3 fotos de trabalho, 1 da nova unidade, 1 de cliente e o logo.",
+      "source": "instagram"
+    },
+    {
+      "id": "logo-vetor",
+      "label": "Logo em SVG",
+      "detail": "Recebido apenas em PNG com fundo branco.",
+      "source": "interno"
+    }
+  ]
+}

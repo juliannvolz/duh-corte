@@ -1,0 +1,132 @@
+{
+  "base": "http://localhost:3000",
+  "startedAt": "2026-10-21T18:38:42.607Z",
+  "viewports": {
+    "mobile/": {
+      "status": 200,
+      "title": "Duh Corte Barbearia — Jaraguá do Sul/SC | Corte, barba e assinatura",
+      "shot": "mobile-home.png"
+    },
+    "mobile/servicos": {
+      "status": 200,
+      "title": "Serviços e preços | Duh Corte",
+      "shot": "mobile-servicos.png"
+    },
+    "mobile/planos": {
+      "status": 200,
+      "title": "Clube do Assinante | Duh Corte",
+      "shot": "mobile-planos.png"
+    },
+    "mobile/agendar": {
+      "status": 200,
+      "title": "Agendar horário | Duh Corte",
+      "shot": "mobile-agendar.png"
+    },
+    "mobile/local": {
+      "status": 200,
+      "title": "Onde estamos | Duh Corte",
+      "shot": "mobile-local.png"
+    },
+    "mobile/privacidade": {
+      "status": 200,
+      "title": "Política de privacidade | Duh Corte",
+      "shot": "mobile-privacidade.png"
+    },
+    "mobile-diagnostics": {
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "httpErrors": [],
+      "warnings": []
+    },
+    "tablet/": {
+      "status": 200,
+      "title": "Duh Corte Barbearia — Jaraguá do Sul/SC | Corte, barba e assinatura",
+      "shot": "tablet-home.png"
+    },
+    "tablet/servicos": {
+      "status": 200,
+      "title": "Serviços e preços | Duh Corte",
+      "shot": "tablet-servicos.png"
+    },
+    "tablet/planos": {
+      "status": 200,
+      "title": "Clube do Assinante | Duh Corte",
+      "shot": "tablet-planos.png"
+    },
+    "tablet/agendar": {
+      "status": 200,
+      "title": "Agendar horário | Duh Corte",
+      "shot": "tablet-agendar.png"
+    },
+    "tablet/local": {
+      "status": 200,
+      "title": "Onde estamos | Duh Corte",
+      "shot": "tablet-local.png"
+    },
+    "tablet/privacidade": {
+      "status": 200,
+      "title": "Política de privacidade | Duh Corte",
+      "shot": "tablet-privacidade.png"
+    },
+    "tablet-diagnostics": {
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "httpErrors": [],
+      "warnings": []
+    },
+    "desktop/": {
+      "status": 200,
+      "title": "Duh Corte Barbearia — Jaraguá do Sul/SC | Corte, barba e assinatura",
+      "shot": "desktop-home.png"
+    },
+    "desktop/servicos": {
+      "status": 200,
+      "title": "Serviços e preços | Duh Corte",
+      "shot": "desktop-servicos.png"
+    },
+    "desktop/planos": {
+      "status": 200,
+      "title": "Clube do Assinante | Duh Corte",
+      "shot": "desktop-planos.png"
+    },
+    "desktop/agendar": {
+      "status": 200,
+      "title": "Agendar horário | Duh Corte",
+      "shot": "desktop-agendar.png"
+    },
+    "desktop/local": {
+      "status": 200,
+      "title": "Onde estamos | Duh Corte",
+      "shot": "desktop-local.png"
+    },
+    "desktop/privacidade": {
+      "status": 200,
+      "title": "Política de privacidade | Duh Corte",
+      "shot": "desktop-privacidade.png"
+    },
+    "desktop-diagnostics": {
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "httpErrors": [],
+      "warnings": []
+    }
+  },
+  "flow": {
+    "servicePressed": true,
+    "choseSlot": true,
+    "slotCount": 38,
+    "success": true,
+    "consoleErrors": [],
+    "pageErrors": [],
+    "failedRequests": [],
+    "httpErrors": [],
+    "warnings": []
+  },
+  "admin": {
+    "loggedIn": true
+  },
+  "finishedAt": "2026-10-21T18:40:48.584Z"
+}

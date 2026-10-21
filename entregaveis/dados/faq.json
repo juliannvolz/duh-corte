@@ -1,0 +1,26 @@
+[
+  {
+    "q": "Preciso agendar com antecedência?",
+    "a": "Sim. A agenda abre com 60 dias de antecedencia e o atendimento e sempre com hora marcada, para garantir que a cadeira esteja reservada para você."
+  },
+  {
+    "q": "Como funciona a assinatura do Clube do Assinante?",
+    "a": "Você escolhe o plano, a vaga na agenda fica reservada e o corte acontece sem fila. A assinatura é mensal e o pagamento pode ser feito por Pix ou cartão."
+  },
+  {
+    "q": "Quais formas de pagamento voces aceitam?",
+    "a": "Pix (com QR Code enviado na hora), cartao de debito, cartao de credito e dinheiro, sempre na barbearia."
+  },
+  {
+    "q": "Posso cancelar ou remarcar?",
+    "a": "Sim. O cancelamento sem custo pode ser feito até 1 hora antes do horário. Atrasos acima de 12 horas podem gerar penalidade na assinatura."
+  },
+  {
+    "q": "Fazem corte infantil?",
+    "a": "Sim. A agenda infantil tem hora reservada, com mais tolerância de tempo e abordagem para a criança."
+  },
+  {
+    "q": "Voces vendem produtos?",
+    "a": "Sim. A casa tem linha própria de produtos para cabelo e barba, disponíveis na loja e também no atendimento."
+  }
+]

@@ -1,0 +1,811 @@
+"use client";
+
+import Link from "next/link";
+import {
+  ArrowLeft,
+  ArrowRight,
+  CalendarDays,
+  Check,
+  CheckCircle2,
+  Clock3,
+  Copy,
+  Loader2,
+  MessageCircle,
+  QrCode,
+  Scissors,
+  User,
+} from "lucide-react";
+import React, { useCallback, useEffect, useState } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { business, formatBRL } from "@/lib/site";
+import type { ProfessionalSeed, ServiceCategory } from "@/lib/site";
+import type { ServiceView } from "@/lib/content";
+
+const STEPS = ["Serviço", "Profissional", "Horário", "Seus dados"];
+
+export type SlotWindow = { weekday: number; openMin: number; closeMin: number } | null;
+
+type SlotResponse = {
+  date: string;
+  weekday: number;
+  closed: boolean;
+  slots: { startsAt: string; label: string }[];
+  error?: string;
+};
+
+/** Data de hoje em São Paulo (ISO, YYYY-MM-DD) — o Brasil é UTC-3 fixo. */
+function todaySP() {
+  const sp = new Date(Date.now() - 3 * 60 * 60 * 1000);
+  return sp.toISOString().slice(0, 10);
+}
+
+/** Lista dos próximos `count` dias (ISO) a partir de hoje em SP. */
+function nextDays(count = 14) {
+  const [y, m, d] = todaySP().split("-").map(Number);
+  const base = Date.UTC(y, m - 1, d);
+  return Array.from(
+    { length: count },
+    (_, i) => new Date(base + i * 86_400_000).toISOString().slice(0, 10),
+  );
+}
+
+/** Rótulos pt-BR curtos ("qui", "22", "out") da data ISO em São Paulo. */
+function labelFor(dateISO: string) {
+  const [y, m, d] = dateISO.split("-").map(Number);
+  const date = new Date(Date.UTC(y, m - 1, d));
+  const short = (opts: Intl.DateTimeFormatOptions) =>
+    date.toLocaleDateString("pt-BR", { timeZone: "UTC", ...opts }).replace(".", "");
+  return {
+    weekday: short({ weekday: "short" }),
+    day: date.toLocaleDateString("pt-BR", { timeZone: "UTC", day: "2-digit" }),
+    month: short({ month: "short" }),
+  };
+}
+
+/** Máscara de telefone BR: (47) 99999-9999. */
+function phoneMask(value: string) {
+  const digits = value.replace(/\D/g, "").slice(0, 11);
+  const ddd = digits.slice(0, 2);
+  const rest = digits.slice(2);
+  if (digits.length <= 2) return `(${ddd}`;
+  const headLen = digits.length > 10 ? 5 : 4;
+  const head = rest.slice(0, headLen);
+  const tail = rest.slice(headLen);
+  return `(${ddd}) ${head}${tail ? `-${tail}` : ""}`;
+}
+
+export function BookingWizard({
+  services,
+  professionals,
+  categories,
+  windows,
+  initialServiceId,
+  initialProfessionalId,
+}: {
+  services: ServiceView[];
+  professionals: ProfessionalSeed[];
+  categories: ServiceCategory[];
+  windows: SlotWindow[];
+  initialServiceId?: string;
+  initialProfessionalId?: string;
+}) {
+  const reduced = useReducedMotion();
+  const [step, setStep] = useState(0);
+  const [serviceId, setServiceId] = useState<string | null>(initialServiceId ?? null);
+  const [professionalId, setProfessionalId] = useState<string | null>(
+    initialProfessionalId ?? null,
+  );
+  const [dateISO, setDateISO] = useState<string>(() => nextDays()[0]);
+  const days = nextDays();
+  const [slots, setSlots] = useState<SlotResponse | null>(null);
+  const [loadingSlots, setLoadingSlots] = useState(false);
+  const [slot, setSlot] = useState<{ startsAt: string; label: string } | null>(null);
+  const [form, setForm] = useState({ name: "", phone: "", email: "", notes: "" });
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [created, setCreated] = useState<{ id: string; startsAt: string; priceCents: number } | null>(
+    null,
+  );
+  const [idempotencyKey] = useState(() => `reserva-${crypto.randomUUID()}`);
+
+  const service = services.find((s) => s.id === serviceId) ?? null;
+  const professional = professionals.find((p) => p.id === professionalId) ?? null;
+
+  const loadSlots = useCallback(async () => {
+    if (!serviceId) return;
+    setLoadingSlots(true);
+    setError(null);
+    try {
+      const params = new URLSearchParams({ service: serviceId, date: dateISO });
+      if (professionalId) params.set("professional", professionalId);
+      const res = await fetch(`/api/slots?${params.toString()}`, { cache: "no-store" });
+      const json = (await res.json()) as SlotResponse;
+      if (!res.ok) throw new Error(json.error ?? "Não foi possível carregar os horários");
+      setSlots(json);
+      setSlot(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erro ao carregar horários");
+      setSlots(null);
+    } finally {
+      setLoadingSlots(false);
+    }
+  }, [serviceId, professionalId, dateISO]);
+
+  useEffect(() => {
+    if (step === 2) {
+      // carga fora do corpo do efeito (evita cascata de renders)
+      const id = requestAnimationFrame(() => {
+        void loadSlots();
+      });
+      return () => cancelAnimationFrame(id);
+    }
+  }, [step, loadSlots]);
+
+﻿  const canAdvance =
+    (step === 0 && Boolean(serviceId)) ||
+    (step === 1 && Boolean(professionalId)) ||
+    (step === 2 && Boolean(slot)) ||
+    step === 3;
+
+  async function submit() {
+    if (!serviceId || !professionalId || !slot) return;
+    setSubmitting(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/appointments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          serviceId,
+          professionalId,
+          startsAt: slot.startsAt,
+          idempotencyKey,
+          customer: {
+            name: form.name.trim(),
+            phone: form.phone.trim(),
+            email: form.email.trim() || undefined,
+            notes: form.notes.trim() || undefined,
+          },
+        }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error ?? "NÃ£o foi possÃ­vel concluir a reserva");
+      setCreated({ id: json.id, startsAt: json.startsAt, priceCents: json.priceCents });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erro ao reservar");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  if (created && service) {
+    return (
+      <SuccessCard
+        created={created}
+        serviceName={service.name}
+        professionalName={professional?.name ?? ""}
+        label={slot?.label ?? ""}
+      />
+    );
+  }
+
+  return (
+    <div className="grid gap-10 lg:grid-cols-12">
+      <div className="lg:col-span-8">
+        {/* progresso */}
+        <ol className="flex flex-wrap items-center gap-x-3 gap-y-2 text-xs">
+          {STEPS.map((label, index) => {
+            const active = index === step;
+            const done = index < step;
+            return (
+              <li key={label} className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => index < step && setStep(index)}
+                  disabled={index > step}
+                  className={`flex items-center gap-2 rounded-full border px-3 py-1.5 transition-colors ${
+                    active
+                      ? "border-gold bg-gold/10 text-gold"
+                      : done
+                        ? "border-line-strong text-bone"
+                        : "border-line text-bone-dim/60"
+                  }`}
+                >
+                  <span className="grid size-4 place-items-center rounded-full border border-current text-[0.6rem]">
+                    {done ? <Check className="size-2.5" /> : index + 1}
+                  </span>
+                  {label}
+                </button>
+                {index < STEPS.length - 1 ? <span className="h-px w-4 bg-line-strong" /> : null}
+              </li>
+            );
+          })}
+        </ol>
+
+        <div className="mt-8 min-h-[26rem] rounded-3xl border border-line bg-ink-2/60 p-6 md:p-8">
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div
+              key={step}
+              initial={reduced ? { opacity: 0 } : { opacity: 0, x: 16 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={reduced ? { opacity: 0 } : { opacity: 0, x: -16 }}
+              transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+            >
+              {step === 0 ? (
+                <StepService
+                  services={services}
+                  categories={categories}
+                  selected={serviceId}
+                  onSelect={(id) => {
+                    setServiceId(id);
+                    setSlot(null);
+                  }}
+                />
+              ) : null}
+
+              {step === 1 ? (
+                <StepProfessional
+                  professionals={professionals}
+                  selected={professionalId}
+                  onSelect={(id) => {
+                    setProfessionalId(id);
+                    setSlot(null);
+                  }}
+                />
+              ) : null}
+
+              {step === 2 ? (
+                <StepSlot
+                  days={days}
+                  windows={windows}
+                  dateISO={dateISO}
+                  onDate={(iso) => setDateISO(iso)}
+                  slots={slots}
+                  loading={loadingSlots}
+                  selected={slot?.startsAt ?? null}
+                  onSelect={(s) => setSlot(s)}
+                />
+              ) : null}
+
+              {step === 3 ? (
+                <StepDetails form={form} setForm={setForm} phoneMask={phoneMask} error={error} />
+              ) : null}
+            </motion.div>
+          </AnimatePresence>
+        </div>
+
+        <div className="mt-6 flex items-center justify-between gap-4">
+          <button
+            type="button"
+            onClick={() => setStep((s) => Math.max(0, s - 1))}
+            disabled={step === 0}
+            className="inline-flex items-center gap-2 rounded-full border border-line px-5 py-3 text-sm text-bone transition-colors hover:border-line-strong disabled:opacity-40"
+          >
+            <ArrowLeft className="size-4" /> Voltar
+          </button>
+
+          {step < 3 ? (
+            <button
+              type="button"
+              onClick={() => setStep((s) => Math.min(3, s + 1))}
+              disabled={!canAdvance}
+              className="group inline-flex items-center gap-2 rounded-full bg-gold px-6 py-3 text-sm font-semibold text-ink transition-transform duration-300 hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              Continuar
+              <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-0.5" />
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={submit}
+              disabled={submitting || form.name.trim().length < 2 || form.phone.replace(/\D/g, "").length < 10}
+              className="inline-flex items-center gap-2 rounded-full bg-gold px-6 py-3 text-sm font-semibold text-ink transition-transform duration-300 hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              {submitting ? <Loader2 className="size-4 animate-spin" /> : <CheckCircle2 className="size-4" />}
+              {submitting ? "Reservando..." : "Confirmar reserva"}
+            </button>
+          )}
+        </div>
+
+        {error && step !== 3 ? <p className="mt-4 text-sm text-red-400">{error}</p> : null}
+      </div>
+
+      {/* resumo */}
+      <aside className="lg:col-span-4">
+        <div className="sticky top-28 rounded-3xl border border-line bg-ink-2 p-6">
+          <p className="eyebrow text-bone-dim">Resumo</p>
+
+          <dl className="mt-5 space-y-4 text-sm">
+            <SummaryRow icon={<Scissors className="size-4" />} label="ServiÃ§o">
+              {service ? (
+                <span>
+                  {service.name}
+                  <span className="block text-xs text-bone-dim">{service.durationMin} min</span>
+                </span>
+              ) : (
+                <span className="text-bone-dim">Escolha um serviÃ§o</span>
+              )}
+            </SummaryRow>
+
+            <SummaryRow icon={<User className="size-4" />} label="Profissional">
+              {professional ? (
+                <span>{professional.name}</span>
+              ) : (
+                <span className="text-bone-dim">Escolha o profissional</span>
+              )}
+            </SummaryRow>
+
+            <SummaryRow icon={<CalendarDays className="size-4" />} label="Data">
+              {slot ? (
+                <span>
+                  {labelFor(dateISO).weekday}, {labelFor(dateISO).day} de {labelFor(dateISO).month}
+                </span>
+              ) : (
+                <span className="text-bone-dim">Escolha o horÃ¡rio</span>
+              )}
+            </SummaryRow>
+
+            <SummaryRow icon={<Clock3 className="size-4" />} label="HorÃ¡rio">
+              {slot ? <span>{slot.label}</span> : <span className="text-bone-dim">â€”</span>}
+            </SummaryRow>
+          </dl>
+
+          <div className="mt-6 flex items-end justify-between border-t border-line pt-5">
+            <span className="text-sm text-bone-dim">Total</span>
+            <span className="display text-2xl text-gold">
+              {service ? formatBRL(service.priceCents) : "â€”"}
+            </span>
+          </div>
+
+          {service && !service.priceConfirmed ? (
+            <p className="mt-3 text-xs leading-relaxed text-gold/80">
+              Valor de referÃªncia â€” confirmado no atendimento.
+            </p>
+          ) : null}
+
+          <p className="mt-5 rounded-2xl border border-line bg-ink/60 p-4 text-xs leading-relaxed text-bone-dim">
+            Pagamento na barbearia: Pix, cartÃ£o de dÃ©bito/crÃ©dito ou dinheiro. O QR Code Pix aparece
+            ao final da reserva.
+          </p>
+        </div>
+      </aside>
+    </div>
+  );
+}
+
+function SummaryRow({
+  icon,
+  label,
+  children,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="flex items-start gap-3">
+      <span className="mt-0.5 text-gold" aria-hidden>
+        {icon}
+      </span>
+      <div className="flex-1">
+        <dt className="text-xs uppercase tracking-[0.16em] text-bone-dim/70">{label}</dt>
+        <dd className="mt-0.5">{children}</dd>
+      </div>
+    </div>
+  );
+}
+
+function StepService({
+  services,
+  categories,
+  selected,
+  onSelect,
+}: {
+  services: ServiceView[];
+  categories: ServiceCategory[];
+  selected: string | null;
+  onSelect: (id: string) => void;
+}) {
+  return (
+    <div>
+      <h2 className="display text-2xl">O que vamos fazer hoje?</h2>
+      <p className="mt-2 text-sm text-bone-dim">PreÃ§os por serviÃ§o, com a duraÃ§Ã£o real do atendimento.</p>
+
+      <div className="mt-6 space-y-6">
+        {categories.map((category) => {
+          const items = services.filter((s) => s.categoryId === category.id);
+          if (!items.length) return null;
+          return (
+            <div key={category.id}>
+              <p className="eyebrow text-bone-dim">{category.name}</p>
+              <ul className="mt-3 grid gap-2">
+                {items.map((item) => {
+                  const active = selected === item.id;
+                  return (
+                    <li key={item.id}>
+                      <button
+                        type="button"
+                        onClick={() => onSelect(item.id)}
+                        aria-pressed={active}
+                        className={`flex w-full items-center justify-between gap-4 rounded-2xl border px-4 py-3 text-left transition-colors ${
+                          active
+                            ? "border-gold bg-gold/10"
+                            : "border-line bg-ink/40 hover:border-line-strong"
+                        }`}
+                      >
+                        <span>
+                          <span className="block text-sm font-medium">{item.name}</span>
+                          <span className="mt-0.5 block text-xs text-bone-dim">
+                            {item.durationMin} min
+                          </span>
+                        </span>
+                        <span className="display text-lg text-gold">{formatBRL(item.priceCents)}</span>
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function StepProfessional({
+  professionals,
+  selected,
+  onSelect,
+}: {
+  professionals: ProfessionalSeed[];
+  selected: string | null;
+  onSelect: (id: string) => void;
+}) {
+  return (
+    <div>
+      <h2 className="display text-2xl">Com quem?</h2>
+      <p className="mt-2 text-sm text-bone-dim">
+        Cada profissional tem a prÃ³pria agenda. Escolha quem vai cuidar do seu visual.
+      </p>
+
+      <ul className="mt-6 grid gap-3 sm:grid-cols-2">
+        {professionals.map((professional) => {
+          const active = selected === professional.id;
+          return (
+            <li key={professional.id}>
+              <button
+                type="button"
+                onClick={() => onSelect(professional.id)}
+                aria-pressed={active}
+                className={`flex w-full items-center gap-4 rounded-2xl border p-4 text-left transition-colors ${
+                  active ? "border-gold bg-gold/10" : "border-line bg-ink/40 hover:border-line-strong"
+                }`}
+              >
+                <span className="grid size-12 shrink-0 place-items-center rounded-full border border-gold/40 font-display text-base text-gold">
+                  {professional.name
+                    .split(" ")
+                    .map((n) => n[0])
+                    .join("")
+                    .slice(0, 2)
+                    .toUpperCase()}
+                </span>
+                <span>
+                  <span className="block text-sm font-medium">{professional.name}</span>
+                  <span className="mt-0.5 block text-xs text-bone-dim">{professional.role}</span>
+                </span>
+              </button>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
+}
+
+function StepSlot({
+  days,
+  windows,
+  dateISO,
+  onDate,
+  slots,
+  loading,
+  selected,
+  onSelect,
+}: {
+  days: string[];
+  windows: SlotWindow[];
+  dateISO: string;
+  onDate: (iso: string) => void;
+  slots: SlotResponse | null;
+  loading: boolean;
+  selected: string | null;
+  onSelect: (slot: { startsAt: string; label: string }) => void;
+}) {
+  return (
+    <div>
+      <h2 className="display text-2xl">Quando fica bom pra vocÃª?</h2>
+      <p className="mt-2 text-sm text-bone-dim">Agenda aberta para os prÃ³ximos 14 dias.</p>
+
+      <div className="no-scrollbar mt-6 flex gap-2 overflow-x-auto pb-2">
+        {days.map((day) => {
+          const info = labelFor(day);
+          const [y, m, d] = day.split("-").map(Number);
+          const weekday = new Date(Date.UTC(y, m - 1, d)).getUTCDay();
+          const closed = !windows[weekday];
+          const active = day === dateISO;
+          return (
+            <button
+              key={day}
+              type="button"
+              disabled={closed}
+              onClick={() => onDate(day)}
+              aria-pressed={active}
+              className={`flex min-w-16 flex-col items-center rounded-2xl border px-3 py-2.5 text-center transition-colors ${
+                active
+                  ? "border-gold bg-gold/10 text-gold"
+                  : closed
+                    ? "border-line/50 text-bone-dim/30"
+                    : "border-line text-bone hover:border-line-strong"
+              }`}
+            >
+              <span className="text-[0.65rem] uppercase tracking-wide">{info.weekday}</span>
+              <span className="display text-xl">{info.day}</span>
+              <span className="text-[0.6rem] uppercase text-bone-dim/70">{info.month}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="mt-6">
+        {loading ? (
+          <div className="flex items-center gap-2 text-sm text-bone-dim">
+            <Loader2 className="size-4 animate-spin" /> Buscando horÃ¡rios...
+          </div>
+        ) : slots?.closed ? (
+          <p className="rounded-2xl border border-line bg-ink/50 p-5 text-sm text-bone-dim">
+            Fechado neste dia. Escolha outra data â€” atendemos de segunda a sexta.
+          </p>
+        ) : slots && slots.slots.length > 0 ? (
+          <div className="grid grid-cols-3 gap-2 sm:grid-cols-5">
+            {slots.slots.map((s) => {
+              const active = selected === s.startsAt;
+              return (
+                <button
+                  key={s.startsAt}
+                  type="button"
+                  onClick={() => onSelect(s)}
+                  aria-pressed={active}
+                  className={`rounded-xl border py-2.5 text-sm font-medium transition-colors ${
+                    active
+                      ? "border-gold bg-gold text-ink"
+                      : "border-line bg-ink/40 hover:border-line-strong"
+                  }`}
+                >
+                  {s.label}
+                </button>
+              );
+            })}
+          </div>
+        ) : slots ? (
+          <p className="rounded-2xl border border-line bg-ink/50 p-5 text-sm text-bone-dim">
+            Sem horÃ¡rios livres neste dia. Tente outra data ou chame no WhatsApp.
+          </p>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
+function StepDetails({
+  form,
+  setForm,
+  phoneMask,
+  error,
+}: {
+  form: { name: string; phone: string; email: string; notes: string };
+  setForm: (value: { name: string; phone: string; email: string; notes: string }) => void;
+  phoneMask: (value: string) => string;
+  error: string | null;
+}) {
+  return (
+    <div>
+      <h2 className="display text-2xl">SÃ³ falta vocÃª.</h2>
+      <p className="mt-2 text-sm text-bone-dim">
+        Usamos o WhatsApp para confirmar. Sem spam, sem cadastro.
+      </p>
+
+      <div className="mt-6 grid gap-4 sm:grid-cols-2">
+        <label className="flex flex-col gap-1.5 text-sm">
+          <span className="text-bone-dim">Nome</span>
+          <input
+            type="text"
+            value={form.name}
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
+            required
+            autoComplete="name"
+            className="rounded-xl border border-line bg-ink px-4 py-3 text-bone placeholder:text-bone-dim/50 focus:border-gold focus:outline-none"
+            placeholder="Como te chamamos?"
+          />
+        </label>
+
+        <label className="flex flex-col gap-1.5 text-sm">
+          <span className="text-bone-dim">WhatsApp</span>
+          <input
+            type="tel"
+            value={form.phone}
+            onChange={(e) => setForm({ ...form, phone: phoneMask(e.target.value) })}
+            required
+            inputMode="tel"
+            autoComplete="tel"
+            className="rounded-xl border border-line bg-ink px-4 py-3 text-bone placeholder:text-bone-dim/50 focus:border-gold focus:outline-none"
+            placeholder="(47) 99999-9999"
+          />
+        </label>
+
+        <label className="flex flex-col gap-1.5 text-sm sm:col-span-2">
+          <span className="text-bone-dim">E-mail (opcional)</span>
+          <input
+            type="email"
+            value={form.email}
+            onChange={(e) => setForm({ ...form, email: e.target.value })}
+            autoComplete="email"
+            className="rounded-xl border border-line bg-ink px-4 py-3 text-bone placeholder:text-bone-dim/50 focus:border-gold focus:outline-none"
+            placeholder="vocÃª@email.com"
+          />
+        </label>
+
+        <label className="flex flex-col gap-1.5 text-sm sm:col-span-2">
+          <span className="text-bone-dim">ObservaÃ§Ã£o (opcional)</span>
+          <textarea
+            value={form.notes}
+            onChange={(e) => setForm({ ...form, notes: e.target.value })}
+            rows={3}
+            className="resize-none rounded-xl border border-line bg-ink px-4 py-3 text-bone placeholder:text-bone-dim/50 focus:border-gold focus:outline-none"
+            placeholder="ReferÃªncia de corte, alergia, primeira vez..."
+          />
+        </label>
+      </div>
+
+      <p className="mt-5 text-xs leading-relaxed text-bone-dim">
+        Ao confirmar, vocÃª concorda com o contato pelo WhatsApp e com a polÃ­tica de cancelamento de{" "}
+        {business.name} (cancelamento sem custo atÃ© 1 hora antes).
+      </p>
+
+      {error ? <p className="mt-4 text-sm text-red-400">{error}</p> : null}
+    </div>
+  );
+}
+
+function SuccessCard({
+  created,
+  serviceName,
+  professionalName,
+  label,
+}: {
+  created: { id: string; startsAt: string; priceCents: number };
+  serviceName: string;
+  professionalName: string;
+  label: string;
+}) {
+  const [pix, setPix] = useState<{ payload: string; amountCents: number } | null>(null);
+  const [pixMessage, setPixMessage] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  const date = new Date(created.startsAt);
+  const local = new Date(date.getTime() - 3 * 60 * 60 * 1000);
+  const dateLabel = `${String(local.getUTCDate()).padStart(2, "0")}/${String(local.getUTCMonth() + 1).padStart(2, "0")} Ã s ${label}`;
+
+  const whatsappText = encodeURIComponent(
+    `OlÃ¡! Acabei de reservar na Duh Corte: ${serviceName} com ${professionalName} em ${dateLabel}. Meu cÃ³digo Ã© ${created.id.slice(0, 8)}.`,
+  );
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/payments/pix", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ appointmentId: created.id }),
+    })
+      .then(async (res) => {
+        const json = await res.json();
+        if (cancelled) return;
+        if (res.ok && json.pixConfigured && json.payload) {
+          setPix({ payload: json.payload, amountCents: json.amountCents });
+        } else {
+          setPixMessage(json.fallback ?? json.error ?? "Pix indisponÃ­vel no momento.");
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setPixMessage("Pix indisponÃ­vel no momento. Pague na barbearia.");
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [created.id]);
+
+  async function copy() {
+    if (!pix) return;
+    await navigator.clipboard.writeText(pix.payload);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
+
+  return (
+    <div className="mx-auto max-w-2xl">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+        className="rounded-3xl border border-gold/40 bg-gradient-to-b from-gold/10 to-transparent p-8 text-center md:p-12"
+      >
+        <span className="mx-auto grid size-14 place-items-center rounded-full bg-gold text-ink">
+          <CheckCircle2 className="size-7" />
+        </span>
+        <h2 className="display mt-6 text-3xl md:text-4xl">Reserva feita.</h2>
+        <p className="mt-3 text-sm text-bone-dim">
+          {serviceName} com {professionalName}
+          <br />
+          <span className="text-bone">
+            {dateLabel} Â· cÃ³digo {created.id.slice(0, 8).toUpperCase()}
+          </span>
+        </p>
+
+        <p className="mt-4 text-sm text-bone-dim">
+          Valor: <span className="text-gold">{formatBRL(created.priceCents)}</span>
+        </p>
+
+        <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
+          <a
+            href={`https://wa.me/${business.whatsapp}?text=${whatsappText}`}
+            target="_blank"
+            rel="noreferrer noopener"
+            className="inline-flex items-center justify-center gap-2 rounded-full bg-[#25D366] px-6 py-3 text-sm font-semibold text-ink"
+          >
+            <MessageCircle className="size-4" /> Confirmar no WhatsApp
+          </a>
+          <Link
+            href="/"
+            className="inline-flex items-center justify-center rounded-full border border-line-strong px-6 py-3 text-sm text-bone transition-colors hover:border-gold hover:text-gold"
+          >
+            Voltar ao inÃ­cio
+          </Link>
+        </div>
+
+        <div className="mt-8 rounded-2xl border border-line bg-ink/70 p-5 text-left">
+          <p className="flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-bone-dim">
+            <QrCode className="size-4 text-gold" /> Pagamento
+          </p>
+
+          {pix ? (
+            <>
+              <p className="mt-3 text-sm text-bone">
+                Pix de <span className="text-gold">{formatBRL(pix.amountCents)}</span> â€” copie o
+                cÃ³digo e pague no app do seu banco.
+              </p>
+              <div className="mt-3 flex items-center gap-2">
+                <code className="flex-1 truncate rounded-lg border border-line bg-ink px-3 py-2 text-xs text-bone-dim">
+                  {pix.payload}
+                </code>
+                <button
+                  type="button"
+                  onClick={copy}
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-gold px-3 py-2 text-xs font-semibold text-ink"
+                >
+                  {copied ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
+                  {copied ? "Copiado" : "Copiar"}
+                </button>
+              </div>
+            </>
+          ) : (
+            <p className="mt-3 text-sm text-bone-dim">
+              {pixMessage ?? "Gerando o QR Code..."}
+              <br />
+              TambÃ©m aceitamos cartÃ£o de dÃ©bito, crÃ©dito e dinheiro na barbearia.
+            </p>
+          )}
+        </div>
+      </motion.div>
+    </div>
+  );
+}

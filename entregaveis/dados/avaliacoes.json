@@ -1,0 +1,38 @@
+[
+  {
+    "id": "t1",
+    "author": "wsluthieria",
+    "initials": "WL",
+    "rating": 5,
+    "text": "Otimo ambiente, atendimento exemplar e um profissional extremamente qualificado. Duh Corte distoa para muito além dos padroes de locais e serviços encontrados na cidade.",
+    "source": "Google",
+    "sourceUrl": "https://maps.google.com/?cid=12222460781727324303"
+  },
+  {
+    "id": "t2",
+    "author": "Suh Camargo",
+    "initials": "SC",
+    "rating": 5,
+    "text": "Otimo atendimento, lugar super agradável, profissionais mto caprichosos.",
+    "source": "Google",
+    "sourceUrl": "https://maps.google.com/?cid=12222460781727324303"
+  },
+  {
+    "id": "t3",
+    "author": "ERICO Brizolla",
+    "initials": "EB",
+    "rating": 5,
+    "text": "Atendimento nota 10, ambiente muito bom!",
+    "source": "Google",
+    "sourceUrl": "https://maps.google.com/?cid=12222460781727324303"
+  },
+  {
+    "id": "t4",
+    "author": "André Ramos",
+    "initials": "AR",
+    "rating": 5,
+    "text": "Atendimento excepcional e agilidade. Obrigada por me ajudar com meu corte.",
+    "source": "Google",
+    "sourceUrl": "https://maps.google.com/?cid=12222460781727324303"
+  }
+]

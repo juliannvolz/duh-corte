@@ -1,0 +1,32 @@
+[
+  {
+    "nome": "Corte",
+    "precoMensal": 99.9,
+    "beneficios": [
+      "Cortes ilimitados no mês",
+      "Agendamento prioritário",
+      "Preço fixo, sem surpresa"
+    ],
+    "status": "referência — tabela oficial em validação com a barbearia"
+  },
+  {
+    "nome": "Corte + Barba",
+    "precoMensal": 159,
+    "beneficios": [
+      "Cortes e barbas ilimitados",
+      "Agendamento prioritário",
+      "Descontos em produtos da casa"
+    ],
+    "status": "referência — tabela oficial em validação com a barbearia"
+  },
+  {
+    "nome": "Barba",
+    "precoMensal": 119,
+    "beneficios": [
+      "Barbas ilimitadas",
+      "Acesso prioritário à agenda",
+      "Assistência de finalização"
+    ],
+    "status": "referência — tabela oficial em validação com a barbearia"
+  }
+]

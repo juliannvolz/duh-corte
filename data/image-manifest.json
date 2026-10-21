@@ -1,0 +1,156 @@
+{
+  "generatedAt": "2026-10-21T18:09:33.444Z",
+  "widths": [
+    480,
+    960,
+    1440,
+    1920
+  ],
+  "images": [
+    {
+      "id": "degrade-medio",
+      "alt": "Corte degradê médio com linha frontal marcada",
+      "credit": "Cashbarber (imagens oficiais da loja)",
+      "source": "oficial/oficial-03.png",
+      "original": {
+        "width": 512,
+        "height": 590,
+        "format": "png"
+      },
+      "placeholder": "data:image/jpeg;base64,/9j/2wBDABQODxIPDRQSEBIXFRQYHjIhHhwcHj0sLiQySUBMS0dARkVQWnNiUFVtVkVGZIhlbXd7gYKBTmCNl4x9lnN+gXz/2wBDARUXFx4aHjshITt8U0ZTfHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHz/wAARCAAcABgDASIAAhEBAxEB/8QAGAAAAwEBAAAAAAAAAAAAAAAAAAMFBAb/xAAjEAACAgICAgEFAAAAAAAAAAABAgMRAAQSIQUxIhMjQVHh/8QAFgEBAQEAAAAAAAAAAAAAAAAAAQID/8QAGhEBAAMBAQEAAAAAAAAAAAAAAQACMREDEv/aAAwDAQACEQMRAD8Ambbg6KDjGjKwt19nMHLlxuXodVXsZQ8c7bDhJgjqgBogXZx03iUMjFZKskgAZm2B5LKKdmVJ1EQN/EYYuDXJZoGYUC3ywwfSpsTzs5Nuvryv5VhrR/boc2Ppf3jtrcXXleBW+rIrcQFGXII0iUBABZs4mDVgj2ZJUiVZGNlvzeU0HZNbpkiHx00WqNp1paJkjPRX+YZ0Xssp7BHYOGPyQ6z/2Q==",
+      "variants": [
+        {
+          "w": 480,
+          "file": "degrade-medio-480.webp",
+          "bytes": 15970
+        }
+      ],
+      "fallback": "degrade-medio-1440.jpg"
+    },
+    {
+      "id": "degrade-alto",
+      "alt": "Corte com degrade alto e acabamento na navalha",
+      "credit": "Cashbarber (imagens oficiais da loja)",
+      "source": "oficial/oficial-04.png",
+      "original": {
+        "width": 512,
+        "height": 590,
+        "format": "png"
+      },
+      "placeholder": "data:image/jpeg;base64,/9j/2wBDABQODxIPDRQSEBIXFRQYHjIhHhwcHj0sLiQySUBMS0dARkVQWnNiUFVtVkVGZIhlbXd7gYKBTmCNl4x9lnN+gXz/2wBDARUXFx4aHjshITt8U0ZTfHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHz/wAARCAAcABgDASIAAhEBAxEB/8QAGAABAQEBAQAAAAAAAAAAAAAABAADAgX/xAAkEAACAQMDBAMBAAAAAAAAAAABAgMABBESITEFQVFhExRxIv/EABcBAQEBAQAAAAAAAAAAAAAAAAMCAAH/xAAaEQADAAMBAAAAAAAAAAAAAAAAAQIREkEh/9oADAMBAAIRAxEAPwDO/kS7Nv8AHGVAfGdyCPNSWjLMWit0JGwcEjn1Sb76ixJbpj5k0l8MdvFdRSEqug8HJ37Ud1qxYhUgM32YreVWGmRR/OnuKqXdTvguAMhSRqPO/aqubXxG0jrM+rNY29kY7UKZpXG68gDvmh2tyIYw8hxnajdTSOG+mjhjVEjJVQPXf9oEcrMTnG1K4VIObcvw9JrljI7OxFqGLaWHnkj3VRLt2FrqBwThT+GqrwiT/9k=",
+      "variants": [
+        {
+          "w": 480,
+          "file": "degrade-alto-480.webp",
+          "bytes": 21538
+        }
+      ],
+      "fallback": "degrade-alto-1440.jpg"
+    },
+    {
+      "id": "moica",
+      "alt": "Corte moica com topo natural",
+      "credit": "Cashbarber (imagens oficiais da loja)",
+      "source": "oficial/oficial-05.png",
+      "original": {
+        "width": 512,
+        "height": 590,
+        "format": "png"
+      },
+      "placeholder": "data:image/jpeg;base64,/9j/2wBDABQODxIPDRQSEBIXFRQYHjIhHhwcHj0sLiQySUBMS0dARkVQWnNiUFVtVkVGZIhlbXd7gYKBTmCNl4x9lnN+gXz/2wBDARUXFx4aHjshITt8U0ZTfHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHz/wAARCAAcABgDASIAAhEBAxEB/8QAGAAAAwEBAAAAAAAAAAAAAAAAAAMEBQb/xAAkEAACAQMEAgIDAAAAAAAAAAABAgMABBEFEhMhMUEiMoGR0f/EABYBAQEBAAAAAAAAAAAAAAAAAAIBAP/EABoRAQADAQEBAAAAAAAAAAAAAAEAESECAzH/2gAMAwEAAhEDEQA/AMy+ifT5eKTaz4H1PRzSReye9uKZqE81zMWnG5lUYbHmrk020kXawOQAS2ftmitRnNzPW4VsnPY8iirdTs5DGgtoo9qDAVT8iKKxpClNRlpcrPaSW9zyM0p2pnvzj3VV26WajYoCKuO/Qrm4SUDlSQQOj+aZLf3EkbQSPvVh5I7/AHVfNdlOwm0mp2SRvyT5fHx41P8AKK5mLsd+jiij8yKh2f/Z",
+      "variants": [
+        {
+          "w": 480,
+          "file": "moica-480.webp",
+          "bytes": 18474
+        }
+      ],
+      "fallback": "moica-1440.jpg"
+    },
+    {
+      "id": "risco-lateral",
+      "alt": "Corte com design na lateral, degrade alto",
+      "credit": "Google Maps (perfil publico da loja)",
+      "source": "maps/map-01.jpg",
+      "original": {
+        "width": 408,
+        "height": 725,
+        "format": "jpeg"
+      },
+      "placeholder": "data:image/jpeg;base64,/9j/2wBDABQODxIPDRQSEBIXFRQYHjIhHhwcHj0sLiQySUBMS0dARkVQWnNiUFVtVkVGZIhlbXd7gYKBTmCNl4x9lnN+gXz/2wBDARUXFx4aHjshITt8U0ZTfHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHz/wAARCAAqABgDASIAAhEBAxEB/8QAGQAAAwEBAQAAAAAAAAAAAAAAAAMFBgQB/8QAJxAAAQQBAwIGAwAAAAAAAAAAAgABAwQREiExBSMTMkFRYXEigbH/xAAXAQADAQAAAAAAAAAAAAAAAAAAAQIE/8QAGREAAgMBAAAAAAAAAAAAAAAAAAIBAxEh/9oADAMBAAIRAxEAPwCjJFNKeqQsuhq5NzhcvWOtDUlOCAe4OxGTbN9LM2bM1g3kkkMizznhGAai4T12HLeZCj1uoz2YWhmxIYZ0k/OPlCnCtKtvpFcrpSEWoSfOn1Z0u7VghryC0bY07bcos9WE5PwjJ8bcs+U4O7C7yNly/iltjpa5MYZmmMgzNIGWDLtqdtnQrt2rGdKvHELA0blkRfh0JzIog5gnGSZhGOXS/JeHgcfaoR3qoRCLifiNs4s3Kn6zKQmIidvl0yDgn9fdbqqVdOmR7WR+HtyYpJhlHtemG9vlCVb8v7QqehNEtzH/2Q==",
+      "variants": [
+        {
+          "w": 480,
+          "file": "risco-lateral-480.webp",
+          "bytes": 28966
+        }
+      ],
+      "fallback": "risco-lateral-1440.jpg"
+    },
+    {
+      "id": "nova-unidade",
+      "alt": "A chave da nova unidade da Duh Corte Barbearia",
+      "credit": "Instagram @duhcortebarbearia",
+      "source": "instagram-posts/post-11-2.jpg",
+      "original": {
+        "width": 3340,
+        "height": 4096,
+        "format": "jpeg"
+      },
+      "placeholder": "data:image/jpeg;base64,/9j/2wBDABQODxIPDRQSEBIXFRQYHjIhHhwcHj0sLiQySUBMS0dARkVQWnNiUFVtVkVGZIhlbXd7gYKBTmCNl4x9lnN+gXz/2wBDARUXFx4aHjshITt8U0ZTfHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHz/wAARCAAdABgDASIAAhEBAxEB/8QAFwABAQEBAAAAAAAAAAAAAAAABQAEAv/EACcQAAICAgAFAgcAAAAAAAAAAAECAxEABAUSEyExQVEGFSNhYnKh/8QAFgEBAQEAAAAAAAAAAAAAAAAAAgEA/8QAGxEBAAMAAwEAAAAAAAAAAAAAAQACEgMREzH/2gAMAwEAAhEDEQA/AKRUiHYDM/EXMs+vqpIsUXKrOxPgkWT98NbiW69XIpv8BnW11RHDKzxuZFs0PFY76sdMPG1or1EuJ8R6309YARgVzHycsH68wXvyEfqMsHmEbyLENbSg2Cqo2yK8sYwB/Ti/yjTTXWGaYk3YYJVZ3qOZQWPkd/fNMtGEMRZvNux8YcDCX+H0ZbXdjA9CUOWbXfl12IHr75ZNWZchP//Z",
+      "variants": [
+        {
+          "w": 480,
+          "file": "nova-unidade-480.webp",
+          "bytes": 15732
+        },
+        {
+          "w": 960,
+          "file": "nova-unidade-960.webp",
+          "bytes": 38152
+        },
+        {
+          "w": 1440,
+          "file": "nova-unidade-1440.webp",
+          "bytes": 65270
+        },
+        {
+          "w": 1920,
+          "file": "nova-unidade-1920.webp",
+          "bytes": 94908
+        }
+      ],
+      "fallback": "nova-unidade-1440.jpg"
+    },
+    {
+      "id": "clube-assinante",
+      "alt": "Peca de divulgacao do Clube do Assinante da Duh Corte",
+      "credit": "Instagram @duhcortebarbearia",
+      "source": "instagram-posts/post-10-2.jpg",
+      "original": {
+        "width": 1086,
+        "height": 1448,
+        "format": "jpeg"
+      },
+      "placeholder": "data:image/jpeg;base64,/9j/2wBDABQODxIPDRQSEBIXFRQYHjIhHhwcHj0sLiQySUBMS0dARkVQWnNiUFVtVkVGZIhlbXd7gYKBTmCNl4x9lnN+gXz/2wBDARUXFx4aHjshITt8U0ZTfHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHz/wAARCAAgABgDASIAAhEBAxEB/8QAGQAAAgMBAAAAAAAAAAAAAAAAAAMCBAUB/8QAKRAAAgEDAwMDBAMAAAAAAAAAAQIDAAQRBRIhMVFxFEFhIiOBkbHB4f/EABYBAQEBAAAAAAAAAAAAAAAAAAECAP/EABoRAAMBAAMAAAAAAAAAAAAAAAABESESMUH/2gAMAwEAAhEDEQA/AN99UtY4opZJgElXcmFJ4/FQkuY1u2i9XOXUgmNUBxnnt0A/VZdu9qmmW3qlw0sbZITIVCefGTim404xGdgcFtpLRZY8Z578e9Ry2FJXC6utWjlyjttSMyEleABxRWfcehuNPuBApyn1Mdm3P+dKKdM1MYiK3hvNLtJJLwII1MboF3bssSM8/Ga6YLVbdoGvwWE24vsHI6bfHzVLTlvLvTpYopF+24Ox9oAUA9B5q4FvwBzCG8L28UNpMEvRqWaw2FzLDOZkkwgDx7Rwcn+KKjOtzFYLDKqss0mIwmPcdh/faikq3s//2Q==",
+      "variants": [
+        {
+          "w": 480,
+          "file": "clube-assinante-480.webp",
+          "bytes": 45444
+        },
+        {
+          "w": 960,
+          "file": "clube-assinante-960.webp",
+          "bytes": 113770
+        },
+        {
+          "w": 1440,
+          "file": "clube-assinante-1440.webp",
+          "bytes": 136490
+        }
+      ],
+      "fallback": "clube-assinante-1440.jpg"
+    }
+  ]
+}
