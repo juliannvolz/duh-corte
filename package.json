@@ -14,7 +14,11 @@
     "db:seed": "tsx prisma/seed.ts",
     "images:process": "tsx scripts/process-images.ts",
     "data:collect": "node scripts/collect.mjs && node scripts/collect-posts.mjs",
-    "qa:screens": "node scripts/qa-screens.mjs"
+    "qa:screens": "node scripts/qa-screens.mjs",
+    "postinstall": "prisma generate",
+    "pdf:gerar": "tsx scripts/gerar-pdf.mts",
+    "db:postgres": "tsx scripts/prepare-db.mts postgres",
+    "db:sqlite": "tsx scripts/prepare-db.mts sqlite"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",
@@ -37,12 +41,14 @@
     "eslint": "^9",
     "eslint-config-next": "16.4.2",
     "lighthouse": "^13.5.0",
+    "marked": "^18.1.1",
     "playwright-core": "^1.64.1",
     "prisma": "^6.16.2",
     "sharp": "^0.34.4",
     "tailwindcss": "^4",
     "tsx": "^4.20.6",
     "typescript": "^5",
+    "vercel": "^65.0.0",
     "vitest": "^5.0.5"
   }
 }

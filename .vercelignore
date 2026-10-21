@@ -1,0 +1,10 @@
+# artefatos locais (nao vao para a Vercel)
+qa/
+.next/
+node_modules/
+prisma/dev.db
+prisma/dev.db-journal
+assets/raw/
+*.log
+.vscode/
+.DS_Store

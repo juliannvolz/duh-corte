@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<title>Duh Corte Barbearia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  @page { size: A4; margin: 0; }
+  html, body { background: var(--ink) !important; }
+
+  :root {
+    --ink: #0a0a0a;
+    --ink-2: #121212;
+    --ink-3: #1b1b1b;
+    --bone: #f2ede4;
+    --bone-dim: #b9b2a6;
+    --gold: #c8952b;
+    --gold-soft: #e0b45c;
+    --line: rgba(242, 237, 228, 0.14);
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--ink);
+    color: var(--bone);
+    font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+    font-size: 10.6pt;
+    line-height: 1.62;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .folha { padding: 13mm 15mm 10mm; }
+
+  .capa {
+    border-bottom: 2px solid var(--gold);
+    padding-bottom: 14px;
+    margin-bottom: 22px;
+  }
+  .selo {
+    display: inline-block;
+    font-size: 7.6pt;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    color: var(--gold);
+    border: 1px solid rgba(200, 149, 43, 0.45);
+    border-radius: 999px;
+    padding: 4px 12px;
+    margin-bottom: 14px;
+  }
+  .titulo {
+    font-family: "Anton", "Arial Narrow", sans-serif;
+    text-transform: uppercase;
+    font-size: 27pt;
+    line-height: 1.02;
+    letter-spacing: -0.01em;
+    margin: 0 0 6px;
+  }
+  .subtitulo {
+    font-family: "Instrument Serif", Georgia, serif;
+    font-style: italic;
+    font-size: 13.5pt;
+    color: var(--bone-dim);
+    margin: 0;
+  }
+  .rodape-capa {
+    display: flex;
+    justify-content: space-between;
+    font-size: 7.6pt;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(242, 237, 228, 0.45);
+    margin-top: 14px;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: "Anton", "Arial Narrow", sans-serif;
+    text-transform: uppercase;
+    letter-spacing: -0.005em;
+    break-after: avoid;
+  }
+  h1 { font-size: 16pt; margin: 26px 0 10px; color: var(--bone); }
+  h2 {
+    font-size: 13.4pt;
+    margin: 22px 0 8px;
+    color: var(--bone);
+    border-left: 3px solid var(--gold);
+    padding-left: 9px;
+  }
+  h3 { font-size: 11.2pt; margin: 16px 0 6px; color: var(--gold-soft); }
+  h4 { font-size: 10pt; margin: 13px 0 4px; color: var(--bone-dim); }
+
+  p { margin: 0 0 9px; color: #ddd6ca; }
+  strong { color: var(--gold); font-weight: 700; }
+  em { color: var(--bone); font-style: italic; }
+  a { color: var(--gold); text-decoration: none; }
+
+  ul, ol { margin: 0 0 10px; padding-left: 18px; }
+  li { margin-bottom: 4px; color: #ddd6ca; }
+  li::marker { color: var(--gold); }
+
+  code {
+    font-family: "Consolas", ui-monospace, monospace;
+    font-size: 8.8pt;
+    background: rgba(200, 149, 43, 0.12);
+    border: 1px solid rgba(200, 149, 43, 0.3);
+    border-radius: 4px;
+    padding: 1px 5px;
+    color: var(--gold-soft);
+  }
+  pre {
+    background: var(--ink-3);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--gold);
+    border-radius: 8px;
+    padding: 10px 12px;
+    overflow: hidden;
+    break-inside: avoid;
+  }
+  pre code { background: none; border: none; padding: 0; color: #cfc8bc; font-size: 8.4pt; }
+
+  blockquote {
+    margin: 12px 0;
+    padding: 10px 14px;
+    border-left: 3px solid var(--gold);
+    background: rgba(200, 149, 43, 0.07);
+    color: var(--bone-dim);
+    font-style: italic;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0 14px;
+    font-size: 9.2pt;
+    break-inside: avoid;
+  }
+  thead th {
+    text-align: left;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 7.6pt;
+    color: var(--gold);
+    border-bottom: 1px solid rgba(200, 149, 43, 0.5);
+    padding: 7px 8px;
+    font-weight: 600;
+  }
+  tbody td {
+    border-bottom: 1px solid var(--line);
+    padding: 7px 8px;
+    color: #ddd6ca;
+    vertical-align: top;
+  }
+  tbody tr:nth-child(even) td { background: rgba(255, 255, 255, 0.022); }
+
+  hr { border: none; border-top: 1px solid var(--line); margin: 18px 0; }
+
+  .quebra { break-before: page; }
+  .destaque {
+    background: linear-gradient(90deg, rgba(200, 149, 43, 0.16), rgba(200, 149, 43, 0.02));
+    border-left: 3px solid var(--gold);
+    padding: 9px 12px;
+    margin: 12px 0;
+    break-inside: avoid;
+  }
+</style>
+</head>
+<body>
+  <div class="folha">
+    <header class="capa">
+      <span class="selo">RESUMO DO CLIENTE</span>
+      <h1 class="titulo">Duh Corte Barbearia</h1>
+      <p class="subtitulo">O que foi feito no site — resumo para o cliente</p>
+      <div class="rodape-capa">
+        <span>Duh Corte Barbearia — Vila Nova, Jaraguá do Sul/SC</span>
+        <span>duhcutebarbearia.com.br</span>
+      </div>
+    </header>
+    <p><strong>Assunto: Site da Duh Corte no ar, com agenda online, painel e programa de fidelidade</strong></p>
+<p>Dudu, ficou pronto o site da barbearia. Resumo do que já está funcionando — e o que só depende de você.</p>
+<h2>O que já está no ar</h2>
+<p><strong>1. Site com a sua cara</strong>
+Visual premium, com as fotos reais da casa, <strong>a sua foto na seção &quot;O nome do dono é a garantia&quot;</strong>, o logo, o telefone, o Instagram e o endereço com mapa — tudo clicável.</p>
+<p><strong>2. Agenda online de verdade</strong>
+O cliente escolhe serviço, profissional, dia e horário. O sistema só mostra horários <strong>realmente livres</strong>, com <strong>15 minutos de intervalo</strong> entre um corte e o outro, no mesmo formato do app Cashbarber (horários separados em manhã e tarde, com a duração do serviço à vista).</p>
+<p><strong>3. Sua agenda do Google conectada em tempo real</strong>
+Você conecta a <strong>sua própria</strong> agenda do Google e, a partir daí, <strong>cada reserva feita no site cai sozinha na sua agenda</strong> — com horário, nome do cliente, telefone e o código da reserva. E os horários que você já tem ocupados <strong>somem</strong> das vagas do site. Isso é uma configuração interna sua: <strong>o cliente não vê nada disso</strong>, além da confirmação da reserva.</p>
+<p><strong>4. Confirmação por WhatsApp</strong>
+Ao finalizar, o cliente recebe um <strong>código de reserva</strong> e o botão de falar com você no WhatsApp. O código serve para a sua equipe achar o horário dele (e é o que vai junto no evento da sua agenda).</p>
+<p><strong>5. Pagamento só na barbearia</strong>
+Como você pediu, o site <strong>não cobra nada online</strong>. O cliente reserva, você confirma no WhatsApp e o pagamento é feito no balcão (Pix, cartão ou dinheiro). Sem risco de confusão em caso de cancelamento.</p>
+<p><strong>6. Painel para você</strong>
+Um painel simples onde você vê a agenda do dia, confirma/cancela/marca &quot;atendido&quot; de cada horário, acompanha o movimento do dia e vê as pendências de conteúdo. Entrada: <code>/admin</code>, com a sua senha.</p>
+<p><strong>7. Programa de fidelidade (pontuação)</strong>
+Cada R$ 1 gasto = 1 ponto. O cliente acumula pontos e recebe: <strong>50 pontos = R$ 10 de desconto · 100 = R$ 25 · 200 = 1 corte grátis · 500 = 2 cortes grátis</strong>. Além disso, cada cliente ganha um <strong>código de indicação</strong>: quem usa o código ganha 30 pontos e quem indicou ganha outros 30. O site calcula tudo sozinho — os pontos entram quando você marca o atendimento como &quot;Atendido&quot;, e no painel você vê quem está acumulando e marca a recompensa como usada.</p>
+<p><strong>8. Movimento e partículas</strong>
+Poeira dourada ao fundo, fotos com parallax, barra de progresso de leitura e entradas de texto animadas.</p>
+<h2>O que depende de você (5 itens rápidos)</h2>
+<ol>
+<li><strong>Tabela oficial de preços</strong> — os valores no site são referência e estão marcados como &quot;tabela em validação&quot;. Me mande preço e duração de cada serviço (e do Clube) que atualizo em minutos.</li>
+<li><strong>Chave Pix e CNPJ</strong> — para o pagamento no balcão e a emissão de recibo.</li>
+<li><strong>Sábado</strong> — o site está como &quot;sábado e domingo fechados&quot; (é o que está no Google Maps). Se abrirem, me avise.</li>
+<li><strong>Senha do painel</strong> — a senha de demonstração precisa ser trocada.</li>
+<li><strong>Fotos e nomes dos outros profissionais</strong> — hoje só você está confirmado.</li>
+</ol>
+<h2>Como conectar a sua agenda do Google</h2>
+<p>Escrevi um tutorial passo a passo, sem jargão, em <strong><code>entregaveis/TUTORIAL-DONO.md</code></strong> (são 5 passos e uns 10 minutos). Se preferir, eu ligo para você e a gente faz junto.</p>
+<h2>Como fica a manutenção</h2>
+<p>Mudança de preço, horário, foto, texto ou profissional: você me manda, eu atualizo e republico. Você não precisa mexer em nada: agenda, horários, pontos e recompensas ficam no painel, pelo celular.</p>
+<p>O site já está rodando localmente (<code>http://localhost:3000</code>) — mostrarei no celular pelo QR. Quando você aprovar a tabela de preços e a foto dos profissionais, é só publicar no domínio e trocar a senha do painel.</p>
+<p>Estamos prontos. Se preferir, passo no sábado para te mostrar ao vivo.</p>
+
+  </div>
+</body>
+</html>

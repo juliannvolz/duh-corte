@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<title>Proposta comercial</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  @page { size: A4; margin: 0; }
+  html, body { background: var(--ink) !important; }
+
+  :root {
+    --ink: #0a0a0a;
+    --ink-2: #121212;
+    --ink-3: #1b1b1b;
+    --bone: #f2ede4;
+    --bone-dim: #b9b2a6;
+    --gold: #c8952b;
+    --gold-soft: #e0b45c;
+    --line: rgba(242, 237, 228, 0.14);
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--ink);
+    color: var(--bone);
+    font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+    font-size: 10.6pt;
+    line-height: 1.62;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .folha { padding: 13mm 15mm 10mm; }
+
+  .capa {
+    border-bottom: 2px solid var(--gold);
+    padding-bottom: 14px;
+    margin-bottom: 22px;
+  }
+  .selo {
+    display: inline-block;
+    font-size: 7.6pt;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    color: var(--gold);
+    border: 1px solid rgba(200, 149, 43, 0.45);
+    border-radius: 999px;
+    padding: 4px 12px;
+    margin-bottom: 14px;
+  }
+  .titulo {
+    font-family: "Anton", "Arial Narrow", sans-serif;
+    text-transform: uppercase;
+    font-size: 27pt;
+    line-height: 1.02;
+    letter-spacing: -0.01em;
+    margin: 0 0 6px;
+  }
+  .subtitulo {
+    font-family: "Instrument Serif", Georgia, serif;
+    font-style: italic;
+    font-size: 13.5pt;
+    color: var(--bone-dim);
+    margin: 0;
+  }
+  .rodape-capa {
+    display: flex;
+    justify-content: space-between;
+    font-size: 7.6pt;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(242, 237, 228, 0.45);
+    margin-top: 14px;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: "Anton", "Arial Narrow", sans-serif;
+    text-transform: uppercase;
+    letter-spacing: -0.005em;
+    break-after: avoid;
+  }
+  h1 { font-size: 16pt; margin: 26px 0 10px; color: var(--bone); }
+  h2 {
+    font-size: 13.4pt;
+    margin: 22px 0 8px;
+    color: var(--bone);
+    border-left: 3px solid var(--gold);
+    padding-left: 9px;
+  }
+  h3 { font-size: 11.2pt; margin: 16px 0 6px; color: var(--gold-soft); }
+  h4 { font-size: 10pt; margin: 13px 0 4px; color: var(--bone-dim); }
+
+  p { margin: 0 0 9px; color: #ddd6ca; }
+  strong { color: var(--gold); font-weight: 700; }
+  em { color: var(--bone); font-style: italic; }
+  a { color: var(--gold); text-decoration: none; }
+
+  ul, ol { margin: 0 0 10px; padding-left: 18px; }
+  li { margin-bottom: 4px; color: #ddd6ca; }
+  li::marker { color: var(--gold); }
+
+  code {
+    font-family: "Consolas", ui-monospace, monospace;
+    font-size: 8.8pt;
+    background: rgba(200, 149, 43, 0.12);
+    border: 1px solid rgba(200, 149, 43, 0.3);
+    border-radius: 4px;
+    padding: 1px 5px;
+    color: var(--gold-soft);
+  }
+  pre {
+    background: var(--ink-3);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--gold);
+    border-radius: 8px;
+    padding: 10px 12px;
+    overflow: hidden;
+    break-inside: avoid;
+  }
+  pre code { background: none; border: none; padding: 0; color: #cfc8bc; font-size: 8.4pt; }
+
+  blockquote {
+    margin: 12px 0;
+    padding: 10px 14px;
+    border-left: 3px solid var(--gold);
+    background: rgba(200, 149, 43, 0.07);
+    color: var(--bone-dim);
+    font-style: italic;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0 14px;
+    font-size: 9.2pt;
+    break-inside: avoid;
+  }
+  thead th {
+    text-align: left;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 7.6pt;
+    color: var(--gold);
+    border-bottom: 1px solid rgba(200, 149, 43, 0.5);
+    padding: 7px 8px;
+    font-weight: 600;
+  }
+  tbody td {
+    border-bottom: 1px solid var(--line);
+    padding: 7px 8px;
+    color: #ddd6ca;
+    vertical-align: top;
+  }
+  tbody tr:nth-child(even) td { background: rgba(255, 255, 255, 0.022); }
+
+  hr { border: none; border-top: 1px solid var(--line); margin: 18px 0; }
+
+  .quebra { break-before: page; }
+  .destaque {
+    background: linear-gradient(90deg, rgba(200, 149, 43, 0.16), rgba(200, 149, 43, 0.02));
+    border-left: 3px solid var(--gold);
+    padding: 9px 12px;
+    margin: 12px 0;
+    break-inside: avoid;
+  }
+</style>
+</head>
+<body>
+  <div class="folha">
+    <header class="capa">
+      <span class="selo">PROPOSTA</span>
+      <h1 class="titulo">Proposta comercial</h1>
+      <p class="subtitulo">Duh Corte Barbearia — site, agenda online e painel</p>
+      <div class="rodape-capa">
+        <span>Duh Corte Barbearia — Vila Nova, Jaraguá do Sul/SC</span>
+        <span>duhcutebarbearia.com.br</span>
+      </div>
+    </header>
+    <p>Valores em reais. Condições pensadas para uma empresa que está começando: entrada menor e parcelamento curto.</p>
+<h2>1. Entrega (pagamento único)</h2>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Inclui</th>
+<th>Valor</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Site institucional premium</td>
+<td>Home, Serviços, Clube do Assinante, Local, Equipe, Galeria, FAQ, Privacidade, SEO técnico (sitemap, robots, Open Graph, JSON-LD)</td>
+<td>R$ 1.900</td>
+</tr>
+<tr>
+<td>Agenda online</td>
+<td>4 passos (serviço → profissional → dia/horário → dados), disponibilidade calculada no servidor, idempotência, cancelamento, formatação estilo app (manhã/tarde, intervalo de 15 min)</td>
+<td>R$ 1.200</td>
+</tr>
+<tr>
+<td>Painel da barbearia</td>
+<td>Login por senha, agenda do dia, status por atendimento, métricas, pendências</td>
+<td>R$ 700</td>
+</tr>
+<tr>
+<td>Integrações</td>
+<td>Google Agenda (<code>.ics</code> para o cliente + leitura/escrita opcional na agenda do barbeiro), WhatsApp, Maps, Instagram</td>
+<td>R$ 400</td>
+</tr>
+<tr>
+<td>Publicação</td>
+<td>domínio, build de produção, variáveis de ambiente, banco de dados, seed, checklist de QA</td>
+<td>R$ 400</td>
+</tr>
+<tr>
+<td><strong>Total da entrega</strong></td>
+<td></td>
+<td><strong>R$ 4.600</strong></td>
+</tr>
+</tbody></table>
+<h3>Condições</h3>
+<ul>
+<li><strong>Entrada R$ 1.000</strong> na aprovação (liberação dos acessos e da conta de publicação).</li>
+<li><strong>2 parcelas de R$ 1.800</strong> — uma na entrega da tabela oficial de preços, outra no go-live.</li>
+<li>Pix ou transferência. No pagamento à vista: <strong>R$ 4.140 (10% de desconto)</strong>.</li>
+</ul>
+<h3>Apoio de início (incluso, por conta da fase de criação)</h3>
+<p>Como a barbearia está começando, incluo sem custo adicional:</p>
+<ul>
+<li><strong>foto do dono</strong> tratada e publicada na seção nova (você só envia o arquivo);</li>
+<li><strong>2 rodadas de ajustes</strong> pós-publicação (textos, fotos, cores, horários) sem cobrança;</li>
+<li><strong>kit de 6 artes para Instagram</strong> (1080×1350) com serviços, tabela e o &quot;agende online&quot; para o feed;</li>
+<li><strong>planilha de controle</strong> de presença/fluxo por dia, para o sistema virar painel.</li>
+</ul>
+<blockquote>
+<p>Valor de mercado dessas inclusões: cerca de <strong>R$ 1.100</strong>. Ou seja, <strong>investimento líquido de R$ 3.500</strong> num pacote que vale aproximadamente R$ 5.700.</p>
+</blockquote>
+<h2>2. Manutenção (opcional, depois da entrega)</h2>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Inclui</th>
+<th>Valor</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Hospedagem gerenciada</td>
+<td>Vercel + banco Postgres + domínio + backup diário + monitoramento</td>
+<td>R$ 149/mês</td>
+</tr>
+<tr>
+<td>Suporte</td>
+<td>até 1 h/mês de alterações (preço, horário, texto, foto, profissional) + resposta em até 1 dia útil</td>
+<td>incluso</td>
+</tr>
+<tr>
+<td>Módulo de cupons</td>
+<td>cupom de desconto do Clube do Assinante no fluxo da agenda</td>
+<td>R$ 250/mês (opcional)</td>
+</tr>
+</tbody></table>
+<p>Sem fidelidade: cancele quando quiser — a entrega e o código são seus.</p>
+<h2>3. O que não está incluído (para não haver surpresa)</h2>
+<ul>
+<li>Domínio próprio (custo do registrador, ~R$ 60/ano, registrado em nome da barbearia).</li>
+<li>WhatsApp Business API oficial (a Meta cobra a conta da empresa; hoje o atendimento usa o WhatsApp pessoal).</li>
+<li>Tráfego pago (campanhas): posso configurar e rodar, com o investimento em mídia separado e transparente.</li>
+<li>Ensaio fotográfico profissional: o site usa as fotos reais da casa; ensaio é opcional, orçado à parte.</li>
+</ul>
+<h2>4. Por que este valor</h2>
+<p>O que foi entregue não é um &quot;site bonito&quot;: é sistema de agenda com regras reais (buffer de 15 min entre clientes, janela de funcionamento, antecedência mínima, idempotência), painel de operação, integração com Google Agenda, pipeline de imagens (AVIF/WebP), 50 testes automatizados e QA visual/E2E em três resoluções (390/768/1440) com Lighthouse medido.</p>
+<p>O valor acima é o de uma entrega enxuta para o padrão premium pedido — e foi orçado pensando no momento da barbearia: entrada de R$ 1.000 e parcelamento em 3 vezes.</p>
+
+  </div>
+</body>
+</html>

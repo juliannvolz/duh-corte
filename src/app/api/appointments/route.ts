@@ -46,19 +46,39 @@ export async function POST(request: Request) {
 
   const data = parsed.data;
 
-  const result = await createAppointment({
-    serviceId: data.serviceId,
-    professionalId: data.professionalId,
-    startsAt: data.startsAt,
-    idempotencyKey: data.idempotencyKey,
-    customer: {
-      name: data.customer.name,
-      phone: data.customer.phone,
-      email: data.customer.email || undefined,
-      notes: data.customer.notes,
-    },
-    referralCode: data.referralCode,
-  });
+  let result: Awaited<ReturnType<typeof createAppointment>>;
+  try {
+    result = await createAppointment({
+      serviceId: data.serviceId,
+      professionalId: data.professionalId,
+      startsAt: data.startsAt,
+      idempotencyKey: data.idempotencyKey,
+      customer: {
+        name: data.customer.name,
+        phone: data.customer.phone,
+        email: data.customer.email || undefined,
+        notes: data.customer.notes,
+      },
+      referralCode: data.referralCode,
+    });
+  } catch (error) {
+    const mensagem = error instanceof Error ? error.message : "erro desconhecido";
+    console.error("[appointments] falha ao gravar a reserva:", mensagem);
+    const semBanco =
+      mensagem.includes("Can't reach database server") ||
+      mensagem.includes("Environment variable not found") ||
+      mensagem.includes("P1001") ||
+      mensagem.includes("P2021");
+    return NextResponse.json(
+      {
+        error: semBanco
+          ? "A agenda está temporariamente indisponível. Chame no WhatsApp que eu já te encaixo."
+          : "Não foi possível concluir a reserva agora. Tente novamente em instantes.",
+        indisponivel: semBanco,
+      },
+      { status: 503 },
+    );
+  }
 
   if (!result.ok) {
     const status = result.code === "UNAVAILABLE" ? 409 : result.code === "CONFLICT" ? 500 : 400;

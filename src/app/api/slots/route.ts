@@ -49,6 +49,20 @@ export async function GET(request: Request) {
   } catch (error) {
     const message = error instanceof Error ? error.message : "Erro ao calcular disponibilidade";
     console.error("[slots] ", message);
-    return NextResponse.json({ error: message }, { status: 500 });
+    // banco indisponivel (deploy sem DATABASE_URL): mensagem clara para o cliente
+    const semBanco =
+      message.includes("Can't reach database server") ||
+      message.includes("Environment variable not found") ||
+      message.includes("P1001") ||
+      message.includes("P2021");
+    return NextResponse.json(
+      {
+        error: semBanco
+          ? "A agenda está temporariamente indisponível. Chame no WhatsApp que eu já te encaixo."
+          : message,
+        indisponivel: semBanco,
+      },
+      { status: 503 },
+    );
   }
 }

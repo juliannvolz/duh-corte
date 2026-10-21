@@ -47,3 +47,6 @@ prisma/dev.db
 
 # tipos do Next (arquivos pvados do cache)
 .next/types/*
+
+.vercel
+.env*
