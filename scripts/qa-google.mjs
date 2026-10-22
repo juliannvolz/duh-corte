@@ -1,6 +1,6 @@
 import { chromium } from "playwright-core";
 
-const BASE = "https://duh-corte.vercel.app";
+const BASE = process.env.QA_BASE ?? "https://duh-corte.vercel.app";
 const BRAVE =
   "C:\\Users\\julia\\AppData\\Local\\BraveSoftware\\Brave-Browser\\Application\\brave.exe";
 

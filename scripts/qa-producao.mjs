@@ -49,8 +49,13 @@ console.log("== admin (producao) ==");
 await page.goto(`${BASE}/admin`, { waitUntil: "networkidle" });
 await page.getByPlaceholder("••••••••").fill(SENHA);
 await page.getByRole("button", { name: /entrar/i }).click();
-await page.waitForTimeout(3000);
-const logado = (await page.getByRole("button", { name: /sair/i }).count()) > 0;
+// espera deterministica: o painel so aparece depois do router.refresh() + fetch
+// da agenda; 3s fixos falhavam em cold start da funcao serverless
+const logado = await page
+  .getByRole("button", { name: /sair/i })
+  .waitFor({ state: "visible", timeout: 20000 })
+  .then(() => true)
+  .catch(() => false);
 console.log("botao Sair (logado):", logado);
 if (!logado) falhas.push("login com senha nao abriu o painel");
 

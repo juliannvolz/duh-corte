@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { connection } from "next/server";
 import { isAdminAccess } from "@/lib/admin-access";
+import { auth } from "@/lib/auth-social";
 import { AdminLogin } from "@/components/admin/AdminLogin";
 import { AdminDashboard } from "@/components/admin/AdminDashboard";
 import { readGoogleCalendarEnv, canWriteCalendar, canReadPublicCalendar } from "@/lib/google-calendar";
@@ -18,6 +19,9 @@ export default async function AdminPage() {
   // sinaliza rota dinamica antes de ler cookie/Date.now (Cache Components)
   await connection();
   const authenticated = await isAdminAccess();
+  // logado pelo Google mas fora de ADMIN_EMAILS: mostra de quem é a conta,
+  // em vez de repetir a tela de entrada sem explicacao
+  const emailSemAcesso = authenticated ? null : ((await auth())?.user?.email ?? null);
 
   const env = readGoogleCalendarEnv();
   const integrations = {
@@ -54,7 +58,7 @@ export default async function AdminPage() {
             windows={windows}
           />
         ) : (
-          <AdminLogin />
+          <AdminLogin emailSemAcesso={emailSemAcesso} />
         )}
       </div>
     </div>

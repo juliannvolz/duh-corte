@@ -24,36 +24,15 @@ export function LoginCard({ provedores }: { provedores: Provedor[] }) {
   const [erroSenha, setErroSenha] = useState<string | null>(null);
   const [erroEquipe, setErroEquipe] = useState<string | null>(null);
 
-  /** Entra pelo provedor social e acompanha o resultado. */
-  async function entrarSocial(provedor: string, irPara: string, checarAdmin = false) {
+  /** Entra pelo provedor social: o navegador vai ao Google e volta para `irPara`. */
+  async function entrarSocial(provedor: string, irPara: string) {
     setCarregando(provedor);
     setErroEquipe(null);
-    const res = (await signIn(provedor, {
-      redirect: false,
-      callbackUrl: irPara,
-    } as never)) as { error?: string; url?: string } | undefined;
-
-    if (res?.error) {
-      setErroEquipe("Não foi possível entrar. Tente novamente.");
-      setCarregando(null);
-      return;
-    }
-
-    if (checarAdmin) {
-      // a equipe so passa se o e-mail estiver autorizado pelo dono
-      const sessao = await fetch("/api/auth/session", { cache: "no-store" })
-        .then((r) => r.json())
-        .catch(() => null);
-      if (!sessao?.user?.isAdmin) {
-        setErroEquipe(
-          "Este e-mail não tem acesso ao painel da barbearia. Entre com o e-mail do dono ou use a senha.",
-        );
-        setCarregando(null);
-        return;
-      }
-    }
-
-    window.location.assign(irPara);
+    // Redirecionamento padrao do Auth.js. NAO usar `redirect: false` aqui: nesse
+    // modo a resposta e uma URL para abrir na mao, e ignora-la devolvia o usuario
+    // para a pagina de destino SEM sessao (login com Google nao autenticava).
+    // Quem nao for da equipe e barrado no servidor, na propria /admin.
+    await signIn(provedor, { callbackUrl: irPara });
   }
 
   /** Entrada da equipe pela senha da casa (grava o cookie do painel). */
@@ -128,7 +107,7 @@ export function LoginCard({ provedores }: { provedores: Provedor[] }) {
               setSenha={setSenha}
               erroSenha={erroSenha}
               erroEquipe={erroEquipe}
-              onSocial={(p) => entrarSocial(p, "/admin", true)}
+              onSocial={(p) => entrarSocial(p, "/admin")}
               onSenha={entrarComSenha}
             />
           )}

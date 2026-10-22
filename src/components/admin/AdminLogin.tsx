@@ -11,7 +11,7 @@ import { Chrome, Loader2, Lock } from "lucide-react";
  * a senha da casa. A senha continua sendo a segunda porta — util quando o
  * dono esta em um computador sem a conta Google dele.
  */
-export function AdminLogin() {
+export function AdminLogin({ emailSemAcesso }: { emailSemAcesso?: string | null }) {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -48,6 +48,13 @@ export function AdminLogin() {
       <p className="mt-3 text-sm leading-relaxed text-bone-dim">
         Área restrita da barbearia: agenda, clientes, avaliações e pendências de conteúdo.
       </p>
+
+      {emailSemAcesso ? (
+        <p className="mt-6 rounded-xl border border-gold/30 bg-gold/5 px-4 py-3 text-sm leading-relaxed text-bone-dim">
+          Você entrou como <strong className="text-bone">{emailSemAcesso}</strong>, mas esse e-mail não
+          está na lista da equipe. Use o e-mail do dono ou a senha abaixo.
+        </p>
+      ) : null}
 
       <a
         href="/entrar?aba=equipe&callbackUrl=/admin"
@@ -91,8 +98,8 @@ export function AdminLogin() {
 
       {process.env.NODE_ENV !== "production" ? (
         <p className="mt-6 text-xs leading-relaxed text-bone-dim/70">
-          Desenvolvimento: a senha padrão é <code className="text-gold">duhcorte</code>. Defina{" "}
-          <code className="text-gold">ADMIN_PASSWORD</code> no .env antes de publicar.
+          Desenvolvimento: a senha vem de <code className="text-gold">ADMIN_PASSWORD</code> no{" "}
+          <code className="text-gold">.env</code> (nesta máquina: <code className="text-gold">admin</code>).
         </p>
       ) : null}
     </div>

@@ -66,6 +66,10 @@ Cliente                    Painel (/admin)                 Banco
 
 > **Feito em 22/10:** schema aplicado no Neon (`db push`, aditivo) e deploy em produção com
 > smoke test PASS (rotas 200, login com senha, 3 abas, visão de semana, 0 erros de console/HTTP).
+> Rodada final: reserva completa feita em produção e apagada depois (script
+> `scripts/limpar-teste-producao.mjs --teste`), login com Google corrigido (com `redirect:false`
+> o Auth.js devolvia a URL do provedor e o botão caía em `/minha-conta` sem sessão), senha
+> provisória do painel em `admin` e dados de teste zerados (0 agendamentos).
 
 1. **Limpar o agendamento de teste** que está em produção em 27/10 13:15 (`ujhuyguyg`) —
    decidir com o dono antes de apagar (é o único registro de agendamento no banco).

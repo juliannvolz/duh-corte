@@ -215,9 +215,23 @@ async function run() {
   try {
     await adminPage.goto(`${BASE}/admin`, { waitUntil: "networkidle" });
     await adminPage.screenshot({ path: path.join(OUT, "screens", "admin-login.png") });
-    await adminPage.getByPlaceholder("••••••••").fill(process.env.ADMIN_PASSWORD ?? "duhcorte");
+    const senha = process.env.ADMIN_PASSWORD ?? "admin";
+    const campo = adminPage.getByPlaceholder("••••••••");
+    await campo.waitFor({ state: "visible" });
+    // hidratacao: preencher um input controlado antes do React assumir
+    // deixava o POST com valor velho (401 intermitente)
+    await adminPage.waitForTimeout(900);
+    for (let i = 0; i < 5; i++) {
+      await campo.fill(senha);
+      if ((await campo.inputValue()) === senha) break;
+      await adminPage.waitForTimeout(300);
+    }
     await adminPage.getByRole("button", { name: /entrar/i }).click();
-    await adminPage.waitForTimeout(2500);
+    // espera deterministica: cold start da funcao serverless passa dos 2,5s
+    await adminPage
+      .getByRole("button", { name: /sair/i })
+      .waitFor({ state: "visible", timeout: 20000 })
+      .catch(() => {});
     // "Sair" so aparece quando o painel carregou (a tela de login fala
     // "agenda do dia" no texto de apoio e gerava falso positivo)
     const logado = await adminPage.getByRole("button", { name: /sair/i }).count();
