@@ -1,6 +1,6 @@
 {
-  "base": "https://duh-corte.vercel.app",
-  "startedAt": "2026-10-22T17:47:55.646Z",
+  "base": "http://localhost:3000",
+  "startedAt": "2026-10-22T19:27:25.812Z",
   "viewports": {
     "mobile/": {
       "status": 200,
@@ -117,7 +117,7 @@
   "flow": {
     "servicePressed": true,
     "choseSlot": true,
-    "slotCount": 26,
+    "slotCount": 6,
     "success": true,
     "pagamentoPresencial": true,
     "codigoReserva": true,
@@ -131,5 +131,5 @@
   "admin": {
     "loggedIn": true
   },
-  "finishedAt": "2026-10-22T17:50:12.810Z"
+  "finishedAt": "2026-10-22T19:29:45.900Z"
 }
