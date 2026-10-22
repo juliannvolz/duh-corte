@@ -37,6 +37,8 @@ Poeira dourada ao fundo, fotos com parallax, barra de progresso de leitura e ent
 3. **Sábado** — o site está como "sábado e domingo fechados" (é o que está no Google Maps). Se abrirem, me avise.
 4. **Senha do painel** — a senha de demonstração precisa ser trocada.
 5. **Fotos e nomes dos outros profissionais** — hoje só você está confirmado.
+6. **O endereço do site** — ele está no ar num endereço provisório. Quando decidir o nome (o perfil oficial é @duhcortebarbearia) e se prefere o domínio principal ou um subdomínio, eu aponto tudo em 1 minuto.
+7. **Login social (opcional)** — para o cliente entrar com Google/Facebook sem senha. Deixei o passo a passo pronto; o Google leva 15 minutos.
 
 ## Como conectar a sua agenda do Google
 

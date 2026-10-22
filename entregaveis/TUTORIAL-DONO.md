@@ -136,14 +136,29 @@ Cada plano tem dois caminhos no site:
 - **"Quero este plano"** → leva o cliente direto para a agenda já com o plano marcado (vaga prioritária e **pontos em dobro**);
 - **"Ativar na loja"** → abre o WhatsApp com a mensagem pronta. A assinatura é ativada presencialmente na loja da Vila Nova, depois do primeiro corte.
 
-## 5. O que você ainda precisa me mandar (6 itens)
+## 4d. O endereço do site (decisão sua)
+
+O site já está no ar em um endereço provisório (`duh-corte.vercel.app`) e funciona por completo. Quando você fechar o nome do domínio, eu aponto tudo para ele em um minuto (canonical, sitemap, links, e-mails).
+
+**O que preciso saber de você:**
+
+1. **O domínio está registrado?** Na checagem, nenhum dos nomes testados (`duhcutebarbearia.com.br`, `duhcutebarbearia.com.br`, `duhcortebarbearia.com.br`) respondeu no DNS — ou seja, o domínio ainda não foi comprado/apontado. O perfil oficial da casa é **@duhcortebarbearia**, então o caminho natural seria `duhcortebarbearia.com.br` (com o "r" do "corte").
+2. **Domínio principal ou subdomínio?**
+   - *Principal* (`duhcortebarbearia.com.br`): o mais profissional — o cliente digita e cai no site. Exige trocar os nameservers no registrador.
+   - *Subdomínio* (`www.` ou `site.`): mantém o endereço principal livre para outra coisa (ex.: cardápio, portfólio) e é mais rápido de configurar.
+3. **Onde o domínio está registrado?** (Registro.br, Hostinger, GoDaddy…) — eu te passo o que trocar lá.
+
+O detalhamento técnico está em `docs/DOMINIO.md`.
+
+## 5. O que você ainda precisa me mandar (7 itens)
 
 1. **Tabela oficial de preços** (preço + duração de cada serviço e dos planos do Clube). Hoje o site mostra valores de referência com o aviso "tabela em validação".
 2. **Chave Pix e CNPJ** da barbearia (para o Pix no balcão e a emissão de recibo).
 3. **Sábado:** o site está como "sábado e domingo fechados" (é o que está no Google Maps). Se vocês abrem, me avise.
 4. **Senha do painel** (a demo é `duhcorte`).
 5. **Fotos e nomes dos outros profissionais** (hoje só o Dudu está confirmado).
-6. **Os apps do login social** (opcional) — para liberar o botão "Entrar com Google/Apple/Facebook". Sem isso, o cliente continua entrando pelo WhatsApp e o painel pela senha.
+6. **Os apps do login social** (opcional) — para liberar o botão "Entrar com Google/Apple/Facebook". Sem isso, o cliente continua entrando pelo WhatsApp e o painel pela senha. O passo a passo do Google e do Facebook está em `entregaveis/CONA-LOGIN-SOCIAL.md`.
+7. **A decisão do domínio** (item 4d acima) — nome, onde está registrado e se prefere domínio principal ou subdomínio.
 
 ---
 
