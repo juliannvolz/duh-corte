@@ -64,16 +64,16 @@ Cliente                    Painel (/admin)                 Banco
 
 ## 4. O que falta (ordem sugerida)
 
-1. **Aplicar o schema no Neon** (obrigatório antes do deploy que usa feedback):
-   ```powershell
-   npm run db:producao
-   ```
-2. **Deploy + smoke test** (`/admin` com Google e com senha; aba Avaliações; criar um horário).
-3. **Domínio** — respostas em `entregaveis/PENDENCIAS-CLIENTE.md` §3.
-4. **Publicar o app OAuth do Google** (*Publish app*; hoje em *Testing*, só e-mails de teste entram).
-5. **Rotacionar segredos expostos no chat** (`GOCSPX-...` do Google e App Secret do Facebook).
-6. **Trocar `ADMIN_PASSWORD`** de produção.
-7. **Conteúdo do cliente** (preços, sábado, equipe, fotos, logo SVG, Pix/CNPJ).
+> **Feito em 22/10:** schema aplicado no Neon (`db push`, aditivo) e deploy em produção com
+> smoke test PASS (rotas 200, login com senha, 3 abas, visão de semana, 0 erros de console/HTTP).
+
+1. **Limpar o agendamento de teste** que está em produção em 27/10 13:15 (`ujhuyguyg`) —
+   decidir com o dono antes de apagar (é o único registro de agendamento no banco).
+2. **Domínio** — respostas em `entregaveis/PENDENCIAS-CLIENTE.md` §3.
+3. **Publicar o app OAuth do Google** (*Publish app*; hoje em *Testing*, só e-mails de teste entram).
+4. **Rotacionar segredos expostos no chat** (`GOCSPX-...` do Google e App Secret do Facebook).
+5. **Trocar `ADMIN_PASSWORD`** de produção.
+6. **Conteúdo do cliente** (preços, sábado, equipe, fotos, logo SVG, Pix/CNPJ).
 
 ---
 
