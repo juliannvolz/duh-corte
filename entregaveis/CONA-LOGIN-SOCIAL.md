@@ -4,14 +4,14 @@
 
 | Botão | Estado | O que falta |
 | --- | --- | --- |
-| **Facebook** | ✅ **no ar** — o botão aparece e abre o login da Meta sem erro de redirect | Para clientes reais (hoje só os administradores do app entram): cadastrar a política de privacidade e passar o app de *Development* para **Live** |
-| **Google** | ⏳ aguardando as chaves | Criar o client OAuth no Google Cloud (15 min) e me passar ID + secret |
+| **Google** | ✅ **no ar** — o botão abre o login do Google com `redirect_uri` aceito e escopos `openid profile email` | Para clientes reais (hoje só o e-mail de teste entra): *OAuth consent screen* → **Publish app** |
+| ~~Facebook~~ | ⛔ desligado | O app da Meta não foi publicado em modo Live (só os administradores entravam). As chaves foram removidas do servidor — o botão não aparece mais. O código do provedor continua no projeto, pronto para religar se quiser. |
 | **Apple** | ⏳ descartado por ora | Sem as chaves, o botão simplesmente não aparece (o site segue normal) |
 
-**No Facebook, falta só isso (2 min, no painel da Meta):**
-1. *App settings → Basic* → preencha **Privacy Policy URL** com `https://duh-corte.vercel.app/privacidade` (ou o endereço final) e a **Descrição** do app ("Barbearia Duh Corte — Vila Nova, Jaraguá do Sul");
-2. no topo da mesma página, mude o app de **Development** para **Live**;
-3. *Facebook Login → Settings* → marque as permissões **email** e **public_profile** e salve.
+**No Google, falta só isso (2 min, no console do Google):**
+1. <https://console.cloud.google.com/apis/credentials> → seu projeto → **APIs e serviços → Tela de consentimento OAuth**;
+2. confirme que os escopos `.../auth/userinfo.email` e `.../auth/userinfo.profile` estão marcados;
+3. clique em **Publish app** (no topo da tela). Sem isso, só o e-mail cadastrado como *usuário de teste* consegue entrar.
 
 O código já está pronto e testado. Falta criar as chaves nos consoles e me passar **dois códigos de cada provedor** (ID e Senha). Aí eu publico em 1 minuto e o botão aparece em `/entrar`.
 
