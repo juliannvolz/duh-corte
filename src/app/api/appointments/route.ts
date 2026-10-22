@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { createAppointment } from "@/lib/booking";
 import { getLoyaltyByAppointment } from "@/lib/loyalty-server";
+import { avisarNovaReserva } from "@/lib/notificacoes";
 
 const schema = z.object({
   serviceId: z.string().min(1),
@@ -86,6 +87,11 @@ export async function POST(request: Request) {
     const status = result.code === "UNAVAILABLE" ? 409 : result.code === "CONFLICT" ? 500 : 400;
     return NextResponse.json({ error: result.error, code: result.code }, { status });
   }
+
+  // Aviso ao dono. Desligado por padrao (sem RESEND_API_KEY/NOTIFY_EMAIL):
+  // devolve na hora e nao custa nada. Await de proposito — em serverless uma
+  // promessa solta pode ser cortada quando a resposta sai.
+  if (!result.replayed) await avisarNovaReserva(result.appointmentId);
 
   return NextResponse.json(
     {

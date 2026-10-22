@@ -15,7 +15,13 @@ O agendamento deixou de depender do Google Agenda do dono. **A agenda agora mora
 | **C — QA e conteúdo** | QA do painel em 390/768/1440 (0 erros); tutorial do dono reescrito; pendências do cliente enxutas; Google Agenda rebaixado a **opcional** |
 
 **Banco:** aditivo e seguro — `Customer.googleId` (único, nulo) e model `Feedback`.
-Local já aplicado; **produção ainda precisa do `db push`** (ver §5).
+Local e produção já aplicados (`db push` aditivo em 22/10).
+
+**Notificações (pré-pronto, desligado):** aviso de nova reserva e de cancelamento
+por e-mail já implementado em `src/lib/notificacoes.ts`, ligado nas rotas de
+reserva/cancelamento e **inócuo sem configuração**. No dia da assinatura basta
+`RESEND_API_KEY` + `NOTIFY_EMAIL` na Vercel (passo a passo:
+`docs/NOTIFICACOES.md`, teste: `node scripts/testar-notificacao.mjs`).
 
 ---
 

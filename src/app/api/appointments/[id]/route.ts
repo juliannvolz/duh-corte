@@ -4,6 +4,7 @@ import { cancelAppointment } from "@/lib/booking";
 import { prisma } from "@/lib/db";
 import { auth } from "@/lib/auth-social";
 import { resolverCliente } from "@/lib/customer-identity";
+import { avisarCancelamento } from "@/lib/notificacoes";
 
 const schema = z.object({
   action: z.literal("cancel"),
@@ -79,6 +80,8 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
   if (!result.ok) {
     return NextResponse.json({ error: result.error }, { status: 404 });
   }
+
+  await avisarCancelamento(id, "cliente");
 
   return NextResponse.json({ id, status: result.status });
 }
