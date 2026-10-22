@@ -1,5 +1,18 @@
 # Cola: liberar os botões de login (Google / Apple / Facebook)
 
+**Estado atual (verificado no site em produção):**
+
+| Botão | Estado | O que falta |
+| --- | --- | --- |
+| **Facebook** | ✅ **no ar** — o botão aparece e abre o login da Meta sem erro de redirect | Para clientes reais (hoje só os administradores do app entram): cadastrar a política de privacidade e passar o app de *Development* para **Live** |
+| **Google** | ⏳ aguardando as chaves | Criar o client OAuth no Google Cloud (15 min) e me passar ID + secret |
+| **Apple** | ⏳ descartado por ora | Sem as chaves, o botão simplesmente não aparece (o site segue normal) |
+
+**No Facebook, falta só isso (2 min, no painel da Meta):**
+1. *App settings → Basic* → preencha **Privacy Policy URL** com `https://duh-corte.vercel.app/privacidade` (ou o endereço final) e a **Descrição** do app ("Barbearia Duh Corte — Vila Nova, Jaraguá do Sul");
+2. no topo da mesma página, mude o app de **Development** para **Live**;
+3. *Facebook Login → Settings* → marque as permissões **email** e **public_profile** e salve.
+
 O código já está pronto e testado. Falta criar as chaves nos consoles e me passar **dois códigos de cada provedor** (ID e Senha). Aí eu publico em 1 minuto e o botão aparece em `/entrar`.
 
 > **Sobre o domínio:** o endereço final (apex ou subdomínio) ainda vai ser decidido. **Use estas URLs de retorno agora** — valem para qualquer um dos dois casos, porque o site aceita qualquer host:
