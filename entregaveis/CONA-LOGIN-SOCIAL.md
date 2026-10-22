@@ -1,23 +1,24 @@
 # Cola: liberar os botões de login (Google / Apple / Facebook)
 
-O código já está pronto e testado. Falta só criar as chaves nos consoles e me passar os dois códigos de cada provedor (ID e Senha). Aí eu publico em 1 minuto e o botão aparece em `/entrar`.
+O código já está pronto e testado. Falta criar as chaves nos consoles e me passar **dois códigos de cada provedor** (ID e Senha). Aí eu publico em 1 minuto e o botão aparece em `/entrar`.
 
-**Redirect URIs (copie exatamente these 3 linhas em cada console):**
-
-```
-https://duh-corte.vercel.app/api/auth/callback/google
-https://duhcutebarbearia.com.br/api/auth/callback/google
-http://localhost:3000/api/auth/callback/google
-```
-
-(troque `google` por `facebook` ou `apple` conforme o provedor; no Facebook é `/api/auth/callback/facebook`, na Apple `/api/auth/callback/apple`)
+> **Sobre o domínio:** o endereço final (apex ou subdomínio) ainda vai ser decidido. **Use estas URLs de retorno agora** — valem para qualquer um dos dois casos, porque o site aceita qualquer host:
+>
+> ```
+> https://duh-corte.vercel.app/api/auth/callback/google
+> https://duh-corte.vercel.app/api/auth/callback/facebook
+> http://localhost:3000/api/auth/callback/google
+> http://localhost:3000/api/auth/callback/facebook
+> ```
+>
+> (o `localhost` é opcional mesmo; eu recomendo deixar, para testar no PC). Quando o endereço definitivo estiver pronto, é só **acrescentar** a linha nova na lista do console — sem mexer em código. Opções de domínio: `docs/DOMINIO.md`.
 
 ---
 
 ## 1) Google (15 minutos — comece por este)
 
 1. <https://console.cloud.google.com/apis/credentials> → **crie um projeto** (canto superior: *Selecionar projeto* → *Novo projeto*, nome `duh-corte-login`).
-2. No menu lateral: **APIs e serviços → Tela de consentimento OAuth**:
+2. Menu lateral: **APIs e serviços → Tela de consentimento OAuth**:
    - *User Type*: **External** → *Iniciar*;
    - Preencha: *App name* = `Duh Corte Barbearia`; *User support email* = seu e-mail; *Developer contact* = seu e-mail;
    - **Adicione um usuário de teste** (o seu e-mail) — em modo de teste, só ele consegue entrar;
@@ -26,47 +27,51 @@ http://localhost:3000/api/auth/callback/google
      - `.../auth/userinfo.profile`
 3. **Credentials → Create Credentials → OAuth client ID → Web application**:
    - *Name*: `Duh Corte Barbearia`
-   - *Authorized redirect URIs*: cole as 3 linhas acima;
-   - Clique em **Create** → aparecem **Client ID** e **Client secret**.
+   - *Authorized redirect URIs*: cole as linhas acima (as do `/google`);
+   - **Create** → aparecem **Client ID** e **Client secret** (copie os dois).
 4. Me mande: `ID` e `secret`.
 
-## 2) Facebook / Meta (10 minutos)
+> Dica: se você quiser que **qualquer cliente** (não só os testadores) entre, o app precisa sair do modo "Testing" — em *OAuth consent screen* → *Publish app* (aparece um botão assim que os escopos básicos estiverem marcados).
 
-1. <https://developers.facebook.com/apps> → **Create App** → tipo **Consumer** (ou Business) → *Use cases* → **Other** → *Business apps* → *Create*.
-2. Add product **Facebook Login** → *Settings* (login com Facebook):
-   - *Valid OAuth Redirect URIs*: cole as 3 linhas (com `/facebook` no final);
-   - *Client OAuth Login* → *Web* → marque *Client OAuth Login* e *Web OAuth Login*.
-3. Em *App settings → Basic*: copie **App ID** e **App secret** (em *Show*).
+## 2) Facebook / Meta — onde ficam as chaves (você já fez o passo do redirect)
+
+Você já cadastrou as URLs de retorno. O que falta é **achar as duas chaves**:
+
+1. <https://developers.facebook.com/apps> → **My Apps** → clique no seu app (o painel dele abre).
+2. Menu lateral (barra azul à esquerda) → **App settings** → aba **Basic**:
+   - Role até a seção **"App ID"** (no meio da página): clique em **Show** ao lado e copie o **App ID**;
+   - Logo abaixo, **"App secret"**: clique em **Show** e copie a senha (ela só aparece com o botão *Show* — por isso parece que "não tem chave").
+3. Volte para o app e confira o item **Facebook Login → Settings**: o campo *Valid OAuth Redirect URIs* precisa estar preenchido **e** o botão **Save** clicado (sem salvar, a URL não é gravada).
 4. Me mande: `ID` e `secret`.
 
-## 3) Apple (só se quiser — exige conta paga)
+### Para o botão funcionar para clientes reais (não só você)
+1. Em *App settings → Basic*, no topo, tem o **modo do app**: troque de *Development* para **Live**.
+2. A Meta exige **política de privacidade** e **termos** para publicar: cole a página `https://duh-corte.vercel.app/privacidade` (ou o endereço final) nos campos.
+3. Em *Facebook Login → Settings*, marque as permissões `email` e `public_profile` (para o botão mostrar nome e e-mail).
+4. Em modo Live, qualquer cliente consegue entrar. Enquanto estiver em Development, **só os administradores/testadores do app** conseguem usar o botão.
 
-1. <https://developer.apple.com/programs/> → assine o **Apple Developer Program** (US$ 99/ano).
-2. *Certificates, Identifiers & Profiles* → **Identifiers → Services IDs** → *Enable Sign in with Apple* → crie `com.duhcutebarbearia.app`.
-3. Volte ao **App ID** do site (você precisa de um app iOS/macOS) e ative **Sign in with Apple**; cadastre o domínio e o Service ID.
-4. Crie uma **chave .p8** (*Keys*) e gere o segredo JWT (client secret) — o formato é `APPID.APPID.SECRET` com o certificado em ECDSA P-256.
-5. Me mande: `Service ID` e o `client secret`.
+## 3) Apple (opcional — você decidiu não fazer)
+
+Sem problema: sem as chaves da Apple, o botão simplesmente **não aparece** e o site segue funcionando (Google + Facebook resolvem). Se um dia quiser, é só seguir `docs/LOGIN-SOCIAL.md` (exige Apple Developer Program, US$ 99/ano).
 
 ---
 
 ## Como me passar as chaves
 
-Escreva no chat, por exemplo:
+Escreva no chat:
 
 ```
 google ID=123456-abc.apps.googleusercontent.com SECRET=GOCSPX-xxxx
 facebook ID=1234567890 SECRET=abcdef123456
 ```
 
-Aí eu rodo: `node scripts/configurar-login.mjs --google=ID:SECRET` — ele grava as variáveis na Vercel, publica e eu testo o botão com `node scripts/qa-login.mjs`.
+Eu rodo: `node scripts/configurar-login.mjs --google=ID:SECRET` — ele grava as variáveis na Vercel, publica e eu testo com `node scripts/qa-login.mjs` (confere se o botão abre o provedor e volta pro site sem erro).
 
 ---
 
 ## O que acontece depois de liberado
 
-- O botão **"Entrar com Google"** aparece em `https://duh-corte.vercel.app/entrar`.
-- O cliente entra, vê os horários, os pontos e o código de indicação em `/minha-conta`.
-- **O admin entra pelo mesmo botão**: se o seu e-mail estiver em `ADMIN_EMAILS`, aparece o botão "Ir para o painel da barbearia".
-- A senha continua funcionando como segunda porta (login do `/admin`).
-
-**Dica:** comece pelo Google — é o mais rápido e resolve 95% dos casos. Apple e Facebook podem ficar para depois; sem eles, o botão simplesmente não aparece (o site não quebra).
+- Aparece o botão **"Entrar com Google/Facebook"** em `https://duh-corte.vercel.app/entrar`.
+- O cliente entra e vê: horários, pontos, recompensas e o código de indicação em `/minha-conta`.
+- **O admin entra pelo mesmo botão**: se o e-mail do dono estiver em `ADMIN_EMAILS`, aparece "Ir para o painel da barbearia".
+- A senha continua como segunda porta (login do `/admin`).
