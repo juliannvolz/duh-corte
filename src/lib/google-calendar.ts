@@ -226,6 +226,11 @@ export function buildIcs(input: {
   startsAt: string;
   endsAt: string;
 }): string {
+  /**
+   * Data/hora no formato iCalendar em UTC: "20261028T130000Z".
+   * O `Z` (UTC) ja vem do `toISOString()` — por isso nao se acrescenta
+   * outro no template (o bug antigo gerava "ZZ" e o Google Agenda recusava).
+   */
   const stamp = (iso: string) =>
     new Date(iso).toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
 
@@ -240,9 +245,9 @@ export function buildIcs(input: {
     "METHOD:PUBLISH",
     "BEGIN:VEVENT",
     `UID:${escape(input.uid)}@duhcutebarbearia.com.br`,
-    `DTSTAMP:${stamp(new Date().toISOString())}Z`,
-    `DTSTART:${stamp(input.startsAt)}Z`,
-    `DTEND:${stamp(input.endsAt)}Z`,
+    `DTSTAMP:${stamp(new Date().toISOString())}`,
+    `DTSTART:${stamp(input.startsAt)}`,
+    `DTEND:${stamp(input.endsAt)}`,
     `SUMMARY:${escape(input.summary)}`,
     `DESCRIPTION:${escape(input.description)}`,
     `LOCATION:${escape(input.location)}`,

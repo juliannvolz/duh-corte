@@ -1,8 +1,14 @@
 import { auth } from "@/lib/auth-social";
+import { connection } from "next/server";
 import { prisma } from "@/lib/db";
 import { getCustomerLoyalty } from "@/lib/loyalty-server";
 import { AccountLookup } from "@/components/account/AccountLookup";
+import { AppointmentActions } from "@/components/account/AppointmentActions";
+import { FeedbackForm } from "@/components/account/FeedbackForm";
+import { resolverCliente } from "@/lib/customer-identity";
 import { formatBRL } from "@/lib/site";
+import { business } from "@/lib/site";
+import { mensagemParaBarbearia, whatsappLink } from "@/lib/whatsapp";
 import { Sparkles, Ticket } from "lucide-react";
 import { SignOutButton } from "@/components/account/AccountButton";
 
@@ -28,7 +34,16 @@ function dataLocal(iso: string) {
   ).padStart(2, "0")}:${String(d.getUTCMinutes()).padStart(2, "0")}`;
 }
 
+function dataISO(iso: string) {
+  return new Date(new Date(iso).getTime() - 3 * 60 * 60 * 1000).toISOString().slice(0, 10);
+}
+
 export default async function MinhaContaPage() {
+  // Cache Components: a pagina le cookie de sessao, entao precisa ser
+  // renderizada a cada request. Sem isso o prerender tenta rodar o Auth.js
+  // (que usa crypto.getRandomValues) e o console acusa erro.
+  await connection();
+
   const session = await auth();
   if (!session?.user?.email) {
     return (
@@ -50,20 +65,16 @@ export default async function MinhaContaPage() {
     );
   }
 
-  const email = session.user.email.toLowerCase();
-  const customers = await prisma.customer.findMany({
-    where: { email: { contains: email } },
-    take: 3,
-    select: { id: true, name: true, phone: true },
+  const cliente = await resolverCliente({
+    session: { id: session.user.id, email: session.user.email },
   });
 
-  const cliente = customers[0] ?? null;
   const loyalty = cliente ? await getCustomerLoyalty(cliente.id) : null;
 
   const appointments = cliente
     ? await prisma.appointment.findMany({
         where: { customerId: cliente.id },
-        include: { service: true, professional: true },
+        include: { service: true, professional: true, customer: true, feedback: true },
         orderBy: { startsAt: "desc" },
         take: 12,
       })
@@ -80,10 +91,7 @@ export default async function MinhaContaPage() {
             </h1>
             <p className="mt-2 text-sm text-bone-dim">{session.user.email}</p>
           </div>
-          <div className="mt-10 flex flex-wrap items-center justify-between gap-6">
-            <p className="eyebrow text-gold">Minha conta</p>
-            <SignOutButton />
-          </div>
+          <SignOutButton />
         </div>
 
         {session.user.isAdmin ? (
@@ -111,25 +119,68 @@ export default async function MinhaContaPage() {
                 <ul className="mt-4 space-y-3">
                   {appointments.map((a) => {
                     const st = STATUS[a.status] ?? STATUS.pending;
+                    // a janela de cancelamento e validada pela API (que devolve
+                    // a mensagem amigavel); aqui o criterio e o status.
+                    const cancelavel =
+                      a.status === "pending" || a.status === "confirmed";
+
+                    const conversa = {
+                      cliente: { name: a.customer.name, phone: a.customer.phone },
+                      servico: { name: a.service.name, durationMin: a.service.durationMin },
+                      profissional: { name: a.professional.name },
+                      dataISO: dataISO(a.startsAt.toISOString()),
+                      hora: dataLocal(a.startsAt.toISOString()).split(" às ")[1] ?? "",
+                      preco: formatBRL(a.priceCents),
+                      endereco: `${business.address.street}, ${business.address.neighborhood}`,
+                      codigo: a.id.slice(0, 8).toUpperCase(),
+                    };
+
                     return (
                       <li
                         key={a.id}
-                        className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-line bg-ink-2/60 px-5 py-4"
+                        className="rounded-2xl border border-line bg-ink-2/60 px-5 py-4"
                       >
-                        <div>
-                          <p className="text-sm font-medium text-bone">
-                            {a.service.name} · {a.professional.name}
-                          </p>
-                          <p className="mt-1 text-xs text-bone-dim">
-                            {dataLocal(a.startsAt.toISOString())} · {a.service.durationMin} min ·{" "}
-                            {formatBRL(a.priceCents)} · código {a.id.slice(0, 8).toUpperCase()}
-                          </p>
+                        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                          <div>
+                            <p className="text-sm font-medium text-bone">
+                              {a.service.name} · {a.professional.name}
+                            </p>
+                            <p className="mt-1 text-xs text-bone-dim">
+                              {dataLocal(a.startsAt.toISOString())} · {a.service.durationMin} min ·{" "}
+                              {formatBRL(a.priceCents)} · código {a.id.slice(0, 8).toUpperCase()}
+                            </p>
+                          </div>
+
+                          <div className="flex flex-col items-start gap-3 sm:items-end">
+                            <span
+                              className={`rounded-full border px-3 py-1 text-[0.65rem] uppercase tracking-[0.12em] ${st.classe}`}
+                            >
+                              {st.label}
+                            </span>
+
+                            {a.status !== "cancelled" ? (
+                              <AppointmentActions
+                                id={a.id}
+                                phone={a.customer.phone}
+                                whatsappHref={whatsappLink(
+                                  business.whatsapp,
+                                  mensagemParaBarbearia(conversa),
+                                )}
+                                podeCancelar={cancelavel}
+                              />
+                            ) : null}
+
+                            {a.feedback ? (
+                              <p className="text-[0.65rem] text-bone-dim">
+                                Sua avaliação: {a.feedback.rating} de 5 estrelas
+                              </p>
+                            ) : null}
+                          </div>
                         </div>
-                        <span
-                          className={`rounded-full border px-3 py-1 text-[0.65rem] uppercase tracking-[0.12em] ${st.classe}`}
-                        >
-                          {st.label}
-                        </span>
+
+                        {a.status === "done" && !a.feedback ? (
+                          <FeedbackForm appointmentId={a.id} phone={a.customer.phone} />
+                        ) : null}
                       </li>
                     );
                   })}
@@ -181,7 +232,7 @@ export default async function MinhaContaPage() {
           </div>
         ) : (
           <div className="mt-10">
-            <AccountLookup email={email} />
+            <AccountLookup email={session.user.email} />
           </div>
         )}
       </div>

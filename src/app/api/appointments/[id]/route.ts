@@ -2,17 +2,24 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { cancelAppointment } from "@/lib/booking";
 import { prisma } from "@/lib/db";
+import { auth } from "@/lib/auth-social";
+import { resolverCliente } from "@/lib/customer-identity";
 
 const schema = z.object({
   action: z.literal("cancel"),
   reason: z.string().max(300).optional(),
+  /** telefone da reserva — prova de dono quando o cliente nao esta logado */
+  phone: z.string().max(20).optional(),
 });
 
 /**
  * PATCH /api/appointments/:id — cancelamento pelo cliente.
  *
  * Regra: so cancela até `cancelWindowMin` antes do inicio (default 60 min).
- * O cliente informa o telefone para provar que e dono da reserva.
+ *
+ * Quem pode cancelar: o dono da reserva. A prova e a sessao social (o
+ * cadastro e casado por googleId/e-mail) ou o telefone usado na reserva.
+ * Sem isso, ninguem cancela a reserva de outro.
  */
 export async function PATCH(request: Request, context: { params: Promise<{ id: string }> }) {
   const { id } = await context.params;
@@ -36,6 +43,22 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
 
   if (!appointment) {
     return NextResponse.json({ error: "Agendamento não encontrado" }, { status: 404 });
+  }
+
+  // prova de dono da reserva
+  const session = await auth();
+  const cliente = await resolverCliente({
+    session: session?.user?.email
+      ? { id: session.user.id, email: session.user.email }
+      : null,
+    phone: parsed.data.phone,
+  });
+
+  if (!cliente || cliente.id !== appointment.customerId) {
+    return NextResponse.json(
+      { error: "Esta reserva não é da sua conta." },
+      { status: 403 },
+    );
   }
 
   const settings = await prisma.businessSettings.findFirst();

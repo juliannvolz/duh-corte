@@ -135,12 +135,16 @@ model Customer {
   points    Int      @default(0)
   /// Codigo de indicacao do cliente (ex.: DUC-7F3A).
   referralCode String? @unique
+  /// Identificador da conta social (Google) vinculada a este cliente.
+  /// Permite reconhecer o cliente logado sem depender do e-mail.
+  googleId  String?  @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   appointments Appointment[]
   subscriptions Subscription[]
   pointEntries PointEntry[]
   rewards     Reward[]
+  feedbacks   Feedback[]
   referralsSent Referral[] @relation("ReferralReferrer")
   referralsReceived Referral[] @relation("ReferralReferee")
 }
@@ -211,9 +215,28 @@ model Appointment {
   service       Service  @relation(fields: [serviceId], references: [id])
   professional  Professional @relation(fields: [professionalId], references: [id])
   payment       Payment?
+  feedback      Feedback?
 
   @@index([professionalId, startsAt])
   @@index([customerId])
+}
+
+/// Avaliacao do cliente sobre um atendimento concluido.
+model Feedback {
+  id            String   @id @default(cuid())
+  appointmentId String   @unique
+  customerId    String
+  /// Nota de 1 a 5.
+  rating        Int
+  text          String?
+  /// Quando marcado, o depoimento aparece no site (secao de avaliacoes).
+  published     Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  appointment   Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  customer      Customer    @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@index([customerId])
+  @@index([published, createdAt])
 }
 
 model TimeOff {

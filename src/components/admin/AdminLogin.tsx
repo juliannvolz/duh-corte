@@ -2,8 +2,15 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, Lock } from "lucide-react";
+import { Chrome, Loader2, Lock } from "lucide-react";
 
+/**
+ * Porta de entrada do painel quando o dono cai direto em `/admin`.
+ *
+ * Duas opcoes, as mesmas de `/entrar`: o Google da equipe (`ADMIN_EMAILS`) ou
+ * a senha da casa. A senha continua sendo a segunda porta — util quando o
+ * dono esta em um computador sem a conta Google dele.
+ */
 export function AdminLogin() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -39,12 +46,25 @@ export function AdminLogin() {
       </span>
       <h1 className="display mt-6 text-4xl">Painel da casa</h1>
       <p className="mt-3 text-sm leading-relaxed text-bone-dim">
-        Área restrita da barbearia: agenda do dia, status dos atendimentos e pendências de conteúdo.
+        Área restrita da barbearia: agenda, clientes, avaliações e pendências de conteúdo.
       </p>
 
-      <form onSubmit={submit} className="mt-8 space-y-4">
+      <a
+        href="/entrar?aba=equipe&callbackUrl=/admin"
+        className="mt-8 flex w-full items-center justify-center gap-2 rounded-full border border-line-strong px-6 py-3 text-sm font-medium text-bone transition-colors hover:border-gold hover:text-gold"
+      >
+        <Chrome className="size-4" /> Entrar com o Google da equipe
+      </a>
+
+      <div className="my-6 flex items-center gap-4">
+        <span className="h-px flex-1 bg-line" aria-hidden />
+        <span className="text-[0.65rem] uppercase tracking-[0.2em] text-bone-dim/60">ou</span>
+        <span className="h-px flex-1 bg-line" aria-hidden />
+      </div>
+
+      <form onSubmit={submit} className="space-y-4">
         <label className="flex flex-col gap-1.5 text-sm">
-          <span className="text-bone-dim">Senha de acesso</span>
+          <span className="text-bone-dim">Senha da barbearia</span>
           <input
             type="password"
             value={password}
@@ -52,7 +72,7 @@ export function AdminLogin() {
             required
             autoFocus
             autoComplete="current-password"
-            className="rounded-xl border border-line bg-ink-2 px-4 py-3 text-bone focus:border-gold focus:outline-none"
+            className="rounded-xl border border-line bg-ink-2 px-4 py-3 text-bone placeholder:text-bone-dim/40 focus:border-gold focus:outline-none"
             placeholder="••••••••"
           />
         </label>
@@ -69,10 +89,12 @@ export function AdminLogin() {
         </button>
       </form>
 
-      <p className="mt-6 text-xs leading-relaxed text-bone-dim/70">
-        Em ambiente de demonstração a senha padrão é <code className="text-gold">duhcorte</code>.
-        Defina <code className="text-gold">ADMIN_PASSWORD</code> no .env antes de publicar.
-      </p>
+      {process.env.NODE_ENV !== "production" ? (
+        <p className="mt-6 text-xs leading-relaxed text-bone-dim/70">
+          Desenvolvimento: a senha padrão é <code className="text-gold">duhcorte</code>. Defina{" "}
+          <code className="text-gold">ADMIN_PASSWORD</code> no .env antes de publicar.
+        </p>
+      ) : null}
     </div>
   );
 }

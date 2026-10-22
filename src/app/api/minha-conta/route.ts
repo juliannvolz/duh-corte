@@ -2,11 +2,14 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth-social";
 import { prisma } from "@/lib/db";
 import { getCustomerLoyalty } from "@/lib/loyalty-server";
+import { resolverCliente } from "@/lib/customer-identity";
 
 /**
- * GET /api/minha-conta?tel=47XXXXXXXXX
+ * GET /api/minha-conta[?tel=47XXXXXXXXX]
+ *
  * Lista os agendamentos e a fidelidade do cliente da sessao social.
- * Sem sessao: 401. Com sessao, busca pelo e-mail da conta ou pelo telefone.
+ * Sem sessao: 401. Com sessao, casa pelo googleId ou pelo e-mail exato;
+ * com telefone, usa o telefone para vincular um cadastro de visitante.
  */
 export async function GET(request: Request) {
   const session = await auth();
@@ -15,47 +18,41 @@ export async function GET(request: Request) {
   }
 
   const url = new URL(request.url);
-  const tel = (url.searchParams.get("tel") ?? "").replace(/\D/g, "");
+  const tel = url.searchParams.get("tel") ?? "";
 
-  const email = session.user.email.toLowerCase();
-  // `contains` funciona em SQLite e Postgres (os e-mails sao gravados em minusculas)
-  const where = tel
-    ? {
-        OR: [
-          { email: { contains: email } },
-          { phone: { contains: tel } },
-        ],
-      }
-    : { email: { contains: email } };
-
-  const customers = await prisma.customer.findMany({
-    where,
-    take: 3,
-    select: { id: true, name: true, phone: true, email: true },
+  const cliente = await resolverCliente({
+    session: { id: session.user.id, email: session.user.email },
+    phone: tel,
   });
 
-  if (customers.length === 0) {
+  if (!cliente) {
     return NextResponse.json({ customer: null, appointments: [], loyalty: null });
   }
 
   const appointments = await prisma.appointment.findMany({
-    where: { customerId: { in: customers.map((c) => c.id) } },
+    where: { customerId: cliente.id },
     include: { service: true, professional: true },
     orderBy: { startsAt: "desc" },
     take: 20,
   });
 
-  const cliente = customers[0];
   const loyalty = await getCustomerLoyalty(cliente.id);
 
   return NextResponse.json({
-    customer: cliente,
+    customer: {
+      id: cliente.id,
+      name: cliente.name,
+      phone: cliente.phone,
+      email: cliente.email,
+      vinculado: cliente.vinculado,
+    },
     appointments: appointments.map((a) => ({
       id: a.id,
       startsAt: a.startsAt.toISOString(),
       endsAt: a.endsAt.toISOString(),
       status: a.status,
       priceCents: a.priceCents,
+      notes: a.notes,
       service: { name: a.service.name, durationMin: a.service.durationMin },
       professional: { name: a.professional.name },
     })),

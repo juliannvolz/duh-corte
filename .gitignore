@@ -55,3 +55,6 @@ entregaveis/.tmp-*.html
 .vscode/
 .vercel/
 
+
+# backup local do banco de producao (contem dados de clientes)
+/backups/

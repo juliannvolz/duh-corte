@@ -1,6 +1,6 @@
 {
   "base": "http://localhost:3000",
-  "startedAt": "2026-10-21T23:28:09.850Z",
+  "startedAt": "2026-10-22T15:44:34.856Z",
   "viewports": {
     "mobile/": {
       "status": 200,
@@ -119,7 +119,7 @@
   "flow": {
     "servicePressed": true,
     "choseSlot": true,
-    "slotCount": 38,
+    "slotCount": 22,
     "success": true,
     "pagamentoPresencial": true,
     "codigoReserva": true,
@@ -133,5 +133,5 @@
   "admin": {
     "loggedIn": true
   },
-  "finishedAt": "2026-10-21T23:30:17.559Z"
+  "finishedAt": "2026-10-22T15:46:51.763Z"
 }

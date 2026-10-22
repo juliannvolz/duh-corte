@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { requireAdmin } from "@/lib/auth";
+import { requireAdminAccess } from "@/lib/admin-access";
 import { prisma } from "@/lib/db";
 import { getLoyaltyOverview } from "@/lib/loyalty-server";
 
 /** GET /api/admin/loyalty — painel do programa de fidelidade. */
 export async function GET() {
-  if (!(await requireAdmin())) {
+  if (!(await requireAdminAccess())) {
     return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
   }
 
@@ -16,7 +16,7 @@ export async function GET() {
 
 /** PATCH /api/admin/loyalty — marca uma recompensa como usada. */
 export async function PATCH(request: Request) {
-  if (!(await requireAdmin())) {
+  if (!(await requireAdminAccess())) {
     return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
   }
 

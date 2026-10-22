@@ -1,201 +1,99 @@
-# Tutorial Duh Corte — guia do dono da barbearia
+# Tutorial do dono — Painel Duh Corte
 
-> Leia do começo ao fim uma vez (10 minutos). Depois, use este arquivo como manual do dia a dia.
-> Nenhum passo aqui exige conhecimento técnico. Se algo travar, é só chamar.
+> Tudo que você precisa para tocar o dia a dia. **Não é preciso configurar nada** no Google,
+> no WhatsApp ou em outro aplicativo: a agenda mora no próprio site.
 
 ---
 
-## 1. O que o site já faz por você (leia em 2 minutos)
+## 1. Entrar no painel
 
-| O que você faz | O que acontece sozinho |
+1. Abra **https://duh-corte.vercel.app/admin**
+2. Duas formas de entrar:
+   - **Google da equipe** — clique em "Entrar com o Google da equipe" (precisa ser o e-mail autorizado).
+   - **Senha da casa** — digite a senha do painel e clique em Entrar.
+3. Para sair: botão **Sair** no canto superior direito.
+
+> A senha atual está com o responsável técnico. Troque por uma sua antes de divulgar.
+
+---
+
+## 2. Agenda (aba principal)
+
+### Visão do dia
+Mostra os atendimentos de hoje em ordem de horário, com nome, serviço, profissional, valor e
+o status (Pendente / Confirmado / Atendido / Cancelado / Não compareceu).
+
+Em cada atendimento você pode:
+
+| Botão | O que faz |
 | --- | --- |
-| O cliente escolhe serviço, profissional, dia e horário | O site só mostra horários **realmente livres** (com 15 min de intervalo entre um corte e o outro, como no app Cashbarber) |
-| O cliente confirma a reserva | Ele recebe um **código de reserva** e um botão para falar com você no WhatsApp |
-| O cliente paga | **Nada é cobrado online.** O pagamento é feito no balcão (Pix, cartão ou dinheiro) |
-| O corte é feito | Quando você marca como **"Atendido"** no painel, os **pontos de fidelidade** entram na conta do cliente |
-| Você atende | Se você conectar a sua agenda do Google, **cada reserva cai sozinha na sua agenda** (com horário, nome, telefone e código) |
+| **Status** (lista) | muda a situação do atendimento |
+| 💬 **WhatsApp** | abre a conversa com o cliente e a mensagem já escrita (data, serviço, valor, código) |
+| 📅 **.ics** | baixa o horário para a sua agenda (Google, Apple, Outlook) |
+| 🕐 **Remarcar** | escolhe outro dia/horário livre e move o atendimento |
+| ✏️ **Editar** | troca serviço, profissional, observação e valor |
+
+**Importante:** ao marcar **Atendido**, os pontos de fidelidade do cliente entram na conta
+automaticamente (1 ponto por real).
+
+### Visão de semana
+Botão **Semana**: mostra os 7 dias lado a lado, com os atendimentos e os horários bloqueados.
+Clique em um atendimento para abrir e editar. É a melhor visão para planejar a semana.
+
+### Novo agendamento (cliente que liga ou chega)
+Botão **Novo agendamento** → escolha serviço, profissional, dia e horário livre → nome e
+WhatsApp do cliente → **Marcar horário**.
+Só aparecem horários realmente livres.
+
+### Bloquear horário (almoço, consulta, curso)
+Botão **Bloquear** → data, hora de início e fim, profissional (ou "a casa inteira") e o motivo.
+O período sai da agenda do site na hora. Para liberar, basta apagar o bloqueio.
 
 ---
 
-## 2. Entrar no painel (onde você controla tudo)
+## 3. Clientes
 
-1. Abra no navegador: **`seusite.com.br/admin`**
-2. Digite a **senha** e clique em **Entrar**.
-3. Para sair, clique em **Sair** (canto superior direito).
-
-> No ambiente de demonstração a senha é `duhcorte`. **Antes de publicar, me mande a senha que você quer usar** — eu troco no servidor.
-
-### O que tem dentro do painel
-
-- **Agenda do dia** — todos os horários, com nome do cliente, serviço, telefone e o valor.
-- **Status de cada horário** — um botão para marcar:
-  - `Pendente` → ainda não confirmou (padrão quando o cliente agenda).
-  - `Confirmado` → cliente confirmou no WhatsApp.
-  - `Atendido` → o corte foi feito. **Marcar como "Atendido" é o que credita os pontos do cliente.**
-  - `Cancelado` → o cliente desmarcou.
-  - `Não compareceu` → o cliente não veio.
-- **Métricas no topo** — quantos atendimentos, quantos ativos, quanto está previsto para o dia e quantos estão aguardando confirmação.
-- **Pendências de conteúdo** — a lista do que ainda falta você me mandar (preços, horário de sábado, fotos da equipe...).
-- **Integrações** — o status da sua agenda do Google + o passo a passo para conectar.
-- **Fidelidade** — pontos em circulação, recompensas liberadas (com o botão "marcar como usada"), quem está acumulando pontos e as indicações recebidas.
-
-### O código da reserva (aquilo que aparece na tela do cliente)
-
-É um código curto (ex.: `CMVIEV23`) que o site gera a cada reserva.
-
-**Para que serve na prática:**
-- É o **RG do agendamento**: a sua equipe (ou você, pelo WhatsApp) acha o horário do cliente digitando esse código.
-- É o que o cliente **manda no WhatsApp** para confirmar, remarcar ou cancelar.
-- É o que aparece **no evento da sua agenda do Google** (para você saber, num olhar, qual reserva é qual).
-
-Não é senha, não é pagamento, não é boleto — é só a identificação do horário. Se o cliente não souber o código, o nome + telefone na agenda já bastam.
+Lista de quem já passou pela cadeira: quantas visitas, quanto deixou, última visita e pontos.
+Use a busca por nome, telefone ou e-mail. O telefone é um atalho direto para o WhatsApp.
 
 ---
 
-## 3. Conectar a SUA agenda do Google (5 passos, ~10 minutos)
+## 4. Avaliações
 
-**Para que serve:** toda reserva feita no site entra **automaticamente** na agenda que você já usa, e os horários que você já ocupou **somem** das vagas disponíveis no site. É a "API" propriamente dita: o site fala com o Google em tempo real.
+Depois de marcar um atendimento como **Atendido**, o cliente pode avaliar (1 a 5 estrelas + comentário)
+na área dele.
 
-> Nada disso aparece para o cliente. É uma configuração interna sua, que só você vê (no painel).
+Aqui você vê todas as avaliações e decide o que vai para o site:
 
-### Passo 1 — Criar o "cartão de visita digital" do Google
-1. Abra <https://console.cloud.google.com> e entre com o e-mail da barbearia.
-2. Clique em **Criar projeto** → nome: `duh-corte-agenda` → **Criar**.
+- **Publicar no site** → o depoimento aparece na página inicial em segundos.
+- **Publicado no site** → clique para esconder.
 
-### Passo 2 — Ligar a API do Google Calendar
-1. No menu lateral, **APIs e serviços** → **Biblioteca**.
-2. Pesquise **Google Calendar API** → **Ativar**.
+O site mostra apenas o primeiro nome do cliente.
 
-### Passo 3 — Criar a conta que vai falar com a sua agenda
-1. **APIs e serviços** → **Contas de serviço** → **Criar conta de serviço**.
-2. Nome: `duh-corte-agenda`. E-mail: `duh-corte@duh-corte-agenda.iam.gserviceaccount.com` → **Criar e continuar**.
-3. Em **Chaves**, clique em **Adicionar chave** → **Criar chave nova** → **Chave JSON**.
-4. **Guarde o arquivo baixado** (ele tem a chave privada) e me envie — ou me envie só o conteúdo do campo `private_key`.
+---
 
-### Passo 4 — Autorizar a conta a mexer na sua agenda
-1. Abra o Google Calendar com a sua conta da barbearia.
-2. Na agenda da barbearia: **Configurações e compartilhamento** → **Permissões e compartilhamento** → **Compartilhar com pessoas**.
-3. Adicione o e-mail `duh-corte@duh-corte-agenda.iam.gserviceaccount.com` com a permissão **"Alterar eventos"** → **Enviar**.
+## 5. O que é opcional (pode ignorar)
 
-### Passo 5 — Colar as 3 informações no servidor
-Na Vercel (*Settings* → *Environment Variables*), adicione:
+- **Google Agenda:** o painel já é a agenda oficial. Se um dia quiser espelhar os horários na sua
+  agenda do Google, o card "Como a casa funciona" tem o passo a passo escondido em
+  *"Quero espelhar no Google"*. **Não é necessário** para nada funcionar.
+- **Pagamento online:** não existe. Cobrança é no balcão (Pix, cartão ou dinheiro).
 
-| Nome da variável | O que colar |
+---
+
+## 6. Problemas comuns
+
+| Situação | O que fazer |
 | --- | --- |
-| `GOOGLE_CALENDAR_ID` | o **ID da agenda** (canto direito do painel da agenda, em "ID da agenda") |
-| `GOOGLE_SERVICE_ACCOUNT_EMAIL` | `duh-corte@duh-corte-agenda.iam.gserviceaccount.com` |
-| `GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY` | a chave privada (o arquivo inteiro, com `\n` no lugar das quebras de linha) |
-
-Depois é só **republicar** o site. Volte ao painel: o card **Integrações** passa a mostrar **"Conectada"** ✅.
-
-### Como testar (2 minutos)
-
-1. Faça uma reserva no site como se fosse um cliente.
-2. Abra sua agenda do Google: o horário tem que aparecer com o nome do cliente, telefone e o código.
-3. Crie um evento qualquer na sua agenda e volte ao site: aquele horário **não aparece mais** como disponível.
-
-> Dúvida ou erro na conexão? Me chame — eu ligo para você e a gente faz junto em 10 minutos.
+| "Esse horário não está livre" | Alguém marcou antes. Atualize a agenda e escolha outro. |
+| Cliente quer cancelar | Abra o atendimento e mude o status para **Cancelado**. |
+| Cliente não apareceu | Mude o status para **Não compareceu**. |
+| Esqueci a senha | Fale com o responsável técnico (a senha fica nas variáveis da Vercel). |
+| Não lembro o e-mail autorizado | O mesmo: está na variável `ADMIN_EMAILS` da Vercel. |
 
 ---
 
-## 4. Programa de fidelidade (como os pontos funcionam)
+## 7. Resumo em uma frase
 
-**Regra simples:** cada R$ 1 gasto = 1 ponto.
-
-| Pontos | Recompensa |
-| --- | --- |
-| 50 | R$ 10 de desconto |
-| 100 | R$ 25 de desconto |
-| 200 | 1 corte grátis (até R$ 50) |
-| 500 | 2 cortes grátis (até R$ 100) |
-
-**Como entra na conta:** quando você marca o atendimento como **"Atendido"** no painel. O site credita os pontos sozinho e **libera a recompensa automaticamente** (aparece no card *Fidelidade*, no painel).
-
-**Como o cliente usa:** na tela de confirmação da reserva ele já vê "Você tem X pontos" e quanto falta para a próxima recompensa. O desconto é aplicado **no balcão** — basta você **marcar a recompensa como "usada"** no painel depois de aplicar.
-
-**Indicação:** cada cliente recebe um código pessoal (`DUC-XXXX`) que aparece na tela dele, com um botão para mandar pelo WhatsApp. Quem usa o código ganha 30 pontos, e quem indicou ganha outros 30 — credited no primeiro corte do indicado. No painel você vê todas as indicações e pode acompanhar quem está acumulando pontos.
-
----
-
-## 4b. Login do cliente (Google, Apple, Facebook)
-
-O site tem uma área do cliente em **/entrar**. O cliente entra com o botão do **Google, Apple ou Facebook** — **sem criar senha no site** (quem guarda a identidade é o próprio Google/Apple/Facebook). Depois de entrar, ele vê:
-
-- os horários que já reservou (com o código e o status);
-- quantos pontos tem e quanto falta para a próxima recompensa;
-- o código de indicação para compartilhar no WhatsApp.
-
-**Para você (barbearia):** o mesmo botão serve para o admin. Basta o seu e-mail estar na lista de administradores — aí, entrando por ele, aparece o botão "Ir para o painel da barbearia". A senha continua valendo como segunda porta, caso o e-mail fique indisponível.
-
-> O botão do Google já pode ser liberado em ~15 minutos (eu te guio por tela). Apple exige conta de desenvolvedor paga (US$ 99/ano) — se não quiser, o Google + Facebook dão conta. Passo a passo: `docs/LOGIN-SOCIAL.md`.
-
-## 4c. Clube do Assinante (planos)
-
-Cada plano tem dois caminhos no site:
-
-- **"Quero este plano"** → leva o cliente direto para a agenda já com o plano marcado (vaga prioritária e **pontos em dobro**);
-- **"Ativar na loja"** → abre o WhatsApp com a mensagem pronta. A assinatura é ativada presencialmente na loja da Vila Nova, depois do primeiro corte.
-
-## 4d. O endereço do site (decisão sua)
-
-O site já está no ar em um endereço provisório (`duh-corte.vercel.app`) e funciona por completo. Quando você fechar o nome do domínio, eu aponto tudo para ele em um minuto (canonical, sitemap, links, e-mails).
-
-**O que preciso saber de você:**
-
-1. **O domínio está registrado?** Na checagem, nenhum dos nomes testados (`duhcutebarbearia.com.br`, `duhcutebarbearia.com.br`, `duhcortebarbearia.com.br`) respondeu no DNS — ou seja, o domínio ainda não foi comprado/apontado. O perfil oficial da casa é **@duhcortebarbearia**, então o caminho natural seria `duhcortebarbearia.com.br` (com o "r" do "corte").
-2. **Domínio principal ou subdomínio?**
-   - *Principal* (`duhcortebarbearia.com.br`): o mais profissional — o cliente digita e cai no site. Exige trocar os nameservers no registrador.
-   - *Subdomínio* (`www.` ou `site.`): mantém o endereço principal livre para outra coisa (ex.: cardápio, portfólio) e é mais rápido de configurar.
-3. **Onde o domínio está registrado?** (Registro.br, Hostinger, GoDaddy…) — eu te passo o que trocar lá.
-
-O detalhamento técnico está em `docs/DOMINIO.md`.
-
-## 5. O que você ainda precisa me mandar (7 itens)
-
-1. **Tabela oficial de preços** (preço + duração de cada serviço e dos planos do Clube). Hoje o site mostra valores de referência com o aviso "tabela em validação".
-2. **Chave Pix e CNPJ** da barbearia (para o Pix no balcão e a emissão de recibo).
-3. **Sábado:** o site está como "sábado e domingo fechados" (é o que está no Google Maps). Se vocês abrem, me avise.
-4. **Senha do painel** (a demo é `duhcorte`).
-5. **Fotos e nomes dos outros profissionais** (hoje só o Dudu está confirmado).
-6. **Os apps do login social** (opcional) — para liberar o botão "Entrar com Google/Apple/Facebook". Sem isso, o cliente continua entrando pelo WhatsApp e o painel pela senha. O passo a passo do Google e do Facebook está em `entregaveis/CONA-LOGIN-SOCIAL.md`.
-7. **A decisão do domínio** (item 4d acima) — nome, onde está registrado e se prefere domínio principal ou subdomínio.
-
----
-
-## 6. Perguntas que você provavelmente vai ter
-
-**O cliente precisa criar conta?**
-Não. Ele informa nome e WhatsApp, pronto.
-
-**E se o cliente quiser remarcar?**
-Ele manda o código da reserva no WhatsApp. Você muda o status no painel (ou me chama que eu mudo).
-
-**Dá para cancelar/estornar pagamento pelo site?**
-Não existe pagamento online — então não existe estorno. É justamente por isso que combinamos assim.
-
-**O que acontece se eu marcar "Atendido" por engano?**
-Fale comigo: eu reverto os pontos e o status.
-
-**Os dados dos clientes ficam seguros?**
-Sim: só o que é necessário (nome, WhatsApp, e-mail opcional, observações). Nada é vendido, e o site tem uma página de privacidade pronta. A senha do painel é a única proteção — não a compartilhe.
-
-**Posso mudar textos, preços e horários sozinho?**
-Sim, para os horários e preços eu deixo tudo em um arquivo único e atualizo em minutos. Se preferir editar você mesmo, te mostro como (leva 5 minutos de treino).
-
----
-
-## 7. Glossário (o "jargão" traduzido)
-
-| Palavra técnica | O que é, em português |
-| --- | --- |
-| Agenda do Google / Google Calendar | O calendário que você já usa no celular e no computador |
-| API / integração | O site falando com o Google em tempo real (a "conversa automática" entre os dois) |
-| Conta de serviço | Um "usuário robô" do Google, que o site usa para escrever na sua agenda |
-| Variável de ambiente | Uma informação guardada no servidor (a senha do painel, o ID da agenda). Você não precisa mexer nisso — eu colo para você |
-| Publicar (deploy) | Colocar a versão nova do site no ar |
-| Seed | Carregar os serviços e horários no banco de dados na primeira vez |
-| QR Code / .ics | Arquivo de agenda — **não é mais usado no site**, o cliente não vê nada disso |
-
----
-
-*Qualquer dúvida, me chama. Prefiro explicar por vídeo/WhatsApp a mandar instrução escrita.*
+**Abra o painel de manhã → confira o dia → confirme no WhatsApp → marque como Atendido no fim.**
+Todo o resto (site, horários, pontos, avaliações) acontece sozinho.

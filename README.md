@@ -40,8 +40,8 @@ Todos os preços são **placeholders de referência** (`priceConfirmed: false`) 
 
 ## Gates medidos (evidência)
 
-- **Build/typecheck/lint:** `tsc --noEmit` limpo; `next build` ok; ESLint **0 erros** (13 avisos, todos em scripts de pipeline); 59 testes verdes.
-- **Testes:** 59 vitests (scheduling + Pix CRC16 + fidelidade) — `npx vitest run`.
+- **Build/typecheck/lint:** `tsc --noEmit` limpo; `next build` ok; ESLint **0 erros** (15 avisos, todos em scripts de pipeline); **73 testes verdes**.
+- **Testes:** 73 vitests (agendamento + Pix CRC16 + fidelidade + `.ics` + identidade/vínculo Google ↔ cliente) — `npx vitest run`.
 - **QA E2E (`scripts/qa.mjs`, Brave headless):** fluxo de reserva completo (serviço → profissional → horário → dados → reserva confirmada), **pagamento presencial** visível, **código da reserva** visível, **pontos de fidelidade** visíveis, admin login OK; 0 erros de console, 0 page errors, 0 request/HTTP failures. Screenshots em `qa/screens/` (390/768/1440).
 - **QA da fidelidade (`scripts/qa-loyalty.mjs`):** reserva → status "atendido" → 50 pontos creditados (R$ 50) → recompensa "R$ 10 de desconto" liberada → cliente com código `DUC-XXXX` e próxima faixa calculada.
 - **Lighthouse (mobile 390×844, Brave):** performance **87** / accessibility **96** / best-practices **100**; FCP 1,0 s, Speed Index 2,2 s, TBT 120 ms, CLS **0**.
@@ -49,7 +49,21 @@ Todos os preços são **placeholders de referência** (`priceConfirmed: false`) 
 - **Acessibilidade:** landmark/skip-link/aria-pressed no wizard; `prefers-reduced-motion` respeitado (motion, keyframes e canvas).
 - **Imagens:** 34 variantes AVIF/WebP/JPEG geradas de 10 originais (512–1024 px); placeholders base64 só no manifesto do servidor; a página carrega `image-srcset.ts` (sem base64).
 
+## Novidades (rodada 5) — a agenda agora é o próprio site
+
+O agendamento deixou de depender do Google Agenda do dono. **A agenda oficial é o painel.**
+
+- **Painel completo (`/admin`)** — visão **dia** e **semana** (a semana usa a largura toda), **criar** agendamento, **bloquear** período (almoço/folga), **remarcar**, **editar** (serviço, profissional, observação, valor), aba **Clientes** (visitas, total gasto, pontos, WhatsApp) e aba **Avaliações** (publicar/ocultar no site).
+- **Duas portas de entrada** — Google da equipe (`ADMIN_EMAILS`) **ou** senha da casa. `/entrar` ganhou duas abas (*Sou cliente* / *Sou da equipe*) e `/admin` oferece as duas portas.
+- **Segurança corrigida** — o casamento cliente ↔ reserva era por `contains` de e-mail (uma conta abria a agenda de outra); agora casa `googleId` exato → e-mail exato → telefone, com vínculo por telefone só quando o cadastro não tem e-mail ou o e-mail é o mesmo. Cancelamento exige prova de dono e respeita a janela de cancelamento.
+- **Avaliação real** — cliente avalia (1–5 + comentário) depois de o atendimento virar **Atendido**, no `/minha-conta`; o painel decide o que vai para a home e o depoimento aparece em segundos (`revalidateTag("conteudo", { expire: 0 })`), só com o primeiro nome.
+- **WhatsApp em um toque** — cada atendimento tem o link `wa.me` com a mensagem pronta (data, serviço, profissional, valor e código).
+- **Google Agenda virou opcional** — o card do painel explica que o painel é a fonte da verdade; o passo a passo para espelhar ficou escondido em *"Quero espelhar no Google"*. Nada quebra sem ele.
+- **Bugs reais corrigidos no caminho** — `.ics` saía com fuso `ZZ` (agenda do Google recusaria o evento); botão de fechar do modal ficava fora da tela no desktop (`items-center` cortava o topo); `crypto.randomUUID()` no prerender; status duplicado na linha do agendamento; modal com rodapé fixo para o botão de salvar nunca sair da tela.
+
 ## Novidades (rodada 2)
+
+
 
 - **Google Agenda** — `.ics` para o cliente salvar o horário (Google/Apple/Outlook) + modo opcional de leitura/escrita na agenda do barbeiro (horários ocupados bloqueiam o site; cada reserva vira evento). Guia completo em [`docs/INTEGRACAO-GOOGLE-AGENDA.md`](docs/INTEGRACAO-GOOGLE-AGENDA.md). Card *Integrações* no painel mostra o status.
 - **Acentuação** — bug real identificado e corrigido: a Instrument Serif itálica **não tem glifo de acento maiúsculo** (o "É" saía como "E"); o span itálico agora preserva a caixa original (`text-transform: none`). Auditoria de texto: `node scripts/audit-text.mjs` e `node scripts/audit-accents.mjs`.

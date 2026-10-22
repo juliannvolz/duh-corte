@@ -4,6 +4,7 @@ import { getCategories, getProfessionals, getServices } from "@/lib/content";
 import { getWeekWindows } from "@/lib/booking";
 import { getPlans } from "@/lib/content";
 import { auth } from "@/lib/auth-social";
+import { connection } from "next/server";
 import { Store, Sparkles } from "lucide-react";
 import { business } from "@/lib/site";
 
@@ -21,6 +22,11 @@ export default async function AgendarPage({
 }: {
   searchParams: Promise<{ servico?: string; profissional?: string; ref?: string; plano?: string }>;
 }) {
+  // Cache Components: a sessao preenche nome/e-mail do cliente, e o Auth.js
+  // usa crypto.getRandomValues. Sem connection() o prerender tenta rodar o
+  // Auth.js e o console acusa erro.
+  await connection();
+
   const [{ servico, profissional, ref, plano }, services, professionals, categories, windows, plans, session] =
     await Promise.all([
       searchParams,

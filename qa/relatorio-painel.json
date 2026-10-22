@@ -1,0 +1,121 @@
+{
+  "base": "http://localhost:3000",
+  "startedAt": "2026-10-22T15:46:57.464Z",
+  "telas": {
+    "mobile/entrar": {
+      "status": 200,
+      "title": "Entrar | Duh Corte",
+      "shot": "painel-mobile-entrar.png"
+    },
+    "mobile/minha-conta": {
+      "status": 200,
+      "title": "Minha conta | Duh Corte",
+      "shot": "painel-mobile-minha-conta.png"
+    },
+    "mobile/admin": {
+      "status": 200,
+      "title": "Painel | Duh Corte",
+      "shot": "painel-mobile-admin.png"
+    },
+    "mobile-diagnostics": {
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "httpErrors": [],
+      "warnings": []
+    },
+    "tablet/entrar": {
+      "status": 200,
+      "title": "Entrar | Duh Corte",
+      "shot": "painel-tablet-entrar.png"
+    },
+    "tablet/minha-conta": {
+      "status": 200,
+      "title": "Minha conta | Duh Corte",
+      "shot": "painel-tablet-minha-conta.png"
+    },
+    "tablet/admin": {
+      "status": 200,
+      "title": "Painel | Duh Corte",
+      "shot": "painel-tablet-admin.png"
+    },
+    "tablet-diagnostics": {
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "httpErrors": [],
+      "warnings": []
+    },
+    "desktop/entrar": {
+      "status": 200,
+      "title": "Entrar | Duh Corte",
+      "shot": "painel-desktop-entrar.png"
+    },
+    "desktop/minha-conta": {
+      "status": 200,
+      "title": "Minha conta | Duh Corte",
+      "shot": "painel-desktop-minha-conta.png"
+    },
+    "desktop/admin": {
+      "status": 200,
+      "title": "Painel | Duh Corte",
+      "shot": "painel-desktop-admin.png"
+    },
+    "desktop-diagnostics": {
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "httpErrors": [],
+      "warnings": []
+    }
+  },
+  "paineis": {
+    "login": {
+      "abaCliente": false,
+      "botaoGoogle": false,
+      "tituloCliente": true,
+      "semSenhaNaAbaCliente": true,
+      "abaEquipe": false,
+      "campoSenha": true,
+      "tituloEquipe": true,
+      "senhaAbreOPainel": true,
+      "abaClientes": true,
+      "abaAvaliacoes": true,
+      "botaoNovoAgendamento": true,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "httpErrors": [],
+      "failedRequests": []
+    },
+    "semana": {
+      "visivel": true,
+      "colunas": 20,
+      "consoleErrors": [],
+      "httpErrors": []
+    },
+    "modais": {
+      "novoAgendamento": true,
+      "gradeDeHorarios": true,
+      "bloqueio": true
+    },
+    "criacao": {
+      "modalAceitouNome": true,
+      "agendamentoCriado": true,
+      "consoleErrors": [],
+      "httpErrors": []
+    },
+    "clientes": {
+      "busca": true,
+      "consoleErrors": [],
+      "httpErrors": []
+    },
+    "avaliacoes": {
+      "titulo": true,
+      "itens": 33,
+      "consoleErrors": [],
+      "httpErrors": [],
+      "failedRequests": []
+    }
+  },
+  "finishedAt": "2026-10-22T15:47:35.810Z"
+}

@@ -2,7 +2,6 @@ import NextAuth, { type DefaultSession } from "next-auth";
 import Google from "next-auth/providers/google";
 import Apple from "next-auth/providers/apple";
 import Facebook from "next-auth/providers/facebook";
-import Credentials from "next-auth/providers/credentials";
 
 /**
  * Login social da Duh Corte.
@@ -12,8 +11,8 @@ import Credentials from "next-auth/providers/credentials";
  * sessao (JWT assinado) com nome, e-mail e foto.
  *
  * O ADMIN entra pelo mesmo botao: basta o e-mail estar na lista
- * `ADMIN_EMAILS` (separados por virgula). A senha continua valendo como
- * segunda porta (login classico do painel).
+ * `ADMIN_EMAILS` (separados por virgula). A senha da casa continua valendo
+ * como segunda porta — ela e tratada fora do Auth.js, em `/api/admin/login`.
  *
  * Os provedores so aparecem se as credenciais estiverem no ambiente — assim
  * o site nunca quebra para quem ainda nao criou o app no Google/Apple/Meta.
@@ -99,27 +98,6 @@ const providers = [
         }),
       ]
     : []),
-  // segunda porta do painel: senha (sem banco, comparada no servidor)
-  Credentials({
-    id: "senha",
-    name: "Senha da barbearia",
-    credentials: {
-      senha: { label: "Senha", type: "password" },
-    },
-    async authorize(credentials) {
-      const senha = credentials?.senha;
-      const admin = process.env.ADMIN_PASSWORD;
-      if (!senha || !admin || senha !== admin) return null;
-      return {
-        id: "admin-senha",
-        name: "Duh Corte (admin)",
-        email:
-          process.env.ADMIN_EMAILS?.split(",")[0]?.trim() ??
-          "admin@duhcutebarbearia.com.br",
-        isAdmin: true,
-      } as never;
-    },
-  }),
 ];
 
 export const { handlers, auth, signIn, signOut } = NextAuth({

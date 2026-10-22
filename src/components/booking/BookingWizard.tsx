@@ -17,11 +17,19 @@ import {
   User,
   Wallet,
 } from "lucide-react";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { business, formatBRL } from "@/lib/site";
 import type { ProfessionalSeed, ServiceCategory } from "@/lib/site";
 import type { ServiceView } from "@/lib/content";
+import {
+  SlotPicker,
+  labelFor,
+  type SlotResponse,
+  type SlotWindow,
+} from "@/components/booking/SlotPicker";
+
+export type { SlotWindow } from "@/components/booking/SlotPicker";
 
 const STEPS = ["Serviço", "Profissional", "Horário", "Seus dados"];
 
@@ -35,16 +43,6 @@ type LoyaltyInfo = {
     progresso: number;
   };
   rewards: Array<{ id: string; label: string; status: string }>;
-};
-
-export type SlotWindow = { weekday: number; openMin: number; closeMin: number } | null;
-
-type SlotResponse = {
-  date: string;
-  weekday: number;
-  closed: boolean;
-  slots: { startsAt: string; label: string }[];
-  error?: string;
 };
 
 /** Data de hoje em São Paulo (ISO, YYYY-MM-DD) — o Brasil é UTC-3 fixo. */
@@ -61,19 +59,6 @@ function nextDays(count = 14) {
     { length: count },
     (_, i) => new Date(base + i * 86_400_000).toISOString().slice(0, 10),
   );
-}
-
-/** Rótulos pt-BR curtos ("qui", "22", "out") da data ISO em São Paulo. */
-function labelFor(dateISO: string) {
-  const [y, m, d] = dateISO.split("-").map(Number);
-  const date = new Date(Date.UTC(y, m - 1, d));
-  const short = (opts: Intl.DateTimeFormatOptions) =>
-    date.toLocaleDateString("pt-BR", { timeZone: "UTC", ...opts }).replace(".", "");
-  return {
-    weekday: short({ weekday: "short" }),
-    day: date.toLocaleDateString("pt-BR", { timeZone: "UTC", day: "2-digit" }),
-    month: short({ month: "short" }),
-  };
 }
 
 /** Máscara de telefone BR: (47) 99999-9999. */
@@ -139,7 +124,16 @@ export function BookingWizard({
     priceCents: number;
     loyalty: LoyaltyInfo | null;
   } | null>(null);
-  const [idempotencyKey] = useState(() => `reserva-${crypto.randomUUID()}`);
+  // Chave de idempotencia: gerada no navegador (nao no render do servidor —
+  // `crypto.randomUUID()` durante o prerender quebra a pagina) e mantida
+  // no ref para que uma segunda tentativa nao duplique a reserva.
+  const idempotencyKeyRef = useRef<string | null>(null);
+  function idempotencyKey() {
+    if (!idempotencyKeyRef.current) {
+      idempotencyKeyRef.current = `reserva-${crypto.randomUUID()}`;
+    }
+    return idempotencyKeyRef.current;
+  }
 
   const service = services.find((s) => s.id === serviceId) ?? null;
   const professional = professionals.find((p) => p.id === professionalId) ?? null;
@@ -192,7 +186,7 @@ export function BookingWizard({
           serviceId,
           professionalId,
           startsAt: slot.startsAt,
-          idempotencyKey,
+          idempotencyKey: idempotencyKey(),
           referralCode,
           planId,
           customer: {
@@ -295,7 +289,7 @@ export function BookingWizard({
               ) : null}
 
               {step === 2 ? (
-                <StepSlot
+                <SlotPicker
                   days={days}
                   windows={windows}
                   dateISO={dateISO}
@@ -540,126 +534,6 @@ function StepProfessional({
           );
         })}
       </ul>
-    </div>
-  );
-}
-
-function StepSlot({
-  days,
-  windows,
-  dateISO,
-  onDate,
-  slots,
-  loading,
-  selected,
-  onSelect,
-  durationMin,
-}: {
-  days: string[];
-  windows: SlotWindow[];
-  dateISO: string;
-  onDate: (iso: string) => void;
-  slots: SlotResponse | null;
-  loading: boolean;
-  selected: string | null;
-  onSelect: (slot: { startsAt: string; label: string }) => void;
-  durationMin: number;
-}) {
-  return (
-    <div>
-      <h2 className="display text-2xl">Quando fica bom pra você?</h2>
-      <p className="mt-2 text-sm text-bone-dim">Agenda aberta para os próximos 14 dias.</p>
-
-      <div className="no-scrollbar mt-6 flex gap-2 overflow-x-auto pb-2">
-        {days.map((day) => {
-          const info = labelFor(day);
-          const [y, m, d] = day.split("-").map(Number);
-          const weekday = new Date(Date.UTC(y, m - 1, d)).getUTCDay();
-          const closed = !windows[weekday];
-          const active = day === dateISO;
-          return (
-            <button
-              key={day}
-              type="button"
-              disabled={closed}
-              onClick={() => onDate(day)}
-              aria-pressed={active}
-              className={`flex min-w-16 flex-col items-center rounded-2xl border px-3 py-2.5 text-center transition-colors ${
-                active
-                  ? "border-gold bg-gold/10 text-gold"
-                  : closed
-                    ? "border-line/50 text-bone-dim/30"
-                    : "border-line text-bone hover:border-line-strong"
-              }`}
-            >
-              <span className="text-[0.65rem] uppercase tracking-wide">{info.weekday}</span>
-              <span className="display text-xl">{info.day}</span>
-              <span className="text-[0.6rem] uppercase text-bone-dim/70">{info.month}</span>
-            </button>
-          );
-        })}
-      </div>
-
-      <div className="mt-6">
-        {loading ? (
-          <div className="flex items-center gap-2 text-sm text-bone-dim">
-            <Loader2 className="size-4 animate-spin" /> Buscando horários...
-          </div>
-        ) : slots?.closed ? (
-          <p className="rounded-2xl border border-line bg-ink/50 p-5 text-sm text-bone-dim">
-            Fechado neste dia. Escolha outra data — atendemos de segunda a sexta.
-          </p>
-        ) : slots && slots.slots.length > 0 ? (
-          <div className="space-y-7">
-            {[
-              { titulo: "Manhã", ate: 12 * 60 },
-              { titulo: "Tarde", ate: 24 * 60 },
-            ].map((grupo) => {
-              const lista = slots.slots.filter((s) => {
-                const minuto = Number(s.label.slice(0, 2)) * 60 + Number(s.label.slice(3, 5));
-                return grupo.titulo === "Manhã" ? minuto < grupo.ate : minuto >= 12 * 60;
-              });
-              if (lista.length === 0) return null;
-              return (
-                <div key={grupo.titulo}>
-                  <p className="eyebrow flex items-center gap-3 text-bone-dim">
-                    {grupo.titulo}
-                    <span className="h-px flex-1 bg-line" aria-hidden />
-                  </p>
-                  <div className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-5">
-                    {lista.map((s) => {
-                      const active = selected === s.startsAt;
-                      return (
-                        <button
-                          key={s.startsAt}
-                          type="button"
-                          onClick={() => onSelect(s)}
-                          aria-pressed={active}
-                          className={`rounded-xl border py-2.5 text-sm font-medium transition-colors ${
-                            active
-                              ? "border-gold bg-gold text-ink"
-                              : "border-line bg-ink/40 hover:border-line-strong"
-                          }`}
-                        >
-                          {s.label}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              );
-            })}
-            <p className="text-xs leading-relaxed text-bone-dim">
-              Cada atendimento tem {durationMin} min e os horarios ficam com 15 min de intervalo
-              entre um corte e o seguinte. Se preferir outro horario, chame no WhatsApp.
-            </p>
-          </div>
-        ) : slots ? (
-          <p className="rounded-2xl border border-line bg-ink/50 p-5 text-sm text-bone-dim">
-            Sem horários livres neste dia. Tente outra data ou chame no WhatsApp.
-          </p>
-        ) : null}
-      </div>
     </div>
   );
 }
