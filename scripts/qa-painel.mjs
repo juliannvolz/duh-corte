@@ -17,7 +17,7 @@ import path from "node:path";
 
 const BRAVE = "C:\\Users\\julia\\AppData\\Local\\BraveSoftware\\Brave-Browser\\Application\\brave.exe";
 const BASE = process.env.QA_BASE ?? "http://localhost:3000";
-const SENHA = process.env.QA_ADMIN_PASSWORD ?? "duhcorte";
+const SENHA = process.env.QA_ADMIN_PASSWORD ?? "admin";
 const ROOT = path.resolve(import.meta.dirname, "..");
 const OUT = path.join(ROOT, "qa");
 

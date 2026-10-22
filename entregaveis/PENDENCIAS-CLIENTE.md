@@ -21,7 +21,7 @@
 | --- | --- | --- |
 | 6 | **Chave Pix + CNPJ** | Pagamento presencial e emissão fiscal. |
 | 7 | **Valores do Clube do Assinante** | A Cashbarber confirma que o clube existe, mas não os valores. |
-| 8 | **Senha do painel** | Trocar a senha provisória pela sua. |
+| 8 | **Senha do painel** | Hoje é `admin` (provisória). Trocar por uma sua antes de divulgar. |
 | 9 | **E-mail(s) da equipe** | Quem pode abrir o painel pelo Google (`ADMIN_EMAILS`). |
 
 ## 3. Domínio (decisão)

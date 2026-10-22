@@ -10,10 +10,10 @@
 1. Abra **https://duh-corte.vercel.app/admin**
 2. Duas formas de entrar:
    - **Google da equipe** — clique em "Entrar com o Google da equipe" (precisa ser o e-mail autorizado).
-   - **Senha da casa** — digite a senha do painel e clique em Entrar.
+   - **Senha da casa** — digite a senha do painel (provisória: **admin**) e clique em Entrar.
 3. Para sair: botão **Sair** no canto superior direito.
 
-> A senha atual está com o responsável técnico. Troque por uma sua antes de divulgar.
+> A senha `admin` é provisória. Peça a troca por uma sua antes de divulgar o site.
 
 ---
 

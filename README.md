@@ -110,4 +110,4 @@ node scripts/shots.mjs # capturas por seção em 1440
 - `src/lib/scheduling.ts` / `booking.ts` — disponibilidade pura (fuso America/Sao_Paulo) + integração opcional com a agenda do Google.
 - `src/lib/google-calendar.ts` — freebusy (leitura) e criação de eventos (escrita) via conta de serviço, sem dependências externas.
 - `src/components/booking/BookingWizard.tsx` — wizard 4 passos; sucesso continua na página (código + WhatsApp + download da agenda).
-- `src/app/api/admin` — sessão por cookie; senha demo em `ADMIN_PASSWORD` (default `duhcorte`).
+- `src/app/api/admin` — sessão por cookie; senha em `ADMIN_PASSWORD` (provisória `admin`).

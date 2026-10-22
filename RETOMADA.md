@@ -25,7 +25,7 @@ Local já aplicado; **produção ainda precisa do `db push`** (ver §5).
 | --- | --- | --- |
 | **Produção (Vercel)** | `https://duh-corte.vercel.app` | é o que os clientes veem |
 | Agenda (cliente) | `/agendar` | wizard de 4 passos |
-| **Painel da casa** | `/admin` | Google da equipe **ou** senha `duh-corte-8a4bdaac` |
+| **Painel da casa** | `/admin` | Google da equipe **ou** senha `admin` (provisória — trocar) |
 | Login | `/entrar` | 2 abas: **Sou cliente** / **Sou da equipe** |
 | Área do cliente | `/minha-conta` | horários, pontos, indicação, cancelar, `.ics`, WhatsApp |
 | Demo local | `http://localhost:3000` | SQLite local |
@@ -113,7 +113,7 @@ npx vercel deploy --prod --yes
 | `.env` local | mesmas chaves para desenvolvimento |
 | `.env.vercel.local` | cópia de produção usada pelos scripts de banco |
 
-Senha de referência do painel: `duh-corte-8a4bdaac` (trocar).
+Senha de referência do painel: `admin` (provisória; trocar em `ADMIN_PASSWORD` antes de divulgar).
 
 ---
 

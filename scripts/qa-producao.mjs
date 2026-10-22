@@ -1,7 +1,7 @@
 import { chromium } from "playwright-core";
 
 const BASE = process.env.QA_BASE ?? "https://duh-corte.vercel.app";
-const SENHA = process.env.ADMIN_PASSWORD ?? "duh-corte-8a4bdaac";
+const SENHA = process.env.ADMIN_PASSWORD ?? "admin";
 const BRAVE =
   process.env.BRAVE_PATH ??
   "C:\\Users\\julia\\AppData\\Local\\BraveSoftware\\Brave-Browser\\Application\\brave.exe";

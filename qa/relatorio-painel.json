@@ -1,6 +1,6 @@
 {
   "base": "http://localhost:3000",
-  "startedAt": "2026-10-22T15:46:57.464Z",
+  "startedAt": "2026-10-22T17:14:53.031Z",
   "telas": {
     "mobile/entrar": {
       "status": 200,
@@ -117,5 +117,5 @@
       "failedRequests": []
     }
   },
-  "finishedAt": "2026-10-22T15:47:35.810Z"
+  "finishedAt": "2026-10-22T17:15:37.800Z"
 }

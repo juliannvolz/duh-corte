@@ -1,6 +1,6 @@
 {
   "base": "http://localhost:3000",
-  "startedAt": "2026-10-22T15:44:34.856Z",
+  "startedAt": "2026-10-22T17:10:13.055Z",
   "viewports": {
     "mobile/": {
       "status": 200,
@@ -35,9 +35,7 @@
     "mobile-diagnostics": {
       "consoleErrors": [],
       "pageErrors": [],
-      "failedRequests": [
-        "GET https://www.google.com/maps?q=R.%20Walter%20Marquardt%2C%20878%2C%20Vila%20Nova%2C%20Jaragu%C3%A1%20do%20Sul%20-%20SC&output=embed :: net::ERR_ABORTED"
-      ],
+      "failedRequests": [],
       "httpErrors": [],
       "warnings": []
     },
@@ -119,19 +117,23 @@
   "flow": {
     "servicePressed": true,
     "choseSlot": true,
-    "slotCount": 22,
+    "slotCount": 14,
     "success": true,
     "pagamentoPresencial": true,
     "codigoReserva": true,
     "fidelidade": true,
-    "consoleErrors": [],
+    "consoleErrors": [
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+    ],
     "pageErrors": [],
     "failedRequests": [],
-    "httpErrors": [],
+    "httpErrors": [
+      "401 http://localhost:3000/api/admin/login"
+    ],
     "warnings": []
   },
   "admin": {
-    "loggedIn": true
+    "loggedIn": false
   },
-  "finishedAt": "2026-10-22T15:46:51.763Z"
+  "finishedAt": "2026-10-22T17:12:40.771Z"
 }
