@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { Loader2, Search, Users } from "lucide-react";
+import { Loader2, Search, ShieldOff, Users } from "lucide-react";
 import { formatBRL } from "@/lib/site";
 import { dataDe } from "@/components/admin/types";
 
@@ -15,6 +15,9 @@ type Cliente = {
   total: number;
   gastoCents: number;
   ultimaVisita: string | null;
+  /** como o cliente entra na area dele hoje */
+  acesso: "google" | "whatsapp" | null;
+  reivindicacoes: number;
 };
 
 export function ClientesTab() {
@@ -22,6 +25,7 @@ export function ClientesTab() {
   const [busca, setBusca] = useState("");
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState<string | null>(null);
+  const [removendo, setRemovendo] = useState<string | null>(null);
 
   const carregar = useCallback(async (q: string) => {
     setCarregando(true);
@@ -44,6 +48,28 @@ export function ClientesTab() {
     const t = setTimeout(() => void carregar(busca), busca ? 300 : 0);
     return () => clearTimeout(t);
   }, [busca, carregar]);
+
+  async function revogarAcesso(cliente: Cliente) {
+    const ok = window.confirm(
+      `Remover o acesso de ${cliente.name} à área "Minha conta"?\n\n` +
+        "Os agendamentos continuam salvos. A pessoa precisará informar o WhatsApp de novo.",
+    );
+    if (!ok) return;
+
+    setRemovendo(cliente.id);
+    try {
+      const res = await fetch(`/api/admin/clientes?id=${encodeURIComponent(cliente.id)}`, {
+        method: "DELETE",
+      });
+      const json = (await res.json().catch(() => ({}))) as { error?: string };
+      if (!res.ok) throw new Error(json.error ?? "Não foi possível remover o acesso.");
+      await carregar(busca);
+    } catch (err) {
+      setErro(err instanceof Error ? err.message : "Não foi possível remover o acesso.");
+    } finally {
+      setRemovendo(null);
+    }
+  }
 
   return (
     <div>
@@ -102,6 +128,17 @@ export function ClientesTab() {
                   {c.email ? (
                     <p className="truncate text-[0.65rem] text-bone-dim/60">{c.email}</p>
                   ) : null}
+                  {c.acesso ? (
+                    <p className="mt-1 flex items-center gap-1.5 text-[0.6rem] text-bone-dim/60">
+                      <span
+                        className={`size-1.5 rounded-full ${
+                          c.acesso === "google" ? "bg-emerald-400" : "bg-gold"
+                        }`}
+                      />
+                      Acesso pela conta {c.acesso === "google" ? "Google" : "do WhatsApp"}
+                      {c.acesso === "whatsapp" ? ` (${c.reivindicacoes})` : ""}
+                    </p>
+                  ) : null}
                 </div>
                 {c.points > 0 ? (
                   <span className="shrink-0 rounded-full border border-gold/40 px-2.5 py-1 text-[0.6rem] text-gold">
@@ -132,6 +169,22 @@ export function ClientesTab() {
                   </dd>
                 </div>
               </dl>
+
+              {c.acesso ? (
+                <button
+                  type="button"
+                  onClick={() => void revogarAcesso(c)}
+                  disabled={removendo === c.id}
+                  className="mt-3 inline-flex items-center gap-1.5 text-[0.6rem] text-bone-dim/60 transition-colors hover:text-red-300 disabled:opacity-50"
+                >
+                  {removendo === c.id ? (
+                    <Loader2 className="size-3 animate-spin" />
+                  ) : (
+                    <ShieldOff className="size-3" />
+                  )}
+                  Remover acesso da conta
+                </button>
+              ) : null}
             </li>
           ))}
         </ul>

@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
   customerIdFromPhone,
+  formaDoVinculo,
+  podeReivindicarPorTelefone,
   podeVincularPorTelefone,
 } from "@/lib/customer-identity";
 import {
@@ -15,7 +17,7 @@ describe("customerIdFromPhone", () => {
   it("normaliza o telefone para a chave do cliente", () => {
     expect(customerIdFromPhone("(47) 99999-8888")).toBe("phone:47999998888");
     expect(customerIdFromPhone("47999998888")).toBe("phone:47999998888");
-    expect(customerIdFromPhone("+55 47 99999-8888")).toBe("phone:5547999998888");
+    expect(customerIdFromPhone("+55 47 99999-8888")).toBe("phone:47999998888");
   });
 });
 
@@ -33,6 +35,55 @@ describe("podeVincularPorTelefone", () => {
     // o caso perigoso: "mariana@x.com" contem "ana@x.com"
     expect(podeVincularPorTelefone("mariana@x.com", "ana@x.com")).toBe(false);
     expect(podeVincularPorTelefone("joao@x.com", "ana@x.com")).toBe(false);
+  });
+});
+
+describe("podeReivindicarPorTelefone", () => {
+  const sessao = { id: "google-123", email: "juliannvolz@gmail.com" };
+
+  it("permite quando o cadastro ainda nao tem conta social", () => {
+    expect(
+      podeReivindicarPorTelefone({ googleId: null, email: "outro@email.com" }, sessao),
+    ).toBe(true);
+  });
+
+  it("permite quando o cadastro ja e desta conta", () => {
+    expect(
+      podeReivindicarPorTelefone({ googleId: "google-123", email: "antigo@email.com" }, sessao),
+    ).toBe(true);
+  });
+
+  it("bloqueia cadastro ligado a OUTRA conta social", () => {
+    expect(
+      podeReivindicarPorTelefone({ googleId: "google-999", email: "outro@email.com" }, sessao),
+    ).toBe(false);
+  });
+
+  it("o caso real: cadastro com outro e-mail e sem googleId pode ser reivindicado", () => {
+    // reserva feita com eserdeoliveira579@gmail.com, login com juliannvolz@gmail.com
+    expect(
+      podeReivindicarPorTelefone({ googleId: null, email: "eserdeoliveira579@gmail.com" }, sessao),
+    ).toBe(true);
+  });
+});
+
+describe("formaDoVinculo", () => {
+  const sessao = { id: "google-123", email: "juliannvolz@gmail.com" };
+
+  it("vira dono quando o e-mail bate", () => {
+    expect(formaDoVinculo({ email: "juliannvolz@gmail.com" }, sessao)).toBe("dono");
+    expect(formaDoVinculo({ email: "JULIANNVOLZ@gmail.com" }, sessao)).toBe("dono");
+  });
+
+  it("vira dono quando o cadastro nao tem e-mail", () => {
+    expect(formaDoVinculo({ email: null }, sessao)).toBe("dono");
+  });
+
+  it("vira reivindicacao (revogavel) quando o e-mail e outro", () => {
+    // o caso real: nunca grava googleId no cadastro de outra pessoa
+    expect(formaDoVinculo({ email: "eserdeoliveira579@gmail.com" }, sessao)).toBe(
+      "reivindicacao",
+    );
   });
 });
 

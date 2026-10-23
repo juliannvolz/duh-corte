@@ -3,8 +3,9 @@ import { z } from "zod";
 import { cancelAppointment } from "@/lib/booking";
 import { prisma } from "@/lib/db";
 import { auth } from "@/lib/auth-social";
-import { resolverCliente } from "@/lib/customer-identity";
+import { identidadesDoPedido } from "@/lib/customer-identity";
 import { avisarCancelamento } from "@/lib/notificacoes";
+import { limitar } from "@/lib/rate-limit";
 
 const schema = z.object({
   action: z.literal("cancel"),
@@ -24,6 +25,22 @@ const schema = z.object({
  */
 export async function PATCH(request: Request, context: { params: Promise<{ id: string }> }) {
   const { id } = await context.params;
+
+  // freio contra tentativa em massa de cancelar reservas alheias por telefone
+  const ip =
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    request.headers.get("x-real-ip") ||
+    "local";
+  const limite = limitar(`cancelar:${ip}`, 12, 60_000);
+  if (!limite.ok) {
+    return NextResponse.json(
+      { error: "Muitas tentativas em pouco tempo. Aguarde um instante." },
+      {
+        status: 429,
+        headers: { "Retry-After": String(Math.ceil(limite.esperarMs / 1000)) },
+      },
+    );
+  }
 
   let body: unknown;
   try {
@@ -46,16 +63,19 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
     return NextResponse.json({ error: "Agendamento não encontrado" }, { status: 404 });
   }
 
-  // prova de dono da reserva
+  // prova de dono da reserva: a conta da sessao OU o telefone informado.
+  // (Antes, um visitante que reservou COM e-mail nao conseguia cancelar:
+  // o telefone era recusado so porque o cadastro tinha e-mail.)
   const session = await auth();
-  const cliente = await resolverCliente({
+  const { daSessao, doTelefone } = await identidadesDoPedido({
     session: session?.user?.email
       ? { id: session.user.id, email: session.user.email }
       : null,
     phone: parsed.data.phone,
   });
 
-  if (!cliente || cliente.id !== appointment.customerId) {
+  const donos = [daSessao?.id, doTelefone?.id].filter(Boolean);
+  if (!donos.includes(appointment.customerId)) {
     return NextResponse.json(
       { error: "Esta reserva não é da sua conta." },
       { status: 403 },

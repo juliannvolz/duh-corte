@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireAdminAccess } from "@/lib/admin-access";
 import { prisma } from "@/lib/db";
+import { revogarReivindicacoes } from "@/lib/customer-identity";
 
 /**
  * GET /api/admin/clientes?q=busca
@@ -23,6 +24,7 @@ export async function GET(request: Request) {
         select: { startsAt: true, priceCents: true, status: true },
         orderBy: { startsAt: "desc" },
       },
+      _count: { select: { claims: true } },
     },
     orderBy: { updatedAt: "desc" },
     take: 300,
@@ -54,9 +56,44 @@ export async function GET(request: Request) {
           gastoCents: validos.reduce((s, a) => s + a.priceCents, 0),
           ultimaVisita: c.appointments[0]?.startsAt.toISOString() ?? null,
           criadoEm: c.createdAt.toISOString(),
+          /** Como o cliente entra na area dele hoje. */
+          acesso: c.googleId ? "google" : c._count.claims > 0 ? "whatsapp" : null,
+          reivindicacoes: c._count.claims,
         };
       }),
     },
     { headers: { "Cache-Control": "no-store" } },
   );
+}
+
+/**
+ * DELETE /api/admin/clientes?id=phone:...
+ *
+ * Remove o acesso do cliente a area "Minha conta" (googleId + reivindicacoes).
+ * Usado quando alguem informou o WhatsApp de outra pessoa: o dono da barbearia
+ * corta o acesso e a pessoa precisa provar de novo. Os agendamentos NAO sao
+ * apagados.
+ */
+export async function DELETE(request: Request) {
+  if (!(await requireAdminAccess())) {
+    return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
+  }
+
+  const url = new URL(request.url);
+  const id = (url.searchParams.get("id") ?? "").trim();
+  if (!id) {
+    return NextResponse.json({ error: "Informe o cliente." }, { status: 422 });
+  }
+
+  const reivindicacoes = await revogarReivindicacoes(id);
+
+  const removido = await prisma.customer
+    .update({ where: { id }, data: { googleId: null }, select: { id: true } })
+    .catch(() => null);
+
+  if (!removido) {
+    return NextResponse.json({ error: "Cliente não encontrado." }, { status: 404 });
+  }
+
+  return NextResponse.json({ ok: true, reivindicacoes });
 }

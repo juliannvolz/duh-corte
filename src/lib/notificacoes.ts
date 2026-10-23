@@ -31,12 +31,16 @@ export type AvisoReserva = {
   id: string;
   cliente: string;
   telefone: string;
+  /** e-mail do cliente (pode ser nulo: reserva feita so com WhatsApp) */
+  email: string | null;
   servico: string;
   profissional: string;
   quando: string;
   preco: string;
   codigo: string;
 };
+
+export type JanelaLembrete = "2d" | "24h";
 
 export type ResultadoAviso = {
   enviado: boolean;
@@ -46,6 +50,18 @@ export type ResultadoAviso = {
 /** Ha credenciais e destinatario configurados? */
 export function notificacoesAtivas(): boolean {
   return Boolean(process.env.RESEND_API_KEY?.trim()) && destinatarios().length > 0;
+}
+
+/**
+ * Ha como enviar e-mail para CLIENTES?
+ *
+ * Basta a chave do Resend: o destinatario e o e-mail do proprio cliente.
+ * Atencao: sem dominio verificado no Resend, o remetente `onboarding@resend.dev`
+ * so entrega para o dono da conta — os lembretes ficam prontos, mas so passam
+ * a sair de verdade depois do dominio.
+ */
+export function emailParaClientesAtivo(): boolean {
+  return Boolean(process.env.RESEND_API_KEY?.trim());
 }
 
 /** Para quem o aviso vai: NOTIFY_EMAIL ou, na falta, a lista da equipe. */
@@ -124,9 +140,49 @@ export function montarAvisoCancelamento(
   };
 }
 
+/**
+ * Lembrete para o CLIENTE (2 dias ou 24h antes).
+ *
+ * Nao promete pagamento nem confirmacao automatica: so relembra o horario e
+ * oferece o caminho para remarcar/cancelar.
+ */
+export function montarLembrete(
+  reserva: AvisoReserva,
+  janela: JanelaLembrete,
+): { assunto: string; texto: string } {
+  const quando = janela === "24h" ? "amanhã" : "em 2 dias";
+  const base = (process.env.NEXT_PUBLIC_SITE_URL?.trim() || "https://duh-corte.vercel.app").replace(
+    /\/$/,
+    "",
+  );
+
+  return {
+    assunto: `Lembrete: seu horário na Duh Corte é ${quando} (${reserva.quando})`,
+    texto: [
+      `Olá, ${reserva.cliente}!`,
+      "",
+      `Passando para lembrar do seu horário ${quando}:`,
+      "",
+      `Quando:       ${reserva.quando}`,
+      `Servico:      ${reserva.servico}`,
+      `Profissional: ${reserva.profissional}`,
+      `Valor:        ${reserva.preco}`,
+      `Codigo:       ${reserva.codigo}`,
+      "",
+      `Se precisar remarcar ou cancelar, responda este e-mail ou fale no WhatsApp da barbearia.`,
+      `Seus horarios: ${base}/minha-conta`,
+      "",
+      "Ate breve!",
+    ].join("\n"),
+  };
+}
+
 /** Envia um e-mail simples pelo Resend. Lanca erro se a API recusar. */
-export async function enviarEmail(assunto: string, texto: string): Promise<ResultadoAviso> {
-  const para = destinatarios();
+export async function enviarPara(
+  para: string[],
+  assunto: string,
+  texto: string,
+): Promise<ResultadoAviso> {
   if (!process.env.RESEND_API_KEY?.trim()) return { enviado: false, motivo: "desligado" };
   if (para.length === 0) return { enviado: false, motivo: "sem_destinatario" };
 
@@ -148,6 +204,11 @@ export async function enviarEmail(assunto: string, texto: string): Promise<Resul
   return { enviado: true };
 }
 
+/** Envia para a equipe (avisos internos). */
+export async function enviarEmail(assunto: string, texto: string): Promise<ResultadoAviso> {
+  return enviarPara(destinatarios(), assunto, texto);
+}
+
 async function carregarReserva(id: string): Promise<AvisoReserva | null> {
   const agendamento = await prisma.appointment.findUnique({
     where: { id },
@@ -159,6 +220,7 @@ async function carregarReserva(id: string): Promise<AvisoReserva | null> {
     id: agendamento.id,
     cliente: agendamento.customer.name,
     telefone: agendamento.customer.phone,
+    email: agendamento.customer.email,
     servico: agendamento.service.name,
     profissional: agendamento.professional.name,
     quando: formatarQuando(agendamento.startsAt),
@@ -204,5 +266,39 @@ export async function avisarCancelamento(
       error instanceof Error ? error.message : error,
     );
     return { enviado: false, motivo: "erro" };
+  }
+}
+
+/**
+ * Lembrete para o cliente (2 dias / 24h antes).
+ *
+ * So ENVIA. Quem marca `reminder2dAt`/`reminder24hAt` e o cron, antes do envio
+ * (claim atomico), para dois processos nunca mandarem o mesmo lembrete. Se o
+ * envio falhar, o cron devolve a marca e o erro fica no log.
+ * Nunca lanca: o cron continua processando os outros agendamentos.
+ */
+export async function avisarLembreteCliente(
+  id: string,
+  janela: JanelaLembrete,
+): Promise<ResultadoAviso & { janela: JanelaLembrete }> {
+  try {
+    if (!emailParaClientesAtivo()) {
+      return { enviado: false, motivo: "desligado", janela };
+    }
+
+    const reserva = await carregarReserva(id);
+    if (!reserva) return { enviado: false, motivo: "nao_encontrada", janela };
+    if (!reserva.email) return { enviado: false, motivo: "sem_destinatario", janela };
+
+    const { assunto, texto } = montarLembrete(reserva, janela);
+    const resultado = await enviarPara([reserva.email], assunto, texto);
+
+    return { ...resultado, janela };
+  } catch (error) {
+    console.error(
+      "[notificacoes] falha ao enviar lembrete:",
+      error instanceof Error ? error.message : error,
+    );
+    return { enviado: false, motivo: "erro", janela };
   }
 }

@@ -1,11 +1,13 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
+  avisarLembreteCliente,
   avisarNovaReserva,
   destinatarios,
   enviarEmail,
   formatarQuando,
   montarAvisoCancelamento,
   montarAvisoNovaReserva,
+  montarLembrete,
   notificacoesAtivas,
   type AvisoReserva,
 } from "@/lib/notificacoes";
@@ -14,6 +16,7 @@ const reserva: AvisoReserva = {
   id: "cmvjtm9qq0003l2081vtzwk7t",
   cliente: "João da Silva",
   telefone: "(47) 99999-1111",
+  email: "joao@exemplo.com",
   servico: "Corte Degradê",
   profissional: "Dudu",
   quando: "ter, 27/10, 13:15",
@@ -129,5 +132,36 @@ describe("notificações — envio", () => {
     await expect(avisarNovaReserva("id-que-nao-existe")).resolves.toEqual(
       expect.objectContaining({ enviado: false }),
     );
+  });
+});
+
+describe("lembrete do cliente", () => {
+  it("o lembrete de 24h diz 'amanhã' e repete horário, serviço e código", () => {
+    const { assunto, texto } = montarLembrete(reserva, "24h");
+    expect(assunto).toContain("amanhã");
+    expect(texto).toContain("João da Silva");
+    expect(texto).toContain("ter, 27/10, 13:15");
+    expect(texto).toContain("Corte Degradê");
+    expect(texto).toContain("Dudu");
+    expect(texto).toContain("CMVJTM9Q");
+    expect(texto).toContain("/minha-conta");
+  });
+
+  it("o lembrete de 2 dias diz 'em 2 dias'", () => {
+    const { assunto, texto } = montarLembrete(reserva, "2d");
+    expect(assunto).toContain("em 2 dias");
+    expect(texto).toContain("em 2 dias");
+  });
+
+  it("sem RESEND_API_KEY o lembrete fica desligado e não toca no banco", async () => {
+    const resultado = await avisarLembreteCliente("id-qualquer", "24h");
+    expect(resultado).toEqual({ enviado: false, motivo: "desligado", janela: "24h" });
+  });
+
+  it("com chave mas sem cadastro, nunca lança", async () => {
+    vi.stubEnv("RESEND_API_KEY", "re_123");
+    const resultado = await avisarLembreteCliente("id-que-nao-existe", "2d");
+    expect(resultado.enviado).toBe(false);
+    expect(["nao_encontrada", "sem_destinatario"]).toContain(resultado.motivo);
   });
 });

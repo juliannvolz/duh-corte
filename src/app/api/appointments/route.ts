@@ -3,6 +3,9 @@ import { z } from "zod";
 import { createAppointment } from "@/lib/booking";
 import { getLoyaltyByAppointment } from "@/lib/loyalty-server";
 import { avisarNovaReserva } from "@/lib/notificacoes";
+import { prisma } from "@/lib/db";
+import { auth } from "@/lib/auth-social";
+import { variantesTelefone } from "@/lib/phone";
 
 const schema = z.object({
   serviceId: z.string().min(1),
@@ -48,6 +51,42 @@ export async function POST(request: Request) {
 
   const data = parsed.data;
 
+  // Reenvio da mesma submissao (ex.: duplo clique) nao conta no limite.
+  const jaExiste = data.idempotencyKey
+    ? await prisma.appointment.findUnique({
+        where: { idempotencyKey: data.idempotencyKey },
+        select: { id: true },
+      })
+    : null;
+
+  // Limite simples anti-spam: um mesmo WhatsApp nao acumula horarios futuros.
+  const chaves = variantesTelefone(data.customer.phone).map((digitos) => `phone:${digitos}`);
+  if (!jaExiste && chaves.length > 0) {
+    const ativos = await prisma.appointment.count({
+      where: {
+        customerId: { in: chaves },
+        status: { in: ["pending", "confirmed"] },
+        startsAt: { gte: new Date() },
+      },
+    });
+    if (ativos >= 3) {
+      return NextResponse.json(
+        {
+          error:
+            "Você já tem 3 horários marcados. Para marcar outro, cancele um deles ou fale com a barbearia no WhatsApp.",
+          code: "LIMITE_AGENDAMENTOS",
+        },
+        { status: 429 },
+      );
+    }
+  }
+
+  // Se o cliente esta logado, a reserva ja nasce ligada a conta dele.
+  const session = await auth();
+  const identidade = session?.user?.email
+    ? { id: session.user.id, email: session.user.email }
+    : null;
+
   let result: Awaited<ReturnType<typeof createAppointment>>;
   try {
     result = await createAppointment({
@@ -55,6 +94,7 @@ export async function POST(request: Request) {
       professionalId: data.professionalId,
       startsAt: data.startsAt,
       idempotencyKey: data.idempotencyKey,
+      identidade,
       customer: {
         name: data.customer.name,
         phone: data.customer.phone,
@@ -84,7 +124,12 @@ export async function POST(request: Request) {
   }
 
   if (!result.ok) {
-    const status = result.code === "UNAVAILABLE" ? 409 : result.code === "CONFLICT" ? 500 : 400;
+    const status =
+      result.code === "UNAVAILABLE" || result.code === "CONTA"
+        ? 409
+        : result.code === "CONFLICT"
+          ? 500
+          : 400;
     return NextResponse.json({ error: result.error, code: result.code }, { status });
   }
 
@@ -100,6 +145,7 @@ export async function POST(request: Request) {
       startsAt: result.startsAt,
       priceCents: result.priceCents,
       status: "pending",
+      vinculo: result.vinculo,
       // programa de fidelidade: pontos do cliente e codigo de indicacao
       loyalty: await getLoyaltyByAppointment(result.appointmentId),
     },

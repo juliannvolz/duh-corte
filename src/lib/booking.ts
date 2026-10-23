@@ -14,6 +14,20 @@ import { getGoogleBusy, createGoogleEvent } from "@/lib/google-calendar";
 import { business } from "@/lib/site";
 import { ensureReferralCode } from "@/lib/loyalty-server";
 import { isValidReferralCode } from "@/lib/loyalty";
+import {
+  normalizarEmail,
+  podeVincularPorTelefone,
+  type SessaoCliente,
+} from "@/lib/customer-identity";
+import { normalizarTelefoneBR } from "@/lib/phone";
+
+/** Erro interno: o WhatsApp informado pertence a OUTRA conta social. */
+class VinculoConflitante extends Error {
+  constructor() {
+    super("WhatsApp ligado a outra conta");
+    this.name = "VinculoConflitante";
+  }
+}
 
 export type AvailabilityQuery = {
   dateISO: string;
@@ -199,11 +213,25 @@ export type CreateAppointmentInput = {
   planId?: string;
   /** Origem da reserva: "site" (publico) ou "painel" (feito pelo dono). */
   source?: string;
+  /**
+   * Conta social de quem esta reservando (quando logado).
+   * Serve para o horario aparecer sozinho em "Minha conta" nas proximas
+   * visitas — sem precisar digitar o telefone de novo.
+   */
+  identidade?: SessaoCliente | null;
 };
 
 export type CreateAppointmentResult =
-  | { ok: true; appointmentId: string; replayed: boolean; startsAt: string; priceCents: number }
-  | { ok: false; error: string; code: "INVALID" | "UNAVAILABLE" | "CONFLICT" };
+  | {
+      ok: true;
+      appointmentId: string;
+      replayed: boolean;
+      startsAt: string;
+      priceCents: number;
+      /** Como o cadastro do cliente ficou ligado a conta social. */
+      vinculo: "novo" | "conta" | "reivindicado" | "visitante";
+    }
+  | { ok: false; error: string; code: "INVALID" | "UNAVAILABLE" | "CONFLICT" | "CONTA" };
 
 export async function createAppointment(
   input: CreateAppointmentInput,
@@ -225,6 +253,7 @@ export async function createAppointment(
         replayed: true,
         startsAt: existing.startsAt.toISOString(),
         priceCents: existing.priceCents,
+        vinculo: "visitante",
       };
     }
   }
@@ -273,31 +302,63 @@ export async function createAppointment(
   const endsAt = new Date(startsAt.getTime() + service.durationMin * 60 * 1000);
 
   try {
-    const appointment = await prisma.$transaction(async (tx) => {
-      const customerId = "phone:" + input.customer.phone.replace(/\D/g, "");
-      const email = input.customer.email?.trim() || null;
+    const { appointment, vinculo } = await prisma.$transaction(async (tx) => {
+      // chave canonica: "phone:4799..." e "phone:554799..." sao a mesma pessoa
+      const customerId = `phone:${
+        normalizarTelefoneBR(input.customer.phone) || input.customer.phone.replace(/\D/g, "")
+      }`;
+      const emailDigitado = input.customer.email?.trim()
+        ? normalizarEmail(input.customer.email)
+        : null;
+      const emailSessao = input.identidade?.email ? normalizarEmail(input.identidade.email) : null;
+      const googleId = input.identidade?.id?.trim() || null;
 
-      // nao sobrescreve o e-mail ja vinculado a uma conta social
+      // nao sobrescreve o e-mail/googleId ja vinculado a uma conta social
       const existente = await tx.customer.findUnique({
         where: { id: customerId },
-        select: { email: true },
+        select: { email: true, googleId: true },
       });
+
+      // conflito = este WhatsApp ja pertence a OUTRA conta social
+      if (googleId && existente?.googleId && existente.googleId !== googleId) {
+        throw new VinculoConflitante();
+      }
+
+      // so vira "dono" quando o e-mail do cadastro nao contradiz a sessao
+      const podeSerDono =
+        Boolean(googleId) &&
+        !existente?.googleId &&
+        podeVincularPorTelefone(existente?.email ?? null, emailSessao ?? "");
 
       const customer = await tx.customer.upsert({
         where: { id: customerId },
         update: {
           name: input.customer.name,
-          ...(email && !existente?.email ? { email } : {}),
+          ...(emailDigitado && !existente?.email ? { email: emailDigitado } : {}),
+          ...(emailSessao && !existente?.email && !emailDigitado ? { email: emailSessao } : {}),
+          ...(podeSerDono && googleId ? { googleId } : {}),
         },
         create: {
           id: customerId,
           name: input.customer.name,
           phone: input.customer.phone,
-          email,
+          email: emailDigitado ?? emailSessao,
+          googleId,
         },
       });
 
-      return tx.appointment.create({
+      // e-mail diferente: reivindicacao revogavel (nunca toma o cadastro)
+      let reivindicado = false;
+      if (googleId && existente?.email && !podeSerDono && !existente.googleId) {
+        await tx.customerClaim.upsert({
+          where: { customerId_googleId: { customerId, googleId } },
+          create: { customerId, googleId, email: emailSessao },
+          update: { email: emailSessao },
+        });
+        reivindicado = true;
+      }
+
+      const criado = await tx.appointment.create({
         data: {
           customerId: customer.id,
           serviceId: input.serviceId,
@@ -313,6 +374,16 @@ export async function createAppointment(
           planId: input.planId ?? null,
         },
       });
+
+      const vinculo: "novo" | "conta" | "reivindicado" | "visitante" = !googleId
+        ? "visitante"
+        : reivindicado
+          ? "reivindicado"
+          : existente
+            ? "conta"
+            : "novo";
+
+      return { appointment: criado, vinculo };
     });
 
     // programa de fidelidade: codigo do cliente + vinculo de indicacao
@@ -362,8 +433,18 @@ export async function createAppointment(
       replayed: false,
       startsAt: appointment.startsAt.toISOString(),
       priceCents: appointment.priceCents,
+      vinculo,
     };
   } catch (error) {
+    if (error instanceof VinculoConflitante) {
+      return {
+        ok: false,
+        code: "CONTA",
+        error:
+          "Esse WhatsApp já está ligado a outra conta. Use outro número ou fale com a barbearia.",
+      };
+    }
+
     // corrida entre duas requisicoes: a chave única protege
     if (input.idempotencyKey) {
       const existing = await prisma.appointment.findUnique({
@@ -376,6 +457,7 @@ export async function createAppointment(
           replayed: true,
           startsAt: existing.startsAt.toISOString(),
           priceCents: existing.priceCents,
+          vinculo: "visitante",
         };
       }
     }

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { auth } from "@/lib/auth-social";
-import { resolverCliente } from "@/lib/customer-identity";
+import { identidadesDoPedido } from "@/lib/customer-identity";
 
 const schema = z.object({
   appointmentId: z.string().min(1),
@@ -50,14 +50,15 @@ export async function POST(request: Request) {
   }
 
   const session = await auth();
-  const cliente = await resolverCliente({
+  const { daSessao, doTelefone } = await identidadesDoPedido({
     session: session?.user?.email
       ? { id: session.user.id, email: session.user.email }
       : null,
     phone: parsed.data.phone,
   });
 
-  if (!cliente || cliente.id !== appointment.customerId) {
+  const donos = [daSessao?.id, doTelefone?.id].filter(Boolean);
+  if (!donos.includes(appointment.customerId)) {
     return NextResponse.json({ error: "Esta reserva não é da sua conta." }, { status: 403 });
   }
 

@@ -219,6 +219,8 @@ export function BookingWizard({
         serviceName={service.name}
         professionalName={professional?.name ?? ""}
         label={slot?.label ?? ""}
+        phone={form.phone}
+        logado={Boolean(clientEmail)}
       />
     );
   }
@@ -623,11 +625,15 @@ function SuccessCard({
   serviceName,
   professionalName,
   label,
+  phone,
+  logado,
 }: {
   created: { id: string; startsAt: string; priceCents: number; loyalty: LoyaltyInfo | null };
   serviceName: string;
   professionalName: string;
   label: string;
+  phone: string;
+  logado: boolean;
 }) {
 
   const date = new Date(created.startsAt);
@@ -650,11 +656,14 @@ function SuccessCard({
         <span className="mx-auto grid size-14 place-items-center rounded-full bg-gold text-ink">
           <CheckCircle2 className="size-7" />
         </span>
-        <h2 className="display mt-6 text-3xl md:text-4xl">Reserva confirmada.</h2>
+        <h2 className="display mt-6 text-3xl md:text-4xl">Horário reservado!</h2>
         <p className="mt-3 text-sm text-bone-dim">
           {serviceName} com {professionalName}
           <br />
           <span className="text-bone">{dateLabel}</span>
+        </p>
+        <p className="mt-2 text-xs text-bone-dim">
+          Aguardando confirmação da barbearia — você recebe um retorno no WhatsApp.
         </p>
 
         <div className="mx-auto mt-6 max-w-md rounded-2xl border border-gold/40 bg-ink/60 p-5 text-left">
@@ -721,7 +730,28 @@ function SuccessCard({
           </div>
         ) : null}
 
-        <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
+        <div className="mt-8">
+          <a
+            href={logado ? "/minha-conta" : "/entrar?callbackUrl=/minha-conta"}
+            className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-gold px-6 py-3.5 text-sm font-semibold text-ink sm:w-auto"
+          >
+            <CalendarDays className="size-4" />
+            {logado ? "Ver meus horários" : "Entrar e acompanhar"}
+          </a>
+          <p className="mt-2 text-xs text-bone-dim">
+            {logado
+              ? "Este horário já aparece na sua conta."
+              : "Entre com o Google para ver este e os próximos horários a qualquer momento."}
+          </p>
+        </div>
+
+        <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
+          <a
+            href={`/api/appointments/${created.id}/ics?tel=${encodeURIComponent(phone)}`}
+            className="inline-flex items-center justify-center gap-2 rounded-full border border-line-strong px-6 py-3 text-sm text-bone transition-colors hover:border-gold hover:text-gold"
+          >
+            <CalendarDays className="size-4" /> Salvar na agenda
+          </a>
           <a
             href={`https://wa.me/${business.whatsapp}?text=${whatsappText}`}
             target="_blank"

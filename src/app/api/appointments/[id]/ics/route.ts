@@ -3,7 +3,7 @@ import { auth } from "@/lib/auth-social";
 import { prisma } from "@/lib/db";
 import { buildIcs } from "@/lib/google-calendar";
 import { business } from "@/lib/site";
-import { resolverCliente } from "@/lib/customer-identity";
+import { identidadesDoPedido } from "@/lib/customer-identity";
 import { sessionIsAdmin } from "@/lib/admin-access";
 import { isAdmin as isAdminByPassword } from "@/lib/auth";
 /**
@@ -37,13 +37,15 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
 
   if (!autorizado) {
     const url = new URL(request.url);
-    const cliente = await resolverCliente({
+    const { daSessao, doTelefone } = await identidadesDoPedido({
       session: session?.user?.email
         ? { id: session.user.id, email: session.user.email }
         : null,
       phone: url.searchParams.get("tel") ?? "",
     });
-    autorizado = cliente?.id === appointment.customerId;
+    autorizado =
+      daSessao?.id === appointment.customerId ||
+      doTelefone?.id === appointment.customerId;
   }
 
   if (!autorizado) {

@@ -14,11 +14,14 @@ export function AppointmentActions({
   phone,
   whatsappHref,
   podeCancelar,
+  semIcs = false,
 }: {
   id: string;
   phone: string;
   whatsappHref: string;
   podeCancelar: boolean;
+  /** true quando o cartao ja tem um botao proprio de "Salvar na agenda" */
+  semIcs?: boolean;
 }) {
   const [estado, setEstado] = useState<"idle" | "cancelando" | "cancelado" | "erro">("idle");
   const [erro, setErro] = useState<string | null>(null);
@@ -57,12 +60,14 @@ export function AppointmentActions({
 
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <a
-        href={`/api/appointments/${id}/ics`}
-        className="inline-flex items-center gap-1.5 rounded-full border border-line px-3 py-1.5 text-[0.65rem] text-bone-dim transition-colors hover:border-gold hover:text-gold"
-      >
-        <CalendarPlus className="size-3" /> Salvar na agenda
-      </a>
+      {semIcs ? null : (
+        <a
+          href={`/api/appointments/${id}/ics`}
+          className="inline-flex items-center gap-1.5 rounded-full border border-line px-3 py-1.5 text-[0.65rem] text-bone-dim transition-colors hover:border-gold hover:text-gold"
+        >
+          <CalendarPlus className="size-3" /> Salvar na agenda
+        </a>
+      )}
 
       <a
         href={whatsappHref}

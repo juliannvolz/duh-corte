@@ -147,6 +147,29 @@ model Customer {
   feedbacks   Feedback[]
   referralsSent Referral[] @relation("ReferralReferrer")
   referralsReceived Referral[] @relation("ReferralReferee")
+  /// Reivindicacoes de acesso feitas por contas sociais (ver CustomerClaim).
+  claims      CustomerClaim[]
+}
+
+/// Reivindicacao de acesso: uma conta social (Google) que provou saber o
+/// telefone de um cadastro SEM virar dona dele.
+///
+/// Por que nao gravar `googleId` direto: o telefone e um dado semi-publico.
+/// Se qualquer pessoa que soubesse o numero pudesse gravar o proprio googleId
+/// no cadastro, o cliente de verdade ficaria trancado para fora (o googleId e
+/// unico). A reivindicacao e revogavel, nao bloqueia o dono e permite varias
+/// contas (ex.: familia) sem sequestrar o cadastro.
+model CustomerClaim {
+  id         String   @id @default(cuid())
+  customerId String
+  /// `sub` do provedor social (Google).
+  googleId   String
+  email      String?
+  createdAt  DateTime @default(now())
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@unique([customerId, googleId])
+  @@index([googleId])
 }
 
 /// Extrato de pontos (toda entrada/saida fica registrada).
@@ -209,6 +232,9 @@ model Appointment {
   referralCode  String?
   /// Plano do Clube do Assinante escolhido na reserva (ativado na loja).
   planId        String?
+  /// Lembretes automaticos enviados ao cliente (null = ainda nao enviado).
+  reminder2dAt  DateTime?
+  reminder24hAt DateTime?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   customer      Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
