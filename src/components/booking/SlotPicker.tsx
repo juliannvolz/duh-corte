@@ -62,7 +62,11 @@ export function SlotPicker({
       <h2 className="display text-2xl">{titulo}</h2>
       <p className="mt-2 text-sm text-bone-dim">{subtitulo}</p>
 
-      <div className="no-scrollbar mt-6 flex gap-2 overflow-x-auto pb-2">
+      {/* Grade fixa de 7 colunas (2 semanas): nada de rolagem horizontal no
+          celular. Antes era um flex nowrap de 14 fichas (~1000px de largura
+          minima) e essa largura subia pela coluna do wizard, estourando o
+          cartao e empurrando o botao "Continuar" para fora da tela. */}
+      <div className="mt-6 grid grid-cols-7 gap-1.5 sm:gap-2">
         {days.map((day) => {
           const info = labelFor(day);
           const [y, m, d] = day.split("-").map(Number);
@@ -76,7 +80,7 @@ export function SlotPicker({
               disabled={closed}
               onClick={() => onDate(day)}
               aria-pressed={active}
-              className={`flex min-w-16 flex-col items-center rounded-2xl border px-3 py-2.5 text-center transition-colors ${
+              className={`flex min-w-0 flex-col items-center rounded-xl border px-1 py-2 text-center transition-colors sm:rounded-2xl sm:px-2 sm:py-2.5 ${
                 active
                   ? "border-gold bg-gold/10 text-gold"
                   : closed
@@ -84,9 +88,13 @@ export function SlotPicker({
                     : "border-line text-bone hover:border-line-strong"
               }`}
             >
-              <span className="text-[0.65rem] uppercase tracking-wide">{info.weekday}</span>
-              <span className="display text-xl">{info.day}</span>
-              <span className="text-[0.6rem] uppercase text-bone-dim/70">{info.month}</span>
+              <span className="text-[0.58rem] uppercase tracking-wide sm:text-[0.65rem]">
+                {info.weekday}
+              </span>
+              <span className="display text-lg sm:text-xl">{info.day}</span>
+              <span className="text-[0.55rem] uppercase text-bone-dim/70 sm:text-[0.6rem]">
+                {info.month}
+              </span>
             </button>
           );
         })}
