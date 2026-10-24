@@ -319,10 +319,10 @@ export async function createAppointment(
         select: { email: true, googleId: true },
       });
 
-      // conflito = este WhatsApp ja pertence a OUTRA conta social
-      if (googleId && existente?.googleId && existente.googleId !== googleId) {
-        throw new VinculoConflitante(existente.email);
-      }
+      // conflito = este WhatsApp ja pertence a OUTRA conta social.
+      // Nao bloqueia mais a reserva: ela acontece e uma reivindicacao
+      // revogavel e criada, para acesso sem intervencao manual.
+      // O googleId do dono original nunca e sobrescrito.
 
       // so vira "dono" quando o e-mail do cadastro nao contradiz a sessao
       const podeSerDono =
@@ -349,7 +349,7 @@ export async function createAppointment(
 
       // e-mail diferente: reivindicacao revogavel (nunca toma o cadastro)
       let reivindicado = false;
-      if (googleId && existente?.email && !podeSerDono && !existente.googleId) {
+      if (googleId && existente?.email && !podeSerDono && existente.googleId !== googleId) {
         await tx.customerClaim.upsert({
           where: { customerId_googleId: { customerId, googleId } },
           create: { customerId, googleId, email: emailSessao },

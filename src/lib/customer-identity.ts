@@ -220,8 +220,8 @@ export async function clienteDaSessao(
   const dono = await prisma.customer.findUnique({ where: { id: claim.customerId } });
   // o cadastro ganhou dono depois da reivindicacao: a claim perde a validade
   if (!dono) return null;
-  if (dono.googleId && dono.googleId !== session.id) return null;
-
+  // Merge automatico: quem provou saber o telefone (claim) acessa os horarios
+  // mesmo quando o cadastro ja tem dono social (conflito de contas).
   return recarregar(dono.id, { reivindicado: true });
 }
 
