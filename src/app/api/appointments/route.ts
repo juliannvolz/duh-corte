@@ -19,7 +19,7 @@ const schema = z.object({
       .min(10)
       .max(20)
       .regex(/^[0-9()+\-\s]+$/, "Telefone invalido"),
-    email: z.string().email().optional().or(z.literal("")),
+    email: z.string().email(),
     notes: z.string().max(500).optional(),
   }),
   referralCode: z.string().max(16).optional(),

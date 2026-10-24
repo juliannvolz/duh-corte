@@ -168,7 +168,8 @@ export default async function MinhaContaPage() {
                   Meus horários
                 </h2>
                 <p className="mt-3 text-sm text-bone-dim">
-                  Nenhum horário marcado no momento.{" "}
+                  Nenhum horário marcado no momento. Seus agendamentos aparecem aqui
+                  automaticamente quando o e-mail da reserva é o mesmo do Google.
                   <a href="/agendar" className="text-gold underline underline-offset-4">
                     Agendar agora
                   </a>

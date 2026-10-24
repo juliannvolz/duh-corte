@@ -142,6 +142,10 @@ function AbaCliente({
         A gente <strong>não cria senha</strong>: quem entra é o Google que guarda a sua identidade.
         Você vê seus horários, seus pontos e o código de indicação.
       </p>
+      <p className="mt-3 text-xs leading-relaxed text-bone-dim/70">
+        Na primeira vez, o Google cria sua conta automaticamente. Depois, é só entrar de novo e seus
+        horários aparecem sozinhos — sem precisar validar o WhatsApp.
+      </p>
 
       {provedores.length > 0 ? (
         <div className="mt-7 space-y-3">

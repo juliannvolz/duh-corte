@@ -193,7 +193,7 @@ export function BookingWizard({
           customer: {
             name: form.name.trim(),
             phone: form.phone.trim(),
-            email: form.email.trim() || undefined,
+            email: form.email.trim(),
             notes: form.notes.trim() || undefined,
           },
         }),
@@ -345,7 +345,13 @@ export function BookingWizard({
             <button
               type="button"
               onClick={submit}
-              disabled={submitting || form.name.trim().length < 2 || form.phone.replace(/\D/g, "").length < 10}
+              disabled={
+              submitting ||
+              form.name.trim().length < 2 ||
+              form.phone.replace(/\D/g, "").length < 10 ||
+              !form.email.trim() ||
+              !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())
+            }
               className="inline-flex items-center gap-2 rounded-full bg-gold px-6 py-3 text-sm font-semibold text-ink transition-transform duration-300 hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-40"
             >
               {submitting ? <Loader2 className="size-4 animate-spin" /> : <CheckCircle2 className="size-4" />}
@@ -611,23 +617,25 @@ function StepDetails({
           />
         </label>
 
-        {logado ? null : (
-          <label className="flex flex-col gap-1.5 text-sm sm:col-span-2">
-            <span className="text-bone-dim">E-mail (opcional)</span>
-            <input
-              type="email"
-              value={form.email}
-              onChange={(e) => setForm({ ...form, email: e.target.value })}
-              autoComplete="email"
-              className="rounded-xl border border-line bg-ink px-4 py-3 text-bone placeholder:text-bone-dim/50 focus:border-gold focus:outline-none"
-              placeholder="você@email.com"
-            />
-            <span className="text-xs leading-relaxed text-bone-dim/70">
-              Use o mesmo e-mail da sua conta Google: aí seus horários aparecem sozinhos em “Minha
-              conta”, sem precisar confirmar o WhatsApp depois.
-            </span>
-          </label>
-        )}
+        <label className="flex flex-col gap-1.5 text-sm sm:col-span-2">
+          <span className="text-bone-dim">E-mail</span>
+          <input
+            type="email"
+            value={form.email}
+            onChange={(e) => setForm({ ...form, email: e.target.value })}
+            required
+            readOnly={logado}
+            autoComplete="email"
+            className={`rounded-xl border border-line bg-ink px-4 py-3 text-bone placeholder:text-bone-dim/50 focus:border-gold focus:outline-none ${
+              logado ? "opacity-60 cursor-not-allowed" : ""
+            }`}
+            placeholder="você@email.com"
+          />
+          <span className="text-xs leading-relaxed text-bone-dim/70">
+            Use o mesmo e-mail da sua conta Google: aí seus horários aparecem sozinhos em “Minha
+            conta”, sem precisar confirmar o WhatsApp depois.
+          </span>
+        </label>
 
         <label className="flex flex-col gap-1.5 text-sm sm:col-span-2">
           <span className="text-bone-dim">Observação (opcional)</span>

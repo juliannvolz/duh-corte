@@ -102,7 +102,7 @@ export async function GET(request: Request) {
       return NextResponse.json(
         {
           error:
-            "Sua conta já acompanha outro cadastro. Para juntar os dois históricos, fale com a barbearia.",
+            "Este WhatsApp pertence a outro cadastro. Seus agendamentos já aparecem na sua conta pelo e-mail.",
           code: "JA_LIGADO",
         },
         { status: 409 },
