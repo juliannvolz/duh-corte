@@ -296,8 +296,8 @@ export function AgendaTab({
           </div>
 
           <p className="mt-4 text-xs text-bone-dim/70">
-            Toque em um horário para abrir e editar. Horários bloqueados somem da agenda do
-            cliente.
+            Toque em um horário para abrir as ações: status, WhatsApp, baixar agenda, remarcar,
+            editar ou cancelar. Horários bloqueados somem da agenda do cliente.
           </p>
         </div>
       ) : null}

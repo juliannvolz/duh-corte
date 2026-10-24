@@ -44,6 +44,15 @@ export type AdminProfessional = {
   name: string;
 };
 
+/** Ordem em que os status aparecem nos seletores do painel. */
+export const STATUS_OPTIONS = [
+  "pending",
+  "confirmed",
+  "done",
+  "cancelled",
+  "no_show",
+] as const;
+
 export const STATUS_LABEL: Record<string, string> = {
   pending: "Pendente",
   confirmed: "Confirmado",

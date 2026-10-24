@@ -1,10 +1,24 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Loader2, X } from "lucide-react";
+import { Ban, CalendarClock, CalendarPlus, Loader2, MessageCircle, X } from "lucide-react";
 import { SlotPicker, type SlotResponse, type SlotWindow } from "@/components/booking/SlotPicker";
-import { formatBRL } from "@/lib/site";
-import type { AdminAppointment, AdminProfessional, AdminService } from "@/components/admin/types";
+import { business, formatBRL } from "@/lib/site";
+import { mensagemParaCliente, whatsappLink } from "@/lib/whatsapp";
+import {
+  STATUS_LABEL,
+  STATUS_OPTIONS,
+  STATUS_STYLE,
+  dataHoraDe,
+  horaDe,
+  type AdminAppointment,
+  type AdminProfessional,
+  type AdminService,
+} from "@/components/admin/types";
+
+/** Mesmo formato dos botoes rotulados da agenda. */
+const ACAO =
+  "inline-flex items-center gap-1.5 rounded-full border border-line px-3 py-1.5 text-xs text-bone-dim transition-colors hover:border-gold hover:text-gold disabled:opacity-50";
 
 export type ModoAgendamento = "novo" | "remarcar" | "editar";
 
@@ -35,6 +49,7 @@ export function AgendamentoModal({
   windows,
   onClose,
   onSalvo,
+  onRemarcar,
 }: {
   modo: ModoAgendamento;
   appointment?: AdminAppointment;
@@ -43,6 +58,7 @@ export function AgendamentoModal({
   windows: SlotWindow[];
   onClose: () => void;
   onSalvo: () => void;
+  onRemarcar: (a: AdminAppointment) => void;
 }) {
   const [serviceId, setServiceId] = useState(() => {
     if (appointment) {
@@ -68,6 +84,7 @@ export function AgendamentoModal({
   const [telefone, setTelefone] = useState(appointment?.customer.phone ?? "");
   const [observacao, setObservacao] = useState(appointment?.notes ?? "");
   const [preco, setPreco] = useState<number | null>(appointment?.priceCents ?? null);
+  const [status, setStatus] = useState(appointment?.status ?? "pending");
   const [salvando, setSalvando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
 
@@ -75,6 +92,22 @@ export function AgendamentoModal({
 
   const servico = services.find((s) => s.id === serviceId);
   const profissional = professionals.find((p) => p.id === professionalId);
+
+  const conversa = appointment
+    ? {
+        cliente: { name: appointment.customer.name, phone: appointment.customer.phone },
+        servico: {
+          name: appointment.service.name,
+          durationMin: appointment.service.durationMin,
+        },
+        profissional: { name: appointment.professional.name },
+        dataISO: appointment.startsAt.slice(0, 10),
+        hora: horaDe(appointment.startsAt),
+        preco: formatBRL(appointment.priceCents),
+        endereco: `${business.address.street}, ${business.address.neighborhood}`,
+        codigo: appointment.id.slice(0, 8).toUpperCase(),
+      }
+    : null;
 
   const buscarSlots = useCallback(async () => {
     if (!dateISO || !serviceId || !professionalId) return;
@@ -185,8 +218,59 @@ export function AgendamentoModal({
           setSalvando(false);
           return;
         }
+
+        // o status usa o mesmo endpoint, mas em uma chamada propria: assim o
+        // crédito de pontos do "atendido" segue o caminho já testado.
+        if (appointment && status !== appointment.status) {
+          const resStatus = await fetch("/api/admin/appointments", {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id: appointment.id, status }),
+          });
+          if (!resStatus.ok) {
+            const jsonStatus = await resStatus.json().catch(() => ({}));
+            setErro(
+              jsonStatus.error ??
+                "Os dados foram salvos, mas o status não mudou. Toque em Salvar de novo.",
+            );
+            setSalvando(false);
+            return;
+          }
+        }
       }
 
+      onSalvo();
+    } catch {
+      setErro("Falha de rede. Tente novamente.");
+      setSalvando(false);
+    }
+  }
+
+  async function cancelarAgendamento() {
+    if (!appointment) return;
+    const quando = dataHoraDe(appointment.startsAt);
+    if (
+      !window.confirm(
+        `Cancelar o horário de ${appointment.customer.name} em ${quando}? O horário volta a ficar livre na agenda.`,
+      )
+    ) {
+      return;
+    }
+
+    setErro(null);
+    setSalvando(true);
+    try {
+      const res = await fetch("/api/admin/appointments", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: appointment.id, status: "cancelled" }),
+      });
+      if (!res.ok) {
+        const json = await res.json().catch(() => ({}));
+        setErro(json.error ?? "Não foi possível cancelar o agendamento.");
+        setSalvando(false);
+        return;
+      }
       onSalvo();
     } catch {
       setErro("Falha de rede. Tente novamente.");
@@ -232,6 +316,82 @@ export function AgendamentoModal({
               {erro}
             </p>
           ) : null}
+          {/* acoes rapidas do agendamento (tambem acessadas pela semana) */}
+          {modo === "editar" && appointment && conversa ? (
+            <div className="rounded-2xl border border-line bg-ink/40 p-4">
+              <p className="text-[0.65rem] uppercase tracking-[0.14em] text-bone-dim">
+                Ações deste agendamento
+              </p>
+              <p className="mt-1 text-xs text-bone-dim/80">
+                {dataHoraDe(appointment.startsAt)} · {appointment.customer.name} ·{" "}
+                {appointment.customer.phone}
+              </p>
+
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                <label className="inline-flex items-center gap-2 text-xs text-bone-dim">
+                  Status
+                  <select
+                    value={status}
+                    onChange={(e) => setStatus(e.target.value)}
+                    disabled={salvando}
+                    aria-label="Status do agendamento"
+                    className={`rounded-full border bg-ink px-3 py-1.5 text-xs focus:border-gold focus:outline-none disabled:opacity-50 ${
+                      STATUS_STYLE[status] ?? "border-line text-bone"
+                    }`}
+                  >
+                    {STATUS_OPTIONS.map((opcao) => (
+                      <option key={opcao} value={opcao}>
+                        {STATUS_LABEL[opcao] ?? opcao}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
+                <a
+                  href={whatsappLink(appointment.customer.phone, mensagemParaCliente(conversa))}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  title="Avisar o cliente no WhatsApp"
+                  className={ACAO}
+                >
+                  <MessageCircle className="size-3.5" /> WhatsApp
+                </a>
+
+                <a
+                  href={`/api/appointments/${appointment.id}/ics`}
+                  title="Baixar o .ics da agenda"
+                  className={ACAO}
+                >
+                  <CalendarPlus className="size-3.5" /> Baixar agenda
+                </a>
+
+                <button
+                  type="button"
+                  onClick={() => onRemarcar(appointment)}
+                  className={ACAO}
+                >
+                  <CalendarClock className="size-3.5" /> Remarcar
+                </button>
+
+                {appointment.status === "pending" || appointment.status === "confirmed" ? (
+                  <button
+                    type="button"
+                    onClick={() => void cancelarAgendamento()}
+                    disabled={salvando}
+                    className="inline-flex items-center gap-1.5 rounded-full border border-line px-3 py-1.5 text-xs text-bone-dim transition-colors hover:border-red-400/50 hover:text-red-300 disabled:opacity-50"
+                  >
+                    <Ban className="size-3.5" /> Cancelar agendamento
+                  </button>
+                ) : null}
+              </div>
+
+              <p className="mt-3 text-[0.7rem] leading-relaxed text-bone-dim/70">
+                O status é salvo junto com o botão “Salvar”. “Atendido” credita os pontos do
+                cliente.
+              </p>
+            </div>
+          ) : null}
+
           {/* servico e profissional */}
           <div className="grid gap-4 sm:grid-cols-2">
             <label className="flex flex-col gap-1.5 text-sm">
@@ -379,7 +539,7 @@ export function AgendamentoModal({
               onClick={onClose}
               className="rounded-full border border-line px-5 py-2.5 text-sm text-bone-dim transition-colors hover:border-gold hover:text-gold"
             >
-              Cancelar
+              {modo === "editar" ? "Fechar" : "Cancelar"}
             </button>
             <button
               type="button"

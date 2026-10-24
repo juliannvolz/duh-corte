@@ -226,6 +226,7 @@ export function AdminDashboard({
           professionals={professionals}
           windows={windows}
           onClose={() => setModal(null)}
+          onRemarcar={(a) => setModal({ modo: "remarcar", appointment: a })}
           onSalvo={() => {
             setModal(null);
             recarregar();

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import {
+  Ban,
   CalendarClock,
   CalendarPlus,
   Loader2,
@@ -14,10 +15,16 @@ import { business, formatBRL } from "@/lib/site";
 import { mensagemParaCliente, whatsappLink } from "@/lib/whatsapp";
 import {
   STATUS_LABEL,
+  STATUS_OPTIONS,
   STATUS_STYLE,
+  dataDe,
   horaDe,
   type AdminAppointment,
 } from "@/components/admin/types";
+
+/** Botao de acao com rotulo curto: no celular o icone sozinho nao se explica. */
+const ACAO =
+  "inline-flex items-center gap-1.5 rounded-full border border-line px-3 py-1.5 text-xs text-bone-dim transition-colors hover:border-gold hover:text-gold disabled:opacity-50";
 
 /**
  * Linha de agendamento no painel.
@@ -56,101 +63,135 @@ export function AppointmentRow({
     setSalvando(false);
   }
 
+  async function cancelar() {
+    const quando = `${horaDe(a.startsAt)} de ${dataDe(a.startsAt)}`;
+    if (
+      !window.confirm(
+        `Cancelar o horário de ${a.customer.name} às ${quando}? O horário volta a ficar livre.`,
+      )
+    ) {
+      return;
+    }
+    await mudarStatus("cancelled");
+  }
+
   return (
-    <div className="flex flex-col gap-4 px-5 py-4 md:flex-row md:items-center md:gap-5">
-      <div className="flex w-16 shrink-0 items-baseline gap-1">
-        <span className="display text-2xl text-bone">{horaDe(a.startsAt)}</span>
-      </div>
+    <div className="px-5 py-4">
+      <div className="flex items-start gap-4">
+        <div className="flex w-16 shrink-0 items-baseline gap-1">
+          <span className="display text-2xl text-bone">{horaDe(a.startsAt)}</span>
+        </div>
 
-      <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-medium text-bone">
-          {a.customer.name}
-          <span className="ml-2 text-xs text-bone-dim">
-            {a.service.name} · {a.professional.name}
-          </span>
-        </p>
-        <p className="mt-1 flex flex-wrap items-center gap-3 text-xs text-bone-dim">
-          <a
-            href={`https://wa.me/55${a.customer.phone.replace(/\D/g, "")}`}
-            target="_blank"
-            rel="noreferrer noopener"
-            className="inline-flex items-center gap-1 transition-colors hover:text-gold"
-          >
-            <Phone className="size-3" /> {a.customer.phone}
-          </a>
-          <span className="inline-flex items-center gap-1">
-            <Clock3 className="size-3" /> {a.service.durationMin} min
-          </span>
-          <span className="text-gold">{formatBRL(a.priceCents)}</span>
-          {a.source === "painel" ? (
-            <span className="rounded-full border border-line px-2 py-0.5 text-[0.6rem] uppercase tracking-[0.12em] text-bone-dim/70">
-              do painel
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-sm font-medium text-bone">
+            {a.customer.name}
+            <span className="ml-2 text-xs text-bone-dim">
+              {a.service.name} · {a.professional.name}
             </span>
+          </p>
+          <p className="mt-1 flex flex-wrap items-center gap-3 text-xs text-bone-dim">
+            <a
+              href={`https://wa.me/55${a.customer.phone.replace(/\D/g, "")}`}
+              target="_blank"
+              rel="noreferrer noopener"
+              className="inline-flex items-center gap-1 transition-colors hover:text-gold"
+            >
+              <Phone className="size-3" /> {a.customer.phone}
+            </a>
+            <span className="inline-flex items-center gap-1">
+              <Clock3 className="size-3" /> {a.service.durationMin} min
+            </span>
+            <span className="text-gold">{formatBRL(a.priceCents)}</span>
+            {a.source === "painel" ? (
+              <span className="rounded-full border border-line px-2 py-0.5 text-[0.6rem] uppercase tracking-[0.12em] text-bone-dim/70">
+                do painel
+              </span>
+            ) : null}
+          </p>
+          {a.notes ? (
+            <p className="mt-1 text-xs italic text-bone-dim/70">{a.notes}</p>
           ) : null}
-        </p>
-        {a.notes ? (
-          <p className="mt-1 text-xs italic text-bone-dim/70">{a.notes}</p>
-        ) : null}
+        </div>
       </div>
 
-      <div className="flex flex-wrap items-center gap-2">
+      {/* acoes em linha propria: com rotulo, os botoes nao cabem ao lado do
+          nome sem espremer o cliente no desktop */}
+      <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-line/60 pt-3 md:justify-end">
         {/* o proprio select carrega a cor do status — antes o badge e o select
             mostravam a mesma informacao duas vezes */}
-        <select
-          value={a.status}
-          onChange={(event) => void mudarStatus(event.target.value)}
-          disabled={salvando}
-          aria-label={`Alterar status de ${a.customer.name}: ${STATUS_LABEL[a.status] ?? a.status}`}
-          className={`rounded-full border bg-ink px-3 py-1 text-xs focus:border-gold focus:outline-none disabled:opacity-50 ${
-            STATUS_STYLE[a.status] ?? "border-line text-bone"
-          }`}
-        >
-          <option value="pending">Pendente</option>
-          <option value="confirmed">Confirmado</option>
-          <option value="done">Atendido</option>
-          <option value="cancelled">Cancelado</option>
-          <option value="no_show">Não compareceu</option>
-        </select>
+        <label className="inline-flex items-center gap-2">
+          <span className="text-[0.6rem] uppercase tracking-[0.14em] text-bone-dim/70">
+            Status
+          </span>
+          <select
+            value={a.status}
+            onChange={(event) => void mudarStatus(event.target.value)}
+            disabled={salvando}
+            aria-label={`Alterar status de ${a.customer.name}: ${STATUS_LABEL[a.status] ?? a.status}`}
+            className={`rounded-full border bg-ink px-3 py-1.5 text-xs focus:border-gold focus:outline-none disabled:opacity-50 ${
+              STATUS_STYLE[a.status] ?? "border-line text-bone"
+            }`}
+          >
+            {STATUS_OPTIONS.map((status) => (
+              <option key={status} value={status}>
+                {STATUS_LABEL[status] ?? status}
+              </option>
+            ))}
+          </select>
+        </label>
 
         <a
           href={whatsappLink(a.customer.phone, mensagemParaCliente(conversa))}
           target="_blank"
           rel="noreferrer noopener"
           title="Avisar o cliente no WhatsApp"
-          className="inline-flex size-7 items-center justify-center rounded-full border border-line text-bone-dim transition-colors hover:border-gold hover:text-gold"
+          aria-label={`Avisar ${a.customer.name} no WhatsApp`}
+          className={ACAO}
         >
-          <MessageCircle className="size-3.5" />
-          <span className="sr-only">Avisar {a.customer.name} no WhatsApp</span>
+          <MessageCircle className="size-3.5" /> WhatsApp
         </a>
 
         <a
           href={`/api/appointments/${a.id}/ics`}
           title="Baixar o .ics da agenda"
-          className="inline-flex size-7 items-center justify-center rounded-full border border-line text-bone-dim transition-colors hover:border-gold hover:text-gold"
+          aria-label={`Baixar agenda de ${a.customer.name}`}
+          className={ACAO}
         >
-          <CalendarPlus className="size-3.5" />
-          <span className="sr-only">Baixar agenda de {a.customer.name}</span>
+          <CalendarPlus className="size-3.5" /> Baixar agenda
         </a>
 
         <button
           type="button"
           onClick={() => onRemarcar(a)}
           title="Remarcar"
-          className="inline-flex size-7 items-center justify-center rounded-full border border-line text-bone-dim transition-colors hover:border-gold hover:text-gold"
+          aria-label={`Remarcar ${a.customer.name}`}
+          className={ACAO}
         >
-          <CalendarClock className="size-3.5" />
-          <span className="sr-only">Remarcar {a.customer.name}</span>
+          <CalendarClock className="size-3.5" /> Remarcar
         </button>
 
         <button
           type="button"
           onClick={() => onEditar(a)}
           title="Editar"
-          className="inline-flex size-7 items-center justify-center rounded-full border border-line text-bone-dim transition-colors hover:border-gold hover:text-gold"
+          aria-label={`Editar ${a.customer.name}`}
+          className={ACAO}
         >
-          <Pencil className="size-3.5" />
-          <span className="sr-only">Editar {a.customer.name}</span>
+          <Pencil className="size-3.5" /> Editar
         </button>
+
+        {a.status === "pending" || a.status === "confirmed" ? (
+          <button
+            type="button"
+            onClick={() => void cancelar()}
+            disabled={salvando}
+            title="Cancelar agendamento"
+            aria-label={`Cancelar o agendamento de ${a.customer.name}`}
+            className="inline-flex items-center gap-1.5 rounded-full border border-line px-3 py-1.5 text-xs text-bone-dim transition-colors hover:border-red-400/50 hover:text-red-300 disabled:opacity-50"
+          >
+            <Ban className="size-3.5" /> Cancelar
+          </button>
+        ) : null}
 
         {salvando ? <Loader2 className="size-3.5 animate-spin text-bone-dim" /> : null}
       </div>
