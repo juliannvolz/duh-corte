@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowUpRight, Check, Sparkles, Store } from "lucide-react";
+import { ArrowUpRight, Check, Sparkles } from "lucide-react";
 import { Section, SectionHeading } from "@/components/ui/Section";
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/Reveal";
 import { getPlans } from "@/lib/content";
@@ -82,16 +82,9 @@ export async function Plans() {
                   Quero este plano
                   <ArrowUpRight className="size-4 transition-transform duration-300 group-hover:translate-x-0.5" />
                 </Link>
-                <a
-                  href={`https://wa.me/${business.whatsapp}?text=${encodeURIComponent(
-                    `Olá! Quero assinar o plano ${plan.name} (${formatBRL(plan.priceCents)}/${plan.period}). Quero saber como ativar na loja.`,
-                  )}`}
-                  target="_blank"
-                  rel="noreferrer noopener"
-                  className="inline-flex items-center justify-center gap-2 rounded-full border border-line px-6 py-3 text-xs text-bone-dim transition-colors hover:border-gold hover:text-gold"
-                >
-                  <Store className="size-3.5" /> Ativar na loja (Vila Nova)
-                </a>
+                <p className="text-center text-xs text-bone-dim/70">
+                  A assinatura e ativada na loja (Vila Nova), depois do primeiro corte.
+                </p>
               </div>
             </RevealItem>
           ))}

@@ -136,7 +136,7 @@ export const services: ServiceSeed[] = [
     durationMin: 40,
     priceCents: 4500,
     priceConfirmed: false,
-    featured: true,
+    featured: false,
     style: "social",
   },
   {
@@ -158,7 +158,7 @@ export const services: ServiceSeed[] = [
     durationMin: 50,
     priceCents: 5500,
     priceConfirmed: false,
-    featured: true,
+    featured: false,
     style: "navalhado",
   },
   {

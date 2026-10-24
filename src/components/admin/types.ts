@@ -11,6 +11,8 @@ export type AdminAppointment = {
   customer: { name: string; phone: string };
   service: { name: string; durationMin: number };
   professional: { id: string; name: string };
+  planId: string | null;
+  planName: string | null;
 };
 
 export type Bloqueio = {

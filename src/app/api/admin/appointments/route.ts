@@ -57,11 +57,15 @@ export async function GET(request: Request) {
   const from = dayStart(dateISO);
   const to = new Date(from.getTime() + 24 * 60 * 60 * 1000);
 
-  const appointments = await prisma.appointment.findMany({
-    where: { startsAt: { gte: from, lt: to } },
-    include: { customer: true, service: true, professional: true },
-    orderBy: { startsAt: "asc" },
-  });
+  const [appointments, plans] = await Promise.all([
+    prisma.appointment.findMany({
+      where: { startsAt: { gte: from, lt: to } },
+      include: { customer: true, service: true, professional: true },
+      orderBy: { startsAt: "asc" },
+    }),
+    prisma.plan.findMany({ select: { id: true, name: true } }),
+  ]);
+  const planMap = new Map(plans.map((p) => [p.id, p.name]));
 
   const pending = await prisma.pendingItem.findMany({ where: { done: false }, orderBy: { id: "asc" } });
 
@@ -78,6 +82,8 @@ export async function GET(request: Request) {
       customer: { name: a.customer.name, phone: a.customer.phone },
       service: { name: a.service.name, durationMin: a.service.durationMin },
       professional: { id: a.professional.id, name: a.professional.name },
+      planId: a.planId,
+      planName: a.planId ? (planMap.get(a.planId) ?? a.planId) : null,
     })),
     pending,
   });

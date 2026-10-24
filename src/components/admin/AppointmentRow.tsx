@@ -10,6 +10,7 @@ import {
   Pencil,
   Phone,
   Clock3,
+  Sparkles,
 } from "lucide-react";
 import { business, formatBRL } from "@/lib/site";
 import { mensagemParaCliente, whatsappLink } from "@/lib/whatsapp";
@@ -102,6 +103,11 @@ export function AppointmentRow({
               <Clock3 className="size-3" /> {a.service.durationMin} min
             </span>
             <span className="text-gold">{formatBRL(a.priceCents)}</span>
+            {a.planName ? (
+              <span className="inline-flex items-center gap-1 rounded-full border border-gold/40 bg-gold/10 px-2 py-0.5 text-[0.6rem] font-semibold uppercase tracking-[0.12em] text-gold">
+                <Sparkles className="size-3" /> Plano {a.planName}
+              </span>
+            ) : null}
             {a.source === "painel" ? (
               <span className="rounded-full border border-line px-2 py-0.5 text-[0.6rem] uppercase tracking-[0.12em] text-bone-dim/70">
                 do painel
@@ -236,6 +242,11 @@ export function AppointmentChip({
       <span className="block truncate text-[0.65rem] text-bone-dim">
         {a.service.name} · {a.professional.name}
       </span>
+      {a.planName ? (
+        <span className="mt-1 inline-flex items-center gap-1 text-[0.6rem] text-gold">
+          <Sparkles className="size-2.5" /> {a.planName}
+        </span>
+      ) : null}
     </button>
   );
 }
