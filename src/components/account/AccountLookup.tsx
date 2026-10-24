@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import { AlertCircle, CheckCircle2, Loader2, Phone } from "lucide-react";
 import { mascararTelefone, somenteDigitos } from "@/lib/phone";
+import { lerUltimoWhatsapp, semInscricao } from "@/lib/browser-storage";
 
 /**
  * Vinculo do WhatsApp a conta social.
@@ -24,13 +25,21 @@ export function AccountLookup({
   temCadastro?: boolean;
 }) {
   const router = useRouter();
+  // Prefill com o WhatsApp da ultima reserva feita neste aparelho. Evita o
+  // cliente ter que redigitar o numero justamente no momento de entrar.
+  // `useSyncExternalStore` mantem o HTML do servidor vazio e atualiza depois
+  // da hidratacao, sem divergencia.
+  const salvo = useSyncExternalStore(semInscricao, lerUltimoWhatsapp, () => "");
   const [tel, setTel] = useState("");
+  const [editado, setEditado] = useState(false);
   const [carregando, setCarregando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
   const [encontrado, setEncontrado] = useState<{ nome: string } | null>(null);
 
-  const digitos = somenteDigitos(tel);
+  const valor = editado ? tel : mascararTelefone(salvo);
+  const digitos = somenteDigitos(valor);
   const podeBuscar = digitos.length >= 10 && digitos.length <= 11;
+  const preenchido = !editado && Boolean(salvo);
 
   // a confirmacao some sozinha: o cartao nao fica preso em "carregando"
   useEffect(() => {
@@ -117,8 +126,9 @@ export function AccountLookup({
           <span className="flex items-center gap-2 rounded-full border border-line-strong bg-ink/40 px-4 py-3 focus-within:border-gold">
             <Phone className="size-4 text-bone-dim" />
             <input
-              value={tel}
+              value={valor}
               onChange={(e) => {
+                setEditado(true);
                 setTel(mascararTelefone(e.target.value));
                 setErro(null);
               }}
@@ -139,6 +149,13 @@ export function AccountLookup({
           Vincular
         </button>
       </form>
+
+      {preenchido && podeBuscar ? (
+        <p className="mt-3 text-xs leading-relaxed text-bone-dim/80">
+          Preenchemos com o WhatsApp da sua última reserva feita neste aparelho. Se foi outro
+          número, é só trocar acima.
+        </p>
+      ) : null}
 
       {erro ? (
         <p role="alert" className="mt-4 flex items-start gap-2 text-sm text-red-300">

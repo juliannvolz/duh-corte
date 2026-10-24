@@ -179,14 +179,34 @@ export async function clienteDaSessao(
   const email = session.email ? normalizarEmail(session.email) : "";
 
   if (email) {
-    // igualdade exata: "mariana@x.com" NAO pode puxar a agenda da "ana@x.com"
-    const porEmail = await prisma.customer.findFirst({ where: { email } });
-    if (porEmail) {
-      // e-mail igual, mas conta social de outra pessoa: nao entrega a agenda
-      if (porEmail.googleId && porEmail.googleId !== session.id) return null;
+    // igualdade exata: "mariana@x.com" NAO pode puxar a agenda da "ana@x.com".
+    // O e-mail nao e unico no banco (a mesma pessoa pode ter reservado com dois
+    // numeros), entao escolhemos: o cadastro que ja e desta conta; senao o de
+    // agendamento mais recente entre os que ainda nao tem dono.
+    const candidatos = await prisma.customer.findMany({
+      where: { email },
+      include: {
+        appointments: { select: { startsAt: true }, orderBy: { startsAt: "desc" }, take: 1 },
+      },
+    });
 
-      const vinculado = await gravarVinculo(porEmail.id, session);
-      return recarregar(porEmail.id, { vinculado });
+    const elegiveis = candidatos.filter((c) => !c.googleId || c.googleId === session.id);
+    // o e-mail existe, mas todos os cadastros pertencem a outra conta social
+    if (candidatos.length > 0 && elegiveis.length === 0) return null;
+
+    if (elegiveis.length > 0) {
+      const dono = elegiveis.find((c) => c.googleId === session.id);
+      const escolhido =
+        dono ??
+        elegiveis.sort((a, b) => {
+          const aData = a.appointments[0]?.startsAt?.getTime() ?? 0;
+          const bData = b.appointments[0]?.startsAt?.getTime() ?? 0;
+          if (aData !== bData) return bData - aData;
+          return b.createdAt.getTime() - a.createdAt.getTime();
+        })[0];
+
+      const vinculado = await gravarVinculo(escolhido.id, session);
+      return recarregar(escolhido.id, { vinculado });
     }
   }
 

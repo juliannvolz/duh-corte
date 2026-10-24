@@ -17,11 +17,12 @@ import {
   User,
   Wallet,
 } from "lucide-react";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { business, formatBRL } from "@/lib/site";
 import type { ProfessionalSeed, ServiceCategory } from "@/lib/site";
 import type { ServiceView } from "@/lib/content";
+import { salvarUltimoWhatsapp, lerOrigem, semInscricao } from "@/lib/browser-storage";
 import {
   SlotPicker,
   labelFor,
@@ -205,6 +206,9 @@ export function BookingWizard({
         priceCents: json.priceCents,
         loyalty: (json.loyalty as LoyaltyInfo | null) ?? null,
       });
+      // Guarda o WhatsApp no aparelho: quando o cliente entrar com o Google,
+      // o campo de vinculo em "Minha conta" ja vem preenchido.
+      salvarUltimoWhatsapp(form.phone);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erro ao reservar");
     } finally {
@@ -227,7 +231,7 @@ export function BookingWizard({
 
   return (
     <div className="grid gap-10 lg:grid-cols-12">
-      <div className="lg:col-span-8">
+      <div className="min-w-0 lg:col-span-8">
         {/* progresso */}
         <ol className="flex flex-wrap items-center gap-x-3 gap-y-2 text-xs">
           {STEPS.map((label, index) => {
@@ -258,7 +262,7 @@ export function BookingWizard({
           })}
         </ol>
 
-        <div className="mt-8 min-h-[26rem] rounded-3xl border border-line bg-ink-2/60 p-6 md:p-8">
+        <div className="mt-8 min-h-[26rem] min-w-0 rounded-3xl border border-line bg-ink-2/60 p-6 md:p-8">
           <AnimatePresence mode="wait" initial={false}>
             <motion.div
               key={step}
@@ -305,7 +309,13 @@ export function BookingWizard({
               ) : null}
 
               {step === 3 ? (
-                <StepDetails form={form} setForm={setForm} phoneMask={phoneMask} error={error} />
+                <StepDetails
+                  form={form}
+                  setForm={setForm}
+                  phoneMask={phoneMask}
+                  error={error}
+                  clientEmail={clientEmail}
+                />
               ) : null}
             </motion.div>
           </AnimatePresence>
@@ -348,7 +358,7 @@ export function BookingWizard({
       </div>
 
       {/* resumo */}
-      <aside className="lg:col-span-4">
+      <aside className="min-w-0 lg:col-span-4">
         <div className="sticky top-28 rounded-3xl border border-line bg-ink-2 p-6">
           <p className="eyebrow text-bone-dim">Resumo</p>
 
@@ -545,18 +555,33 @@ function StepDetails({
   setForm,
   phoneMask,
   error,
+  clientEmail,
 }: {
   form: { name: string; phone: string; email: string; notes: string };
   setForm: (value: { name: string; phone: string; email: string; notes: string }) => void;
   phoneMask: (value: string) => string;
   error: string | null;
+  /** Quando existe sessao, o horario ja nasce ligado a conta. */
+  clientEmail?: string;
 }) {
+  const logado = Boolean(clientEmail);
+
   return (
     <div>
       <h2 className="display text-2xl">Só falta você.</h2>
       <p className="mt-2 text-sm text-bone-dim">
-        Usamos o WhatsApp para confirmar. Sem spam, sem cadastro.
+        Usamos o WhatsApp para confirmar. Sem spam, sem senha.
       </p>
+
+      {logado ? (
+        <p className="mt-4 flex items-start gap-2 rounded-2xl border border-gold/30 bg-gold/[0.06] px-4 py-3 text-xs leading-relaxed text-bone">
+          <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-gold" />
+          <span>
+            Você está logado como <span className="text-gold">{clientEmail}</span>. Este horário vai
+            aparecer em <strong>Minha conta</strong> sozinho, com os pontos e o código de indicação.
+          </span>
+        </p>
+      ) : null}
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2">
         <label className="flex flex-col gap-1.5 text-sm">
@@ -586,17 +611,23 @@ function StepDetails({
           />
         </label>
 
-        <label className="flex flex-col gap-1.5 text-sm sm:col-span-2">
-          <span className="text-bone-dim">E-mail (opcional)</span>
-          <input
-            type="email"
-            value={form.email}
-            onChange={(e) => setForm({ ...form, email: e.target.value })}
-            autoComplete="email"
-            className="rounded-xl border border-line bg-ink px-4 py-3 text-bone placeholder:text-bone-dim/50 focus:border-gold focus:outline-none"
-            placeholder="você@email.com"
-          />
-        </label>
+        {logado ? null : (
+          <label className="flex flex-col gap-1.5 text-sm sm:col-span-2">
+            <span className="text-bone-dim">E-mail (opcional)</span>
+            <input
+              type="email"
+              value={form.email}
+              onChange={(e) => setForm({ ...form, email: e.target.value })}
+              autoComplete="email"
+              className="rounded-xl border border-line bg-ink px-4 py-3 text-bone placeholder:text-bone-dim/50 focus:border-gold focus:outline-none"
+              placeholder="você@email.com"
+            />
+            <span className="text-xs leading-relaxed text-bone-dim/70">
+              Use o mesmo e-mail da sua conta Google: aí seus horários aparecem sozinhos em “Minha
+              conta”, sem precisar confirmar o WhatsApp depois.
+            </span>
+          </label>
+        )}
 
         <label className="flex flex-col gap-1.5 text-sm sm:col-span-2">
           <span className="text-bone-dim">Observação (opcional)</span>
@@ -639,6 +670,10 @@ function SuccessCard({
   const date = new Date(created.startsAt);
   const local = new Date(date.getTime() - 3 * 60 * 60 * 1000);
   const dateLabel = `${String(local.getUTCDate()).padStart(2, "0")}/${String(local.getUTCMonth() + 1).padStart(2, "0")} às ${label}`;
+
+  // A origem so existe no navegador: `useSyncExternalStore` serve o HTML do
+  // servidor vazio e atualiza depois da hidratacao, sem divergencia.
+  const origem = useSyncExternalStore(semInscricao, lerOrigem, () => "");
 
   const whatsappText = encodeURIComponent(
     `Olá! Acabei de reservar na Duh Corte: ${serviceName} com ${professionalName} em ${dateLabel}. Meu código é ${created.id.slice(0, 8)}.`,
@@ -717,7 +752,7 @@ function SuccessCard({
                 <p className="display mt-1 text-lg text-bone">{created.loyalty.referralCode}</p>
                 <a
                   href={`https://wa.me/?text=${encodeURIComponent(
-                    `Corte na Duh Corte Barbearia? Use meu código ${created.loyalty.referralCode} e ganhe 30 pontos no seu primeiro corte: ${typeof window === "undefined" ? "" : window.location.origin}/agendar?ref=${created.loyalty.referralCode}`,
+                    `Corte na Duh Corte Barbearia? Use meu código ${created.loyalty.referralCode} e ganhe 30 pontos no seu primeiro corte: ${origem}/agendar?ref=${created.loyalty.referralCode}`,
                   )}`}
                   target="_blank"
                   rel="noreferrer noopener"
@@ -736,12 +771,18 @@ function SuccessCard({
             className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-gold px-6 py-3.5 text-sm font-semibold text-ink sm:w-auto"
           >
             <CalendarDays className="size-4" />
-            {logado ? "Ver meus horários" : "Entrar e acompanhar"}
+            {logado ? "Ver meus horários" : "Entrar com Google"}
           </a>
-          <p className="mt-2 text-xs text-bone-dim">
-            {logado
-              ? "Este horário já aparece na sua conta."
-              : "Entre com o Google para ver este e os próximos horários a qualquer momento."}
+          <p className="mx-auto mt-2 max-w-sm text-xs leading-relaxed text-bone-dim">
+            {logado ? (
+              "Este horário já aparece na sua conta, com pontos e código de indicação."
+            ) : (
+              <>
+                Sem senha: no primeiro acesso, confirme o WhatsApp{" "}
+                <span className="text-bone">{phone}</span> — já deixamos o campo pronto. Depois,
+                seus horários aparecem sozinhos.
+              </>
+            )}
           </p>
         </div>
 

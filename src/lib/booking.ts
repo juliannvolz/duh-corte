@@ -19,11 +19,11 @@ import {
   podeVincularPorTelefone,
   type SessaoCliente,
 } from "@/lib/customer-identity";
-import { normalizarTelefoneBR } from "@/lib/phone";
+import { normalizarTelefoneBR, mascararEmail } from "@/lib/phone";
 
 /** Erro interno: o WhatsApp informado pertence a OUTRA conta social. */
 class VinculoConflitante extends Error {
-  constructor() {
+  constructor(readonly emailDono: string | null = null) {
     super("WhatsApp ligado a outra conta");
     this.name = "VinculoConflitante";
   }
@@ -321,7 +321,7 @@ export async function createAppointment(
 
       // conflito = este WhatsApp ja pertence a OUTRA conta social
       if (googleId && existente?.googleId && existente.googleId !== googleId) {
-        throw new VinculoConflitante();
+        throw new VinculoConflitante(existente.email);
       }
 
       // so vira "dono" quando o e-mail do cadastro nao contradiz a sessao
@@ -437,11 +437,13 @@ export async function createAppointment(
     };
   } catch (error) {
     if (error instanceof VinculoConflitante) {
+      const dono = error.emailDono ? mascararEmail(error.emailDono) : null;
       return {
         ok: false,
         code: "CONTA",
-        error:
-          "Esse WhatsApp já está ligado a outra conta. Use outro número ou fale com a barbearia.",
+        error: dono
+          ? `Esse WhatsApp já está ligado à conta ${dono}. Entre com ela para ver seus horários — ou fale com a barbearia para juntar tudo.`
+          : "Esse WhatsApp já está ligado a outra conta. Entre com ela ou fale com a barbearia para juntar tudo.",
       };
     }
 
