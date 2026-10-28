@@ -65,6 +65,23 @@ export function normalizarEmail(email: string): string {
 }
 
 /**
+ * `googleId` gerado pelo proprio app, nao vindo de provedor social.
+ *
+ * O Auth.js (JWT) gera `crypto.randomUUID()` como id de sessao quando o
+ * provedor nao entrega `sub`. Esse id entra no cadastro como `googleId` e,
+ * na volta do login social DE VERDADE (sub do Google, numerico), o dono
+ * legitimo era tratado como "outra conta" e perderia a propria agenda.
+ *
+ * Formato: UUID v4. Nenhum provedor usa esse formato como id
+ * (Google = ~21 digitos numericos; Apple = `sub` com pontos; Facebook = numerico).
+ */
+const UUID_V4 = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+export function idGeradoLocalmente(googleId: string | null | undefined): boolean {
+  return Boolean(googleId && UUID_V4.test(googleId));
+}
+
+/**
  * O vinculo automatico (sem o cliente digitar o telefone) so acontece quando o
  * cadastro nao tem e-mail ou quando o e-mail e o mesmo da sessao.
  */
@@ -86,7 +103,14 @@ export function podeReivindicarPorTelefone(
   registro: { googleId: string | null; email: string | null },
   sessao: SessaoCliente,
 ): boolean {
-  if (registro.googleId && registro.googleId !== sessao.id) return false;
+  if (
+    registro.googleId &&
+    registro.googleId !== sessao.id &&
+    // id gerado localmente nao pertence a ninguem de verdade: pode ser retomado
+    !idGeradoLocalmente(registro.googleId)
+  ) {
+    return false;
+  }
   return true;
 }
 
@@ -126,7 +150,11 @@ async function gravarVinculo(customerId: string, session: SessaoCliente): Promis
 
   const data: { email?: string; googleId?: string } = {};
 
-  if (session.id && !customer.googleId) data.googleId = session.id;
+  // `googleId` gerado localmente (sessao sem provedor real) nao e dono de
+  // verdade: o login social com o MESMO e-mail prova a posse e substitui.
+  const semDono = !customer.googleId || idGeradoLocalmente(customer.googleId);
+
+  if (session.id && semDono) data.googleId = session.id;
   if (session.email && !customer.email) data.email = normalizarEmail(session.email);
 
   if (Object.keys(data).length === 0) return false;
@@ -183,6 +211,8 @@ export async function clienteDaSessao(
     // O e-mail nao e unico no banco (a mesma pessoa pode ter reservado com dois
     // numeros), entao escolhemos: o cadastro que ja e desta conta; senao o de
     // agendamento mais recente entre os que ainda nao tem dono.
+    // Cadastro com googleId GERADO localmente (sessao sem provedor real) conta
+    // como sem dono: o login social do mesmo e-mail recupera a posse.
     const candidatos = await prisma.customer.findMany({
       where: { email },
       include: {
@@ -190,7 +220,9 @@ export async function clienteDaSessao(
       },
     });
 
-    const elegiveis = candidatos.filter((c) => !c.googleId || c.googleId === session.id);
+    const elegiveis = candidatos.filter(
+      (c) => !c.googleId || c.googleId === session.id || idGeradoLocalmente(c.googleId),
+    );
     // o e-mail existe, mas todos os cadastros pertencem a outra conta social
     if (candidatos.length > 0 && elegiveis.length === 0) return null;
 

@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   customerIdFromPhone,
   formaDoVinculo,
+  idGeradoLocalmente,
   podeReivindicarPorTelefone,
   podeVincularPorTelefone,
 } from "@/lib/customer-identity";
@@ -64,6 +65,44 @@ describe("podeReivindicarPorTelefone", () => {
     expect(
       podeReivindicarPorTelefone({ googleId: null, email: "eserdeoliveira579@gmail.com" }, sessao),
     ).toBe(true);
+  });
+
+  it("googleId GERADO localmente nao bloqueia: o dono de verdade retoma (bug do 28/10)", () => {
+    // a reserva gravou o uuid da sessao efemera como googleId; ao voltar pelo
+    // Google real (sub numerico), o cliente nao podia ver os proprios horarios
+    expect(
+      podeReivindicarPorTelefone(
+        {
+          googleId: "7806381f-1b3e-4504-b540-07f7a7810a8c",
+          email: "juliannvolz@gmail.com",
+        },
+        sessao,
+      ),
+    ).toBe(true);
+  });
+});
+
+describe("idGeradoLocalmente", () => {
+  it("reconhece o uuid v4 gerado pelo Auth.js", () => {
+    expect(idGeradoLocalmente("7806381f-1b3e-4504-b540-07f7a7810a8c")).toBe(true);
+    expect(idGeradoLocalmente("ABCDEF01-2345-6789-ABCD-EF0123456789")).toBe(true);
+  });
+
+  it("ids reais de provedor sao donos legitimos", () => {
+    // Google: ~21 digitos numericos
+    expect(idGeradoLocalmente("109872641245260919824")).toBe(false);
+    // Apple: sub com pontos
+    expect(idGeradoLocalmente("001241.abc123def456.7890")).toBe(false);
+    // Facebook: numerico curto
+    expect(idGeradoLocalmente("1234567890")).toBe(false);
+    // nosso formato interno de teste
+    expect(idGeradoLocalmente("google-123")).toBe(false);
+  });
+
+  it("rejeita vazio", () => {
+    expect(idGeradoLocalmente(null)).toBe(false);
+    expect(idGeradoLocalmente(undefined)).toBe(false);
+    expect(idGeradoLocalmente("")).toBe(false);
   });
 });
 
