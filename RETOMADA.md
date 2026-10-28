@@ -1,4 +1,4 @@
-# RETOMADA — Duh Corte Barbearia (estado em 22/10/2026)
+# RETOMADA — Duh Corte Barbearia (estado em 28/10/2026)
 
 > Ponto de partida do próximo dia. O topo diz o que está pronto; o resto, como continuar.
 
@@ -36,8 +36,16 @@ reserva/cancelamento e **inócuo sem configuração**. No dia da assinatura bast
 | Área do cliente | `/minha-conta` | horários, pontos, indicação, cancelar, `.ics`, WhatsApp |
 | Demo local | `http://localhost:3000` | SQLite local |
 
-**Infra:** Vercel `duh-corte` (escopo `juliannvolz-6059s-projects`) · Neon Postgres
-`neon-aero-ferry` · região `gru1` · domínio próprio ainda não definido.
+**Infra:** Vercel `duh-corte` (escopo `juliannvolz-6059s-projects`) · Neon **próprio**:
+ projeto dedicado, host pooler `ep-fancy-fog-b7vou30n-pooler.c-13.us-east-1.aws.neon.tech/neondb`
+ (store `duh-corte-db`, integrado à Vercel com prefixo `STORAGE_` nos ambientes Preview/Development).
+ O banco compartilhado antigo (`neon-aqua-bell`, host `ep-aged-cherry`) **não** é mais o do duh-corte:
+ o schema `public` foi dropado em 28/10 e lá sobram apenas `crm` (7 tabelas) e `neon_auth` (9),
+ que são os dados do **CRM-DOC2B** (crm-doc2b.vercel.app) — não mexer. Backup do estado
+ pré-drop em `backups/neon-2026-10-28T10-51-14-426Z.json`.
+ Migração de 21 tabelas validada (contagens 21/21) e smoke 10/10 em produção.
+ A partir de agora o banco usa **prisma migrate** (baseline `20261028120000_init`; mudança de
+ schema = criar migração + `prisma migrate deploy` apontando `DATABASE_URL` do Neon próprio).
 
 ---
 
@@ -94,13 +102,22 @@ Cliente                    Painel (/admin)                 Banco
 npm run dev                      # desenvolvimento
 npm run build && npm start       # produção local
 npm run db:local                 # schema sqlite + Prisma Client
-npm run db:producao              # aplica o schema no Neon  ← pendente
+npm run db:producao              # aplica schema via db push (legado; normal e usar migrate deploy)
 npm run pdf:gerar                # regera os PDFs dos entregáveis
 
 # qualidade
 npm run typecheck                # 0 erros
-npm run lint                     # 0 erros (15 avisos históricos)
-npx vitest run                   # 73 testes
+npm run lint                     # 0 erros, ~17 avisos historicos em scripts/
+npx vitest run                   # 109 testes (rodar com schema sqlite: npm run db:local antes)
+
+# fumaça (deploy/producao)
+npm run qa:fumaca                 # fetch puro contra https://duh-corte.vercel.app
+node scripts/backup-neon.mjs      # dump json do banco (le .env.vercel.local)
+
+# banco proprio (Neon duh-corte-db)
+npm run db:local                  # dev local: schema sqlite + client (tree fica "M schema.prisma")
+npm run db:postgres               # estado commitado/producao: schema postgres
+npx prisma migrate deploy         # aplica migracoes pendentes (DATABASE_URL do Neon proprio)
 
 # QA
 node scripts/qa.mjs               # E2E público + admin (local)
