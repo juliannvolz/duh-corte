@@ -15,6 +15,7 @@
     "images:process": "tsx scripts/process-images.ts",
     "data:collect": "node scripts/collect.mjs && node scripts/collect-posts.mjs",
     "qa:screens": "node scripts/qa-screens.mjs",
+    "qa:fumaca": "node scripts/fumaca.mjs",
     "postinstall": "prisma generate",
     "pdf:gerar": "tsx scripts/gerar-pdf.mts",
     "db:postgres": "tsx scripts/prepare-db.mts postgres",
@@ -40,6 +41,7 @@
     "zod": "^4.1.12"
   },
   "devDependencies": {
+    "@playwright/test": "^1.64.1",
     "@tailwindcss/turbopack": "^4",
     "@types/node": "^24.19.2",
     "@types/react": "^19",

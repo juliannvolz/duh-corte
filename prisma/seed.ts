@@ -23,6 +23,21 @@ import {
 const prisma = new PrismaClient();
 
 async function main() {
+  // Trava de seguranca: o seed apaga tudo antes de recriar. Se ja existir
+  // movimento real de clientes, ele aborta em vez de destruir a agenda.
+  if (process.env.SEED_FORCE !== "1") {
+    const [agendamentos, clientes] = await Promise.all([
+      prisma.appointment.count(),
+      prisma.customer.count(),
+    ]);
+    if (agendamentos > 0 || clientes > 0) {
+      throw new Error(
+        `Seed abortado: o banco tem ${agendamentos} agendamento(s) e ${clientes} cliente(s).\n` +
+          "O seed apaga TUDO antes de recriar. Se for proposital, rode com SEED_FORCE=1.",
+      );
+    }
+  }
+
   await prisma.payment.deleteMany();
   await prisma.subscription.deleteMany();
   await prisma.appointment.deleteMany();
