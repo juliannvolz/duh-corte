@@ -1,32 +1,79 @@
 [
   {
-    "nome": "Corte",
-    "precoMensal": 99.9,
+    "nome": "Star Corte",
+    "nivel": "Star",
+    "precoMensal": 89.9,
     "beneficios": [
-      "Cortes ilimitados no mês",
+      "Cortes inclusos no mês",
       "Agendamento prioritário",
       "Preço fixo, sem surpresa"
     ],
-    "status": "referência — tabela oficial em validação com a barbearia"
+    "status": "confirmado — tabela oficial da barbearia"
   },
   {
-    "nome": "Corte + Barba",
-    "precoMensal": 159,
+    "nome": "Star Barba",
+    "nivel": "Star",
+    "precoMensal": 99.9,
     "beneficios": [
-      "Cortes e barbas ilimitados",
+      "Barbas inclusas no mês",
+      "Acesso prioritário à agenda",
+      "Finalização inclusa"
+    ],
+    "status": "confirmado — tabela oficial da barbearia"
+  },
+  {
+    "nome": "Star Combo",
+    "nivel": "Star",
+    "precoMensal": 199,
+    "beneficios": [
+      "Cortes e barbas inclusos no mês",
       "Agendamento prioritário",
       "Descontos em produtos da casa"
     ],
-    "status": "referência — tabela oficial em validação com a barbearia"
+    "status": "confirmado — tabela oficial da barbearia"
   },
   {
-    "nome": "Barba",
-    "precoMensal": 119,
+    "nome": "Essencial Corte",
+    "nivel": "Essencial",
+    "precoMensal": 127,
     "beneficios": [
-      "Barbas ilimitadas",
-      "Acesso prioritário à agenda",
-      "Assistência de finalização"
+      "Cortes inclusos no mês",
+      "Agendamento prioritário",
+      "Preço fixo, sem surpresa"
     ],
-    "status": "referência — tabela oficial em validação com a barbearia"
+    "status": "confirmado — tabela oficial da barbearia"
+  },
+  {
+    "nome": "Essencial Barba",
+    "nivel": "Essencial",
+    "precoMensal": 137,
+    "beneficios": [
+      "Barbas inclusas no mês",
+      "Acesso prioritário à agenda",
+      "Finalização inclusa"
+    ],
+    "status": "confirmado — tabela oficial da barbearia"
+  },
+  {
+    "nome": "Essencial Combo",
+    "nivel": "Essencial",
+    "precoMensal": 237,
+    "beneficios": [
+      "Cortes e barbas inclusos no mês",
+      "Agendamento prioritário",
+      "Descontos em produtos da casa"
+    ],
+    "status": "confirmado — tabela oficial da barbearia"
+  },
+  {
+    "nome": "One",
+    "nivel": "One",
+    "precoMensal": 47,
+    "beneficios": [
+      "1 serviço incluso no mês",
+      "Acesso à agenda da casa",
+      "Preço fixo, sem surpresa"
+    ],
+    "status": "confirmado — tabela oficial da barbearia"
   }
 ]

@@ -104,11 +104,13 @@ export type ServiceCategory = {
 };
 
 export const serviceCategories: ServiceCategory[] = [
-  { id: "cabelo", name: "Cabelo", blurb: "Degradê, social, navalhado e finalização, com atendimento individual.", order: 1 },
-  { id: "barba", name: "Barba", blurb: "Toalha quente, navalha afiada e acabamento preciso.", order: 2 },
+  { id: "cabelo", name: "Cabelo", blurb: "Degradê, social, pézinho e finalização, com atendimento individual.", order: 1 },
+  { id: "barba", name: "Barba", blurb: "Toalha quente, navalha afiada, camuflagem e acabamento preciso.", order: 2 },
   { id: "combo", name: "Combos", blurb: "Corte + barba + sobrancelha na mesma cadeira.", order: 3 },
-  { id: "infantil", name: "Infantil", blurb: "Corte infantil com paciência e do jeito da criança.", order: 4 },
-  { id: "extras", name: "Extras", blurb: "Finalização, hidratação e produtos da casa.", order: 5 },
+  { id: "quimica", name: "Química e Coloração", blurb: "Tintura, selagem e platinado — valor a partir, conforme o efeito escolhido.", order: 4 },
+  { id: "estetica", name: "Estética", blurb: "Limpeza de pele e depilação com material descartável e higiene rigorosa.", order: 5 },
+  { id: "infantil", name: "Infantil", blurb: "Corte infantil com paciência e do jeito da criança.", order: 6 },
+  { id: "extras", name: "Extras", blurb: "Finalização, hidratação e produtos da casa.", order: 7 },
 ];
 
 export type ServiceSeed = {
@@ -124,18 +126,18 @@ export type ServiceSeed = {
 };
 
 /**
- * Preços = referência de mercado local (Jaraguá do Sul) até a tabela oficial do cliente.
- * `priceConfirmed: false` -> o site sinaliza "tabela em validação" e o admin lista a pendencia.
+ * Tabela oficial confirmada com a barbearia (out/2026): `priceConfirmed: true`.
+ * Serviços fora da placa continuam com `priceConfirmed: false` (referência local).
  */
 export const services: ServiceSeed[] = [
   {
     id: "corte-social",
-    name: "Corte Social",
+    name: "Corte",
     description: "Corte clássico, sem desenhos, respeitando a linha do cabelo e o formato do rosto.",
     categoryId: "cabelo",
     durationMin: 40,
-    priceCents: 4500,
-    priceConfirmed: false,
+    priceCents: 4000,
+    priceConfirmed: true,
     featured: false,
     style: "social",
   },
@@ -146,7 +148,7 @@ export const services: ServiceSeed[] = [
     categoryId: "cabelo",
     durationMin: 45,
     priceCents: 5000,
-    priceConfirmed: false,
+    priceConfirmed: true,
     featured: true,
     style: "degrade",
   },
@@ -167,9 +169,27 @@ export const services: ServiceSeed[] = [
     description: "Toalha quente, navalha afiada, bigode alinhado e finalização.",
     categoryId: "barba",
     durationMin: 30,
-    priceCents: 4000,
-    priceConfirmed: false,
+    priceCents: 4500,
+    priceConfirmed: true,
     featured: true,
+  },
+  {
+    id: "camuflagem-barba",
+    name: "Camuflagem de Barba",
+    description: "Disfarce os efeitos de tom da barba com produto da casa.",
+    categoryId: "barba",
+    durationMin: 20,
+    priceCents: 4000,
+    priceConfirmed: true,
+  },
+  {
+    id: "acabamento-barba",
+    name: "Acabamento de Barba",
+    description: "Contorno da barba alinhado na navalha, sem barbear completa.",
+    categoryId: "barba",
+    durationMin: 15,
+    priceCents: 2500,
+    priceConfirmed: true,
   },
   {
     id: "sobrancelha",
@@ -177,8 +197,8 @@ export const services: ServiceSeed[] = [
     description: "Design e alinhamento preciso na navalha.",
     categoryId: "barba",
     durationMin: 15,
-    priceCents: 2000,
-    priceConfirmed: false,
+    priceCents: 1000,
+    priceConfirmed: true,
   },
   {
     id: "corte-barba",
@@ -186,9 +206,81 @@ export const services: ServiceSeed[] = [
     description: "O combo mais pedido: visual completo em uma única visita.",
     categoryId: "combo",
     durationMin: 70,
-    priceCents: 8000,
-    priceConfirmed: false,
+    priceCents: 9000,
+    priceConfirmed: true,
     featured: true,
+  },
+  {
+    id: "tintura",
+    name: "Tintura",
+    description: "Coloração completa do cabelo — valor a partir, conforme o efeito escolhido.",
+    categoryId: "quimica",
+    durationMin: 60,
+    priceCents: 8000,
+    priceConfirmed: true,
+  },
+  {
+    id: "selagem",
+    name: "Selagem",
+    description: "Alinhamento e brilho com efeito progressivo — valor a partir, conforme o comprimento.",
+    categoryId: "quimica",
+    durationMin: 75,
+    priceCents: 12000,
+    priceConfirmed: true,
+  },
+  {
+    id: "platinado",
+    name: "Platinado",
+    description: "Descoloração global com matização — valor a partir, conforme o comprimento.",
+    categoryId: "quimica",
+    durationMin: 120,
+    priceCents: 20000,
+    priceConfirmed: true,
+  },
+  {
+    id: "limpeza-de-pele",
+    name: "Limpeza de Pele",
+    description: "Higienização profunda do rosto com extração e finalização.",
+    categoryId: "estetica",
+    durationMin: 40,
+    priceCents: 4500,
+    priceConfirmed: true,
+  },
+  {
+    id: "depilacao-nariz",
+    name: "Depilação de Nariz",
+    description: "Remoção rápida com cera descartável.",
+    categoryId: "estetica",
+    durationMin: 10,
+    priceCents: 2000,
+    priceConfirmed: true,
+  },
+  {
+    id: "depilacao-orelha",
+    name: "Depilação de Orelha",
+    description: "Remoção rápida com cera descartável.",
+    categoryId: "estetica",
+    durationMin: 10,
+    priceCents: 2000,
+    priceConfirmed: true,
+  },
+  {
+    id: "depilacao-nariz-orelha",
+    name: "Depilação (Nariz e Orelha)",
+    description: "Nariz e orelha na mesma sessão, com cera descartável.",
+    categoryId: "estetica",
+    durationMin: 20,
+    priceCents: 3500,
+    priceConfirmed: true,
+  },
+  {
+    id: "pezinho",
+    name: "Pézinho",
+    description: "Acabamento na nuca e nas têmporas entre um corte e outro.",
+    categoryId: "cabelo",
+    durationMin: 15,
+    priceCents: 2000,
+    priceConfirmed: true,
   },
   {
     id: "corte-barba-sobrancelha",
@@ -273,34 +365,74 @@ export type PlanSeed = {
   priceConfirmed: boolean;
 };
 
+/**
+ * Planos do Clube do Assinante conforme placa oficial (out/2026). O plano por extenso
+ * leva o nome do nível (Star / Essencial / One) na frente — o frontend agrupa por nível.
+ */
 export const plans: PlanSeed[] = [
   {
-    id: "corte",
-    name: "Corte",
+    id: "plano-star-corte",
+    name: "Star Corte",
+    priceCents: 8990,
+    period: "mensal",
+    description: "Nível Star: cortes em dia todos os meses.",
+    perks: ["Cortes inclusos no mês", "Agendamento prioritário", "Preço fixo, sem surpresa"],
+    priceConfirmed: true,
+  },
+  {
+    id: "plano-star-barba",
+    name: "Star Barba",
     priceCents: 9990,
     period: "mensal",
-    description: "Para quem não deixa o visual passar do prazo.",
-    perks: ["Cortes ilimitados no mês", "Agendamento prioritário", "Preço fixo, sem surpresa"],
-    priceConfirmed: false,
+    description: "Nível Star: barba sempre alinhada.",
+    perks: ["Barbas inclusas no mês", "Acesso prioritário à agenda", "Finalização inclusa"],
+    priceConfirmed: true,
   },
   {
-    id: "corte-barba",
-    name: "Corte + Barba",
-    priceCents: 15900,
+    id: "plano-star-combo",
+    name: "Star Combo",
+    priceCents: 19900,
     period: "mensal",
-    description: "O pacote completo: cabelo e barba sempre no ponto.",
-    perks: ["Cortes e barbas ilimitados", "Agendamento prioritário", "Descontos em produtos da casa"],
+    description: "Nível Star completo: cabelo e barba na mesma assinatura.",
+    perks: ["Cortes e barbas inclusos no mês", "Agendamento prioritário", "Descontos em produtos da casa"],
     highlight: true,
-    priceConfirmed: false,
+    priceConfirmed: true,
   },
   {
-    id: "barba",
-    name: "Barba",
-    priceCents: 11900,
+    id: "plano-essencial-corte",
+    name: "Essencial Corte",
+    priceCents: 12700,
     period: "mensal",
-    description: "Para quem cuida do detalhe todos os dias.",
-    perks: ["Barbas ilimitadas", "Acesso prioritário à agenda", "Assistência de finalização"],
-    priceConfirmed: false,
+    description: "Nível Essencial: o corte completo na agenda prioritária.",
+    perks: ["Cortes inclusos no mês", "Agendamento prioritário", "Preço fixo, sem surpresa"],
+    priceConfirmed: true,
+  },
+  {
+    id: "plano-essencial-barba",
+    name: "Essencial Barba",
+    priceCents: 13700,
+    period: "mensal",
+    description: "Nível Essencial: barba com acabamento mensal.",
+    perks: ["Barbas inclusas no mês", "Acesso prioritário à agenda", "Finalização inclusa"],
+    priceConfirmed: true,
+  },
+  {
+    id: "plano-essencial-combo",
+    name: "Essencial Combo",
+    priceCents: 23700,
+    period: "mensal",
+    description: "Nível Essencial completo: cabelo e barba sem limite de agenda.",
+    perks: ["Cortes e barbas inclusos no mês", "Agendamento prioritário", "Descontos em produtos da casa"],
+    priceConfirmed: true,
+  },
+  {
+    id: "plano-one",
+    name: "One",
+    priceCents: 4700,
+    period: "mensal",
+    description: "Nível One: a entrada no Clube, com um serviço por mês.",
+    perks: ["1 serviço incluso no mês", "Acesso à agenda da casa", "Preço fixo, sem surpresa"],
+    priceConfirmed: true,
   },
 ];
 

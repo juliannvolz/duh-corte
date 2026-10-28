@@ -3,11 +3,23 @@ import { ArrowUpRight, Check, Sparkles } from "lucide-react";
 import { Section, SectionHeading } from "@/components/ui/Section";
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/Reveal";
 import { getPlans } from "@/lib/content";
-import { business, formatBRL } from "@/lib/site";
+import { formatBRL } from "@/lib/site";
 
 export async function Plans() {
-  const plans = await getPlans();
-  const pending = plans.some((p) => !p.priceConfirmed);
+  const allPlans = await getPlans();
+  const pending = allPlans.some((p) => !p.priceConfirmed);
+
+  // Agrupa por nivel da placa: "Star ..." -> Plano Star, "Essencial ..." -> Plano Essencial, demais -> Plano One.
+  const tiers: { id: string; label: string; plans: typeof allPlans }[] = [
+    { id: "star", label: "Plano Start", plans: [] },
+    { id: "essencial", label: "Plano Essencial", plans: [] },
+    { id: "one", label: "Plano One", plans: [] },
+  ];
+  for (const plan of allPlans) {
+    const tier = plan.name.startsWith("Star") ? "star" : plan.name.startsWith("Essencial") ? "essencial" : "one";
+    tiers.find((t) => t.id === tier)?.plans.push(plan);
+  }
+  const tiersComPlanos = tiers.filter((t) => t.plans.length > 0);
 
   return (
     <Section id="planos" tone="ink2" className="overflow-hidden py-24 md:py-36">
@@ -33,8 +45,16 @@ export async function Plans() {
           </Reveal>
         ) : null}
 
-        <RevealGroup className="mt-16 grid gap-6 lg:grid-cols-3">
-          {plans.map((plan) => (
+        <div className="mt-16 space-y-14">
+          {tiersComPlanos.map((tier) => (
+            <div key={tier.id}>
+              <Reveal>
+                <h3 className="flex items-baseline gap-3 border-b border-line pb-3 display text-xl md:text-2xl">
+                  <span className="text-gold/70">{tier.label}</span>
+                </h3>
+              </Reveal>
+              <RevealGroup className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {tier.plans.map((plan) => (
             <RevealItem
               key={plan.id}
               className={`group relative flex flex-col justify-between overflow-hidden rounded-3xl border p-8 transition-colors duration-500 ${
@@ -88,7 +108,10 @@ export async function Plans() {
               </div>
             </RevealItem>
           ))}
-        </RevealGroup>
+              </RevealGroup>
+            </div>
+          ))}
+        </div>
       </div>
     </Section>
   );
